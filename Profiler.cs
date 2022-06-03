@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public static class Profiler
     {

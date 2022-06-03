@@ -1,6 +1,6 @@
 ﻿using UnityEngine.SceneManagement;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public class StartupSingleton<T> : SingletonComponent<T>
         where T : StartupSingleton<T>

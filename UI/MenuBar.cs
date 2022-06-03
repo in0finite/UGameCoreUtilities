@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 
     public class MenuBar : MonoBehaviour

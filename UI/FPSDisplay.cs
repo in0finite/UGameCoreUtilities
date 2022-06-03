@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 
-namespace SanAndreasUnity.Utilities {
+namespace UGameCore.Utilities {
 	
 	public class FPSDisplay : MonoBehaviour {
 

@@ -1,5 +1,5 @@
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 
 

@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     //Static class with extra functions
     public static class F

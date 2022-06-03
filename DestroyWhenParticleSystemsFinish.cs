@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 
     public class DestroyWhenParticleSystemsFinish : MonoBehaviour

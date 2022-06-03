@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 
 	public class CustomInput : MonoBehaviour

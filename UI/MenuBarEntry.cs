@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 
     public class MenuBarEntry : MonoBehaviour

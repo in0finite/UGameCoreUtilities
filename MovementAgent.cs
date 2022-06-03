@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public class MovementAgent : MonoBehaviour
     {

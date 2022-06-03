@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public class Stats
     {

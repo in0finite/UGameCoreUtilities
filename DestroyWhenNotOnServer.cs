@@ -2,7 +2,7 @@
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public class DestroyWhenNotOnServer : MonoBehaviour
     {

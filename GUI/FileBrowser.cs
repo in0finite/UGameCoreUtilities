@@ -445,7 +445,7 @@ public class FileBrowser {
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();
 
-		if (SanAndreasUnity.Utilities.GUIUtils.ButtonWithCalculatedSize("Cancel")) {
+		if (UGameCore.Utilities.GUIUtils.ButtonWithCalculatedSize("Cancel")) {
 			m_callback(null);
 		}
 
@@ -468,7 +468,7 @@ public class FileBrowser {
 
 		string selectButtonText = BrowserType == FileBrowserType.File ? "Select" : "Select current folder";
 
-		if (SanAndreasUnity.Utilities.GUIUtils.ButtonWithCalculatedSize (selectButtonText)) {
+		if (UGameCore.Utilities.GUIUtils.ButtonWithCalculatedSize (selectButtonText)) {
 			if (BrowserType == FileBrowserType.File) {
 				m_callback(Path.Combine(m_currentDirectory, m_files[m_selectedFile]));
 			} else {

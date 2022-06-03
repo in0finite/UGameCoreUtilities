@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public class CoroutineInfo
     {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public static class Tools
     {

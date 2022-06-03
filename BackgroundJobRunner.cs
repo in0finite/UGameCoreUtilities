@@ -6,7 +6,7 @@ using System.Threading;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public class BackgroundJobRunner
     {

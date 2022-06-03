@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     /// <summary>
     /// Container for <see cref="IState"/> objects.

@@ -1,4 +1,4 @@
-﻿namespace SanAndreasUnity.Utilities
+﻿namespace UGameCore.Utilities
 {
     public class Ref<T>
     {

@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Runtime.CompilerServices;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 	
 	public class AsyncLoader<TKey, TObj>

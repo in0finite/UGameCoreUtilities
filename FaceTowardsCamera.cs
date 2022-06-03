@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public class FaceTowardsCamera : MonoBehaviour
     {

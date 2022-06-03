@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine.UI;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 
 	public class OnScreenMessageManager : MonoBehaviour

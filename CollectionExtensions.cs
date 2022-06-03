@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public static class CollectionExtensions
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 
 	/// <summary>

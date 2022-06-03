@@ -1,6 +1,6 @@
 
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public enum WhenOnClient
     {

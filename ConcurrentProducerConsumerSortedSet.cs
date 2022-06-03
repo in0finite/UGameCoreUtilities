@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public class ConcurrentProducerConsumerSortedSet<T> : IProducerConsumerCollection<T>
     {

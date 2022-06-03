@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     /// <summary>
     /// Represents a subsection of another stream, starting from a certain offset and

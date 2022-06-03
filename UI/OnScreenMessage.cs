@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 
     public class OnScreenMessage : MonoBehaviour

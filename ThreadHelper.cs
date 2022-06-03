@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public static class ThreadHelper
     {

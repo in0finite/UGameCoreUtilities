@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
 
     public class CustomEventSystemForMixingIMGUIAndNewUI : EventSystem

@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 #endif
 using UnityEngine;
 
-namespace SanAndreasUnity.Utilities
+namespace UGameCore.Utilities
 {
     public static class EditorUtilityEx
     {
