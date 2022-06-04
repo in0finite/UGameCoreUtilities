@@ -125,6 +125,15 @@ namespace UGameCore.Utilities
         /// </summary>
         public static string FormatElapsedTime(double elapsedTimeSeconds, bool useMilliseconds = false)
         {
+            if (double.IsNaN(elapsedTimeSeconds))
+                return "NaN";
+
+            if (TimeSpan.MaxValue.TotalSeconds < elapsedTimeSeconds)
+                return double.PositiveInfinity.ToString(CultureInfo.InvariantCulture);
+
+            if (TimeSpan.MinValue.TotalSeconds > elapsedTimeSeconds)
+                return double.NegativeInfinity.ToString(CultureInfo.InvariantCulture);
+
             TimeSpan timeSpan = TimeSpan.FromSeconds(elapsedTimeSeconds);
             string format = (timeSpan.Days > 0 ? "d\\." : "") + (timeSpan.Hours > 0 || timeSpan.Days > 0 ? "hh\\:" : "") + "mm\\:ss" + (useMilliseconds ? "\\.fff" : "");
             return timeSpan.ToString(format, CultureInfo.InvariantCulture);
