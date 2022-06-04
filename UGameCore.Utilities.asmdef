@@ -1,6 +1,6 @@
 {
     "name": "UGameCore.Utilities",
-    "rootNamespace": "",
+    "rootNamespace": "UGameCore.Utilities",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
