@@ -4,18 +4,29 @@ namespace UGameCore.Utilities
 {
     public class ETAMeasurer
     {
-        System.Diagnostics.Stopwatch m_stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        float m_lastProgressPerc = 0f;
-        float m_changeInterval = 1f;
-        public string ETA { get; private set; } = "0";
-
-
-        public ETAMeasurer(float changeInterval)
+        private struct Sample
         {
-            if (float.IsNaN(changeInterval) || changeInterval < 0f)
-                throw new System.ArgumentOutOfRangeException(nameof(changeInterval));
+            public double time;
+            public float progress;
+        }
 
-            m_changeInterval = changeInterval;
+        readonly System.Diagnostics.Stopwatch m_totalTimeStopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+        Sample? m_lastChangedSample;
+        Sample m_currentSample;
+
+        readonly float m_sampleInterval = 1f;
+        double m_timeWhenSampled = 0;
+
+        public string ETA { get; private set; } = F.FormatElapsedTime(0);
+
+
+        public ETAMeasurer(float sampleInterval)
+        {
+            if (float.IsNaN(sampleInterval) || sampleInterval < 0f)
+                throw new System.ArgumentOutOfRangeException(nameof(sampleInterval));
+
+            m_sampleInterval = sampleInterval;
         }
 
         public void UpdateETA(float newProgressPerc)
@@ -25,28 +36,48 @@ namespace UGameCore.Utilities
 
             newProgressPerc = Mathf.Clamp01(newProgressPerc);
 
-            double elapsedSeconds = m_stopwatch.Elapsed.TotalSeconds;
+            double timeNow = m_totalTimeStopwatch.Elapsed.TotalSeconds;
 
-            if (elapsedSeconds < m_changeInterval)
+            double elapsedSeconds = timeNow - m_timeWhenSampled;
+
+            if (elapsedSeconds < m_sampleInterval)
                 return;
 
-            m_stopwatch.Restart();
+            m_timeWhenSampled = timeNow;
 
-            if (m_lastProgressPerc > newProgressPerc) // progress reduced
+            Sample newSample = new Sample { time = timeNow, progress = newProgressPerc };
+
+            if (newSample.progress <= m_currentSample.progress) // progress reduced or remained
             {
-                // don't change current ETA
-                m_lastProgressPerc = newProgressPerc;
+                // discard this sample, and update ETA text based on last changed sample and this one
+
+                if (!m_lastChangedSample.HasValue)
+                    return;
+
+                if (newSample.progress <= m_lastChangedSample.Value.progress) // progress reduced or remained even compared to last changed sample
+                    return;
+
+                this.ETA = GetETAText(m_lastChangedSample.Value, newSample);
                 return;
             }
 
-            double processedPerc = newProgressPerc - m_lastProgressPerc;
-            double percPerSecond = processedPerc / elapsedSeconds;
+            // progress increased
 
-            double percLeft = 1.0 - newProgressPerc;
-            double secondsLeft = percLeft / percPerSecond;
-            this.ETA = F.FormatElapsedTime(secondsLeft);
+            this.ETA = GetETAText(m_currentSample, newSample);
 
-            m_lastProgressPerc = newProgressPerc;
+            m_lastChangedSample = m_currentSample;
+            m_currentSample = newSample;
+        }
+
+        static string GetETAText(Sample previousSample, Sample currentSample)
+        {
+            double progressDiff = currentSample.progress - previousSample.progress;
+            double timeDiff = currentSample.time - previousSample.time;
+            double progressPerSecond = progressDiff / timeDiff;
+
+            double progressLeft = 1.0 - currentSample.progress;
+            double secondsLeft = progressLeft / progressPerSecond;
+            return F.FormatElapsedTime(secondsLeft);
         }
     }
 }
