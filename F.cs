@@ -126,7 +126,7 @@ namespace UGameCore.Utilities
         public static string FormatElapsedTime(double elapsedTimeSeconds, bool useMilliseconds = false)
         {
             TimeSpan timeSpan = TimeSpan.FromSeconds(elapsedTimeSeconds);
-            string format = (timeSpan.Days > 0 ? "d\\." : "") + (timeSpan.Hours > 0 ? "hh\\:" : "") + "mm\\:ss" + (useMilliseconds ? "\\.fff" : "");
+            string format = (timeSpan.Days > 0 ? "d\\." : "") + (timeSpan.Hours > 0 || timeSpan.Days > 0 ? "hh\\:" : "") + "mm\\:ss" + (useMilliseconds ? "\\.fff" : "");
             return timeSpan.ToString(format, CultureInfo.InvariantCulture);
         }
 
