@@ -51,13 +51,12 @@ namespace UGameCore.Utilities
             {
                 // discard this sample, and update ETA text based on last changed sample and this one
 
-                if (!m_lastChangedSample.HasValue)
+                Sample previousSample = m_lastChangedSample ?? new Sample(); // if last sample does not exist, use 'starting' sample
+
+                if (newSample.progress <= previousSample.progress) // progress reduced or remained even compared to last changed sample
                     return;
 
-                if (newSample.progress <= m_lastChangedSample.Value.progress) // progress reduced or remained even compared to last changed sample
-                    return;
-
-                this.ETA = GetETAText(m_lastChangedSample.Value, newSample);
+                this.ETA = GetETAText(previousSample, newSample);
                 return;
             }
 
