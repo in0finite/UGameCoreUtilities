@@ -436,7 +436,7 @@ namespace UGameCore.Utilities
             while (obj.transform.parent != null)
             {
                 obj = obj.transform.parent.gameObject;
-                path = "/" + obj.name + path;
+                path = obj.name + "/" + path;
             }
             return path;
         }
