@@ -24,6 +24,22 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static T SingleOr<T>(this IEnumerable<T> enumerable, T defaultValue)
+        {
+            if (enumerable == null)
+                throw new ArgumentNullException(nameof(enumerable));
+
+            try
+            {
+                // use Single() because it has optimizations if IEnumerable is ICollection, etc ...
+                return enumerable.Single();
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
+
         public static int FindIndex<T>(this IEnumerable<T> enumerable, System.Predicate<T> predicate)
         {
             int i = 0;
