@@ -40,5 +40,23 @@ namespace UGameCore.Utilities
         {
             return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
         }
+
+        public static Vector3 Scaled(this Vector3 v, Vector3 other)
+        {
+            Vector3 result = v;
+            result.Scale(other);
+            return result;
+        }
+
+        public static Vector3 WithValueAtIndex(this Vector3 vec3, int index, float value)
+        {
+            vec3[index] = value;
+            return vec3;
+        }
+
+        public static Vector3Int IsLess(this Vector3 v, Vector3 other)
+        {
+            return new Vector3Int(v.x < other.x ? 1 : 0, v.y < other.y ? 1 : 0, v.z < other.z ? 1 : 0);
+        }
     }
 }
