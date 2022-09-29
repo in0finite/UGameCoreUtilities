@@ -135,6 +135,16 @@ namespace UGameCore.Utilities
             return array;
         }
 
+        public static T[] ToArrayOrEmpty<T>(this ICollection<T> collection)
+        {
+            int count = collection.Count;
+            if (count == 0)
+                return Array.Empty<T>();
+            T[] array = new T[count];
+            collection.CopyTo(array, 0);
+            return array;
+        }
+
         public static IEnumerable<T> AppendIf<T>(this IEnumerable<T> enumerable, bool condition, T element)
         {
             return condition ? enumerable.Append(element) : enumerable;
