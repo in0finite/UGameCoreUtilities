@@ -57,5 +57,27 @@ namespace UGameCore.Utilities
 			}
 			return path;
 		}
+
+		public static void SetLayerRecursive(this GameObject go, int Layer)
+		{
+			go.layer = Layer;
+
+			for (int i = 0; i < go.transform.childCount; i++)
+			{
+				go.transform.GetChild(i).gameObject.SetLayerRecursive(Layer);
+			}
+		}
+
+		public static void SetLayerRecursive(this GameObject go, string layer)
+		{
+			var layerint = LayerMask.NameToLayer(layer);
+			if (layerint == 0)
+			{
+				Debug.LogWarning("SetLayerRecursive: couldn't find layer: " + layer);
+				return;
+			}
+
+			go.SetLayerRecursive(layerint);
+		}
 	}
 }

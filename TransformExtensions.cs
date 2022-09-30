@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7,21 +6,6 @@ namespace UGameCore.Utilities
 {
     public static class TransformExtensions
     {
-        public static void MakeChild(this Transform parent, GameObject[] children)
-        {
-            MakeChild(parent, children, null);
-        }
-
-        //Make the game objects children of the parent.
-        public static void MakeChild(this Transform parent, GameObject[] children, Action<Transform, GameObject> actionPerLoop)
-        {
-            foreach (GameObject child in children)
-            {
-                child.transform.parent = parent;
-                if (actionPerLoop != null) actionPerLoop(parent, child);
-            }
-        }
-
         public static IEnumerable<Transform> GetAllParents(this Transform tr)
         {
             Transform currentParent = tr.parent;
@@ -70,6 +54,20 @@ namespace UGameCore.Utilities
                 array[i] = tr.GetChild(i);
             }
             return array;
+        }
+
+        public static Transform FindChildRecursive(this Transform transform, string strName)
+        {
+            if (transform.name.Equals(strName, System.StringComparison.InvariantCultureIgnoreCase))
+                return transform;
+
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                var tran = transform.GetChild(i).FindChildRecursive(strName);
+                if (tran) return tran;
+            }
+
+            return null;
         }
 
         public static void SetY(this Transform t, float yPos)
