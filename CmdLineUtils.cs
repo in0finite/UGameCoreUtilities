@@ -1,4 +1,6 @@
-﻿namespace UGameCore.Utilities
+﻿using System.Globalization;
+
+namespace UGameCore.Utilities
 {
 
     public class CmdLineUtils
@@ -49,36 +51,29 @@
             }
         }
 
-        [System.Obsolete]
-        public static bool GetArgument(string argName, ref string argValue)
+        public static string GetStringArgumentOrDefault(string argName, string defaultValue)
         {
-            string value;
-            if (TryGetStringArgument(argName, out value))
-            {
-                argValue = value;
-                return true;
-            }
-            
-            return false;
-        }
-
-        [System.Obsolete]
-        public static bool GetUshortArgument(string argName, ref ushort argValue)
-        {
-            if (TryGetUshortArgument(argName, out ushort value))
-            {
-                argValue = value;
-                return true;
-            }
-
-            return false;
+            if (TryGetStringArgument(argName, out string value))
+                return value;
+            return defaultValue;
         }
 
         public static bool TryGetUshortArgument(string argName, out ushort argValue)
         {
             argValue = 0;
-            return TryGetStringArgument(argName, out string stringValue)
-                && ushort.TryParse(stringValue, out argValue);
+
+            if (!TryGetStringArgument(argName, out string stringValue))
+                return false;
+
+            argValue = ushort.Parse(stringValue, CultureInfo.InvariantCulture);
+            return true;
+        }
+
+        public static ushort GetUshortArgumentOrDefault(string argName, ushort defaultValue)
+        {
+            if (TryGetUshortArgument(argName, out ushort value))
+                return value;
+            return defaultValue;
         }
 
         public static bool HasArgument(string argName)
