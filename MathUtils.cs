@@ -41,11 +41,31 @@ namespace UGameCore.Utilities
             return new Vector3(Mathf.Abs(v.x), Mathf.Abs(v.y), Mathf.Abs(v.z));
         }
 
+        public static Vector2 AsAbsolute(this Vector2 vec)
+        {
+            return new Vector2(Mathf.Abs(vec.x), Mathf.Abs(vec.y));
+        }
+
         public static Vector3 Scaled(this Vector3 v, Vector3 other)
         {
             Vector3 result = v;
             result.Scale(other);
             return result;
+        }
+
+        public static Vector3 Inverted(this Vector3 vec3)
+        {
+            return new Vector3(1.0f / vec3.x, 1.0f / vec3.y, 1.0f / vec3.z);
+        }
+
+        public static Vector2 ToVec2WithXAndZ(this Vector3 vec3)
+        {
+            return new Vector2(vec3.x, vec3.z);
+        }
+
+        public static Vector3 ToVec3XZ(this Vector2 vec)
+        {
+            return new Vector3(vec.x, 0.0f, vec.y);
         }
 
         public static Vector3 WithValueAtIndex(this Vector3 vec3, int index, float value)
@@ -54,9 +74,174 @@ namespace UGameCore.Utilities
             return vec3;
         }
 
+        public static Vector3 WithXAndZ(this Vector3 vec3)
+        {
+            return new Vector3(vec3.x, 0f, vec3.z);
+        }
+
+        public static Vector3 WithY(this Vector3 vec3, float yValue)
+        {
+            return new Vector3(vec3.x, yValue, vec3.z);
+        }
+
+        public static Vector3 WithAddedY(this Vector3 vec3, float addedYValue)
+        {
+            return new Vector3(vec3.x, vec3.y + addedYValue, vec3.z);
+        }
+
         public static Vector3Int IsLess(this Vector3 v, Vector3 other)
         {
             return new Vector3Int(v.x < other.x ? 1 : 0, v.y < other.y ? 1 : 0, v.z < other.z ? 1 : 0);
+        }
+
+        public static bool IsGreaterOrEqual(this Vector2 local, Vector2 other)
+        {
+            if (local.x >= other.x && local.y >= other.y)
+                return true;
+            else
+                return false;
+        }
+
+        public static bool IsLesserOrEqual(this Vector2 local, Vector2 other)
+        {
+            if (local.x <= other.x && local.y <= other.y)
+                return true;
+            else
+                return false;
+        }
+
+        public static bool IsGreater(this Vector2 local, Vector2 other, bool orOperator = false)
+        {
+            if (orOperator)
+            {
+                if (local.x > other.x || local.y > other.y)
+                    return true;
+                else
+                    return false;
+            }
+            else
+            {
+                if (local.x > other.x && local.y > other.y)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        public static bool IsLesser(this Vector2 local, Vector2 other, bool orOperator = false)
+        {
+            if (orOperator)
+            {
+                if (local.x < other.x || local.y < other.y)
+                    return true;
+                else
+                    return false;
+            }
+            else
+            {
+                if (local.x < other.x && local.y < other.y)
+                    return true;
+                else
+                    return false;
+            }
+        }
+
+        public static Vector3 TransformDirection(this Quaternion rot, Vector3 dir)
+        {
+            return rot * dir;
+        }
+
+        public static Vector3 ClampDirection(Vector3 dir, Vector3 referenceVec, float maxAngle)
+        {
+            float angle = Vector3.Angle(dir, referenceVec);
+            if (angle > maxAngle)
+            {
+                // needs to be clamped
+
+                return Vector3.RotateTowards(dir, referenceVec, (angle - maxAngle) * Mathf.Deg2Rad, 0f);
+                //	Vector3.Lerp( dir, referenceVec, );
+            }
+
+            return dir;
+        }
+
+        public static bool BetweenInclusive(this float v, float min, float max)
+        {
+            return v >= min && v <= max;
+        }
+
+        public static bool BetweenExclusive(this float v, float min, float max)
+        {
+            return v > min && v < max;
+        }
+
+        public static int RoundToInt(this float f)
+        {
+            return Mathf.RoundToInt(f);
+        }
+
+        public static float SqrtOrZero(this float f)
+        {
+            if (float.IsNaN(f))
+                return 0f;
+            if (f <= 0f)
+                return 0f;
+            return Mathf.Sqrt(f);
+        }
+
+        /// <summary>
+		/// Clamps all coordinates between 0 and 1.
+		/// </summary>
+		public static Rect Clamp01(this Rect rect)
+        {
+
+            float xMin = rect.xMin;
+            float xMax = rect.xMax;
+            float yMin = rect.yMin;
+            float yMax = rect.yMax;
+
+            xMin = Mathf.Clamp01(xMin);
+            xMax = Mathf.Clamp01(xMax);
+            yMin = Mathf.Clamp01(yMin);
+            yMax = Mathf.Clamp01(yMax);
+
+            return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
+        }
+
+        public static bool Contains(this Rect rect, Rect other)
+        {
+
+            return rect.xMax >= other.xMax && rect.xMin <= other.xMin && rect.yMax >= other.yMax && rect.yMin <= other.yMin;
+
+        }
+
+        public static Rect Intersection(this Rect rect, Rect other)
+        {
+
+            float xMax = Mathf.Min(rect.xMax, other.xMax);
+            float yMax = Mathf.Min(rect.yMax, other.yMax);
+
+            float xMin = Mathf.Max(rect.xMin, other.xMin);
+            float yMin = Mathf.Max(rect.yMin, other.yMin);
+
+            return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
+        }
+
+        public static Rect Normalized(this Rect rect, Rect outter)
+        {
+
+            float xMin = (rect.xMin - outter.xMin) / outter.width;
+            float xMax = (rect.xMax - outter.xMin) / outter.width;
+
+            float yMin = (rect.yMin - outter.yMin) / outter.height;
+            float yMax = (rect.yMax - outter.yMin) / outter.height;
+
+            return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
+        }
+
+        public static Rect CreateRect(Vector2 center, Vector2 size)
+        {
+            return new Rect(center - size / 2.0f, size);
         }
     }
 }
