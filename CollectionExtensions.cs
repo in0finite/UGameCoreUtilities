@@ -135,6 +135,14 @@ namespace UGameCore.Utilities
             return array;
         }
 
+        public static T[] ToArrayOrEmpty<T>(this IEnumerable<T> enumerable)
+        {
+            T[] array = enumerable.ToArray();
+            if (array.Length == 0)
+                return Array.Empty<T>();
+            return array;
+        }
+
         public static T[] ToArrayOrEmpty<T>(this ICollection<T> collection)
         {
             int count = collection.Count;
