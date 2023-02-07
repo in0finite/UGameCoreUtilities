@@ -12,6 +12,7 @@ namespace UGameCore.Utilities
             public bool hadFirstUpdate;
             public System.Reflection.MethodInfo startMethod;
             public System.Reflection.MethodInfo updateMethod;
+            public System.Reflection.MethodInfo lateUpdateMethod;
         }
 
         private readonly static List<ObjectData> s_subscribers = new List<ObjectData>();
@@ -44,6 +45,7 @@ namespace UGameCore.Utilities
             s_subscribersUpdateBuffer.AddRange(s_subscribers);
             s_subscribersUpdateBuffer.TrimExcessSmart();
             s_subscribersUpdateBuffer.ForEach(DispatchUpdateToSingleObject);
+            s_subscribersUpdateBuffer.ForEach(objectData => DispatchMethodToSingleObject(objectData, objectData.lateUpdateMethod));
             s_subscribersUpdateBuffer.Clear();
         }
 
@@ -65,6 +67,16 @@ namespace UGameCore.Utilities
                 F.RunExceptionSafe(() => objectData.updateMethod.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
         }
 
+        private static void DispatchMethodToSingleObject(
+            ObjectData objectData, System.Reflection.MethodInfo methodInfo)
+        {
+            if (!objectData.monoBehaviour.isActiveAndEnabled)
+                return;
+
+            if (methodInfo != null)
+                F.RunExceptionSafe(() => methodInfo.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
+        }
+
         public static void Register(MonoBehaviour subscriber)
         {
 #if UNITY_EDITOR
@@ -78,6 +90,7 @@ namespace UGameCore.Utilities
 
             objectData.startMethod = type.GetMethod("Start", bindingFlags);
             objectData.updateMethod = type.GetMethod("Update", bindingFlags);
+            objectData.lateUpdateMethod = type.GetMethod("LateUpdate", bindingFlags);
 
             s_subscribers.Add(objectData);
 #endif
