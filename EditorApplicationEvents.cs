@@ -93,9 +93,12 @@ namespace UGameCore.Utilities
                 F.RunExceptionSafe(() => methodInfo.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
         }
 
-        public static void Register(MonoBehaviour subscriber)
+        public static bool Register(MonoBehaviour subscriber)
         {
 #if UNITY_EDITOR
+
+            if (s_subscribers.Exists(o => o.monoBehaviour == subscriber))
+                return false;
 
             ObjectData objectData = new ObjectData { monoBehaviour = subscriber };
 
@@ -110,16 +113,11 @@ namespace UGameCore.Utilities
             objectData.lateUpdateMethod = type.GetMethod("LateUpdate", bindingFlags);
 
             s_subscribers.Add(objectData);
-#endif
-        }
 
-        public static bool RegisterIfNotExists(MonoBehaviour subscriber)
-        {
-            if (s_subscribers.Exists(o => o.monoBehaviour == subscriber))
-                return false;
-
-            Register(subscriber);
             return true;
+#else
+            return false;
+#endif
         }
     }
 }
