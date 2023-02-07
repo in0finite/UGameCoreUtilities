@@ -9,7 +9,9 @@ namespace UGameCore.Utilities
         private struct ObjectData
         {
             public MonoBehaviour monoBehaviour;
+            public bool awakeCalled;
             public bool hadFirstUpdate;
+            public System.Reflection.MethodInfo awakeMethod;
             public System.Reflection.MethodInfo startMethod;
             public System.Reflection.MethodInfo updateMethod;
             public System.Reflection.MethodInfo lateUpdateMethod;
@@ -44,9 +46,23 @@ namespace UGameCore.Utilities
 
             s_subscribersUpdateBuffer.AddRange(s_subscribers);
             s_subscribersUpdateBuffer.TrimExcessSmart();
+            s_subscribersUpdateBuffer.ForEach(DispatchAwakeToSingleObject);
             s_subscribersUpdateBuffer.ForEach(DispatchUpdateToSingleObject);
             s_subscribersUpdateBuffer.ForEach(objectData => DispatchMethodToSingleObject(objectData, objectData.lateUpdateMethod));
             s_subscribersUpdateBuffer.Clear();
+        }
+
+        private static void DispatchAwakeToSingleObject(ObjectData objectData, int index)
+        {
+            if (objectData.awakeCalled)
+                return;
+
+            objectData.awakeCalled = true;
+            s_subscribers[index] = objectData;
+
+            if (objectData.awakeMethod != null)
+                F.RunExceptionSafe(() => objectData.awakeMethod.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
+            
         }
 
         private static void DispatchUpdateToSingleObject(ObjectData objectData, int index)
@@ -88,6 +104,7 @@ namespace UGameCore.Utilities
             System.Reflection.BindingFlags bindingFlags =
                 System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
 
+            objectData.awakeMethod = type.GetMethod("Awake", bindingFlags);
             objectData.startMethod = type.GetMethod("Start", bindingFlags);
             objectData.updateMethod = type.GetMethod("Update", bindingFlags);
             objectData.lateUpdateMethod = type.GetMethod("LateUpdate", bindingFlags);
