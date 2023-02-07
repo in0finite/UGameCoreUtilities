@@ -304,7 +304,7 @@ namespace UGameCore.Utilities
 #if !UNITY_EDITOR
                 return false;
 #else
-                return !UnityEditor.EditorApplication.isPlaying && !UnityEditor.EditorApplication.isPaused;
+                return !Application.isPlaying;
 #endif
             }
         }
