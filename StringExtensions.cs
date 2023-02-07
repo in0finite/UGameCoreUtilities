@@ -1,3 +1,5 @@
+using System;
+
 namespace UGameCore.Utilities
 {
     public static class StringExtensions
@@ -23,6 +25,12 @@ namespace UGameCore.Utilities
                     return str.ToLower();
             }
             return str;
+        }
+
+        public static bool Contains(
+            this string str, string containedString, StringComparison stringComparison)
+        {
+            return str.IndexOf(containedString, stringComparison) >= 0;
         }
     }
 }

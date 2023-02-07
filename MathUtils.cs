@@ -53,6 +53,11 @@ namespace UGameCore.Utilities
             return result;
         }
 
+        public static Vector3 WithMagnitude(this Vector3 v, float newMagnitude)
+        {
+            return v.normalized * newMagnitude;
+        }
+
         public static Vector3 Inverted(this Vector3 vec3)
         {
             return new Vector3(1.0f / vec3.x, 1.0f / vec3.y, 1.0f / vec3.z);
