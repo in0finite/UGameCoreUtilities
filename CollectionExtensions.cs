@@ -96,6 +96,25 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static void TrimExcessSmart<T>(
+            this List<T> list,
+            float sizeUpperLimitRatio = 1f / 3f,
+            float newCapacityMultiplier = 1.5f,
+            int minCapacityToTrim = 32)
+        {
+            if (list.Capacity <= minCapacityToTrim)
+                return;
+
+            int sizeUpperLimit = (int)Math.Ceiling(list.Capacity * sizeUpperLimitRatio);
+            if (list.Count >= sizeUpperLimit)
+                return;
+
+            int newCapacity = (int)(list.Count * newCapacityMultiplier);
+            newCapacity = Math.Max(newCapacity, minCapacityToTrim);
+
+            list.Capacity = newCapacity;
+        }
+
         public static T RemoveLast<T>(this IList<T> list)
         {
             T lastElement = list[list.Count - 1];
