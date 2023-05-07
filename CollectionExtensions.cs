@@ -74,11 +74,15 @@ namespace UGameCore.Utilities
         }
 
         public static int IndexOf<T>(this IEnumerable<T> enumerable, T value)
+            where T : IEquatable<T>
         {
-            // TODO: this can allocate memory if T is value-type
             return enumerable.FindIndex(elem => elem.Equals(value));
         }
 
+        public static int IndexOf<T>(this IEnumerable<T> enumerable, object value)
+        {
+            return enumerable.FindIndex(elem => elem.Equals(value));
+        }
 
         public static bool TryGetCountFast<T>(this IEnumerable<T> enumerable, out int count)
         {
