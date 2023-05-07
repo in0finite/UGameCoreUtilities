@@ -46,14 +46,20 @@ namespace UGameCore.Utilities
 
             foreach (var fieldInfo in fieldInfos)
             {
+                object oldValue = fieldInfo.GetValue(objectToDraw);
+
                 object newValue = DrawObjectInInspector(
                     fieldInfo.FieldType,
-                    fieldInfo.GetValue(objectToDraw),
+                    oldValue,
                     fieldInfo.Name,
                     isEditable);
 
                 if (isEditable && !fieldInfo.IsInitOnly)
-                    fieldInfo.SetValue(objectToDraw, newValue);
+                {
+                    bool changed = !object.Equals(oldValue, newValue);
+                    if (changed)
+                        fieldInfo.SetValue(objectToDraw, newValue);
+                }
             }
 
             return objectToDraw;
@@ -73,14 +79,20 @@ namespace UGameCore.Utilities
         {
             foreach (var propertyInfo in properties)
             {
+                object oldValue = propertyInfo.GetValue(objectToDraw);
+
                 object newValue = DrawObjectInInspector(
                     propertyInfo.PropertyType,
-                    propertyInfo.GetValue(objectToDraw),
+                    oldValue,
                     propertyInfo.Name,
                     isEditable);
 
                 if (isEditable && propertyInfo.CanWrite)
-                    propertyInfo.SetValue(objectToDraw, newValue);
+                {
+                    bool changed = !object.Equals(oldValue, newValue);
+                    if (changed)
+                        propertyInfo.SetValue(objectToDraw, newValue);
+                }
             }
 
             return objectToDraw;
