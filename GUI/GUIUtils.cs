@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UGameCore.Utilities
 {
@@ -277,77 +278,148 @@ namespace UGameCore.Utilities
 			return GetNextRectInARowPerc (rowRect, ref currentRectIndex, spacing, widthPercs);
 		}
 
-		public static int DrawPagedViewNumbers (Rect rect, int currentPage, int numPages)
+		[System.Serializable]
+		public class PagedViewParams
+        {
+			public int currentPage; // page number, not an index
+			public int totalNumItems;
+			public int pageSize = 30;
+			public int jumpButtonPageCount = 10;
+
+			public float? width; // for layout draw
+			public float height = 25; // for layout draw
+			public float buttonWidth = 25;
+			public float spacingBetweenButtons = 1;
+
+			public int NumPages => Mathf.CeilToInt(this.totalNumItems / (float)this.pageSize);
+
+			public void FixValues()
+            {
+				if (currentPage < 1)
+					currentPage = 1;
+				if (width.HasValue && width.Value <= 0)
+					width = null;
+				if (height <= 0)
+					height = 0;
+				if (buttonWidth <= 0)
+					buttonWidth = 0;
+				if (spacingBetweenButtons <= 0)
+					spacingBetweenButtons = 0;
+				if (totalNumItems < 0)
+					totalNumItems = 0;
+				if (pageSize < 1)
+					pageSize = 1;
+				if (jumpButtonPageCount < 1)
+					jumpButtonPageCount = 1;
+            }
+
+            public IEnumerable<T> ApplyPaging<T>(IEnumerable<T> enumerable)
+            {
+				this.FixValues();
+                return enumerable.Skip((this.currentPage - 1) * this.pageSize).Take(this.pageSize);
+            }
+        }
+
+		public static float FindOutLayoutWidth()
+        {
+			GUILayout.Space(1);
+			return GUILayoutUtility.GetLastRect().width;
+        }
+
+		public static int DrawPagedViewNumbers(Rect rect, int currentPage, int numPages)
+        {
+			var pagedViewParams = new PagedViewParams();
+			pagedViewParams.currentPage = currentPage;
+			// page size doesn't matter here - it can be any value
+			pagedViewParams.totalNumItems = numPages * pagedViewParams.pageSize;
+			DrawPagedViewNumbers(rect, pagedViewParams);
+			return pagedViewParams.currentPage;
+		}
+
+		public static void DrawPagedViewNumbers(Rect rect, PagedViewParams pagedViewParams)
 		{
+			pagedViewParams.FixValues();
+
+			int currentPage = pagedViewParams.currentPage;
+			int numPages = pagedViewParams.NumPages;
+
 			int resultingPage = currentPage;
-			float spacing = 1f;
+			float spacing = pagedViewParams.spacingBetweenButtons;
+			float buttonWidth = pagedViewParams.buttonWidth;
+
+			Rect btnRect = rect;
+			btnRect.width = buttonWidth;
+
+			// << < 1 2 3 4 > >>
+
+			// always display 2 buttons on ends - they move to first/last page
+			// always display 2 buttons for fast scrolling - they move the view for 10 pages
+			// display as many page number buttons as possible in the middle
+
+			float minWidth = spacing + buttonWidth + spacing + buttonWidth + spacing + buttonWidth + spacing + buttonWidth;
+			float widthLeftForMiddleButtons = rect.width - minWidth;
+			int numMiddleButtonsToShow = Mathf.FloorToInt(widthLeftForMiddleButtons / (buttonWidth + spacing));
+			if (numMiddleButtonsToShow > numPages)
+				numMiddleButtonsToShow = numPages;
+
+			// 2 buttons on left side
+
+			btnRect.position += new Vector2(spacing, 0f);
+			if (GUI.Button(btnRect, "<<"))
+            {
+				resultingPage = 1;
+			}
+
+			btnRect.position += new Vector2(buttonWidth + spacing, 0f);
+			if (GUI.Button(btnRect, "<"))
+			{
+				resultingPage -= pagedViewParams.jumpButtonPageCount;
+			}
+
+			// middle buttons
 			
-			var btnRect=rect;
-			btnRect.width = 25f;
+			int firstMiddleButtonPageNumber = currentPage - (numMiddleButtonsToShow - 1) / 2;
+			if (firstMiddleButtonPageNumber < 1)
+				firstMiddleButtonPageNumber = 1;
+			if (firstMiddleButtonPageNumber + numMiddleButtonsToShow > numPages)
+				firstMiddleButtonPageNumber = numPages - numMiddleButtonsToShow + 1;
 
-			/*
-			 *  <_x_x_...x_>
-			 *  suppose we got y pages, then there are y+1 spacing.
-			 *  totalWidth =y*btnWidth+(y+1)*spacing+2*btnWidth
-			 *  1) if totalWidth<= rect.width use < and > , when click result page -- or ++
-			 *  2) if totalWidth> rect.width use << and >> , when click add number of max to all,
-			 *     result page will be max+!
-			 */
-
-			var totalWidth = numPages * btnRect.width + (numPages + 1) * spacing + 2 * btnRect.width;
-			var showNextSign = totalWidth <= rect.width;
-			var maxShow =showNextSign?numPages:Mathf.FloorToInt( numPages/( (totalWidth-2*btnRect.width) /( rect.width-2*btnRect.width)));
-
-
-			if (GUI.Button (btnRect,showNextSign? "<":"<<")) {
-				if (showNextSign)
+            for (int i = 0; i < numMiddleButtonsToShow; i++)
+            {
+				int page = firstMiddleButtonPageNumber + i;
+				GUIStyle style = currentPage == page ? GUI.skin.box : GUI.skin.button;
+				btnRect.position += new Vector2(buttonWidth + spacing, 0f);
+				if (GUI.Button(btnRect, $"{page}", style))
 				{
-					resultingPage--;
-				}
-				else
-				{
-					resultingPage -= maxShow;
+					resultingPage = page;
 				}
 			}
 
-			btnRect.position += new Vector2(btnRect.width + spacing, 0f);
+			// 2 buttons on right side
 
-			int startBtnIndex = 0;
-			if (maxShow != 0)
+			btnRect.position += new Vector2(buttonWidth + spacing, 0f);
+			if (GUI.Button(btnRect, ">"))
 			{
-				if (currentPage % maxShow == 0)
-				{
-					startBtnIndex =((currentPage / maxShow)-1)*maxShow;
-				}
-				else
-				{
-					startBtnIndex =currentPage / maxShow*maxShow;
-				}
+				resultingPage += pagedViewParams.jumpButtonPageCount;
 			}
-			for (int i = 0; i < maxShow; i++)
+
+			btnRect.position += new Vector2(buttonWidth + spacing, 0f);
+			if (GUI.Button(btnRect, ">>"))
 			{
-				var btnIndex = startBtnIndex + i + 1;
-
-				var style = currentPage == btnIndex ? GUI.skin.box : GUI.skin.button;
-				if (GUI.Button (btnRect, (btnIndex).ToString (), style))
-					resultingPage = btnIndex ;
-				btnRect.position += new Vector2(btnRect.width + spacing, 0f);
+				resultingPage = numPages;
 			}
 
-			if (GUI.Button (btnRect, showNextSign?">":">>")) {
-				if (showNextSign)
-				{
-					resultingPage++;
-				}
-				else
-				{
-					resultingPage += maxShow;
-				}
-			}
 
-			resultingPage = Mathf.Clamp( resultingPage, 1, numPages );
+			resultingPage = Mathf.Clamp(resultingPage, 1, numPages);
+			pagedViewParams.currentPage = resultingPage;
+		}
 
-			return resultingPage;
+		public static void LayoutDrawPagedViewNumbers(PagedViewParams pagedViewParams)
+		{
+			pagedViewParams.FixValues();
+			float width = pagedViewParams.width ?? FindOutLayoutWidth();
+			Rect rect = GUILayoutUtility.GetRect(width, pagedViewParams.height);
+			DrawPagedViewNumbers(rect, pagedViewParams);
 		}
 
 		public static int DrawPagedViewNumbers (Rect rect, int currentPage, int totalNumItems, int numItemsPerPage)
