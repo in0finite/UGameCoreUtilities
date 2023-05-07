@@ -32,18 +32,33 @@ namespace UGameCore.Utilities
 
         public static T SingleOr<T>(this IEnumerable<T> enumerable, T defaultValue)
         {
-            if (enumerable == null)
-                throw new ArgumentNullException(nameof(enumerable));
+            return enumerable.TryGetSingle(out T singleElem) ? singleElem : defaultValue;
+        }
 
-            try
+        public static bool TryGetSingle<T>(this IEnumerable<T> enumerable, out T result)
+        {
+            if (enumerable.TryGetCountFast(out int countFast) && countFast != 1)
             {
-                // use Single() because it has optimizations if IEnumerable is ICollection, etc ...
-                return enumerable.Single();
+                result = default;
+                return false;
             }
-            catch
+
+            T tempResult = default;
+            long count = 0;
+            foreach (T item in enumerable)
             {
-                return defaultValue;
+                if (count == 1)
+                {
+                    result = default;
+                    return false;
+                }
+
+                tempResult = item;
+                count++;
             }
+
+            result = tempResult;
+            return true;
         }
 
         public static int FindIndex<T>(this IEnumerable<T> enumerable, System.Predicate<T> predicate)
@@ -62,6 +77,25 @@ namespace UGameCore.Utilities
         {
             // TODO: this can allocate memory if T is value-type
             return enumerable.FindIndex(elem => elem.Equals(value));
+        }
+
+
+        public static bool TryGetCountFast<T>(this IEnumerable<T> enumerable, out int count)
+        {
+            if (enumerable is ICollection<T> collectionGeneric)
+            {
+                count = collectionGeneric.Count;
+                return true;
+            }
+
+            if (enumerable is System.Collections.ICollection collection)
+            {
+                count = collection.Count;
+                return true;
+            }
+
+            count = 0;
+            return false;
         }
 
         public static bool AnyInList<T>(this IList<T> list, System.Predicate<T> predicate)
@@ -96,6 +130,16 @@ namespace UGameCore.Utilities
             }
         }
 
+        /// <summary>
+        /// Initializes every element of the list by calling the default constructor.
+        /// </summary>
+        public static void ConstructAll<T>(this IList<T> list)
+            where T : new()
+        {
+            for (int i = 0; i < list.Count; i++)
+                list[i] = new T();
+        }
+
         public static void TrimExcessSmart<T>(
             this List<T> list,
             float sizeUpperLimitRatio = 1f / 3f,
@@ -127,6 +171,17 @@ namespace UGameCore.Utilities
             T firstElement = list[0];
             list.RemoveAt(0);
             return firstElement;
+        }
+
+        public static int RemoveAll<T>(this List<T> list, System.Func<T, int, bool> predicate)
+        {
+            int i = 0;
+            return list.RemoveAll(_ =>
+            {
+                bool b = predicate(_, i);
+                i++;
+                return b;
+            });
         }
 
         public static Queue<T> ToQueue<T>(this IEnumerable<T> enumerable)
@@ -199,6 +254,19 @@ namespace UGameCore.Utilities
             return newArray;
         }
 
+        public static bool HasDuplicates<T>(this IEnumerable<T> enumerable)
+        {
+            var hashSet = new HashSet<T>();
+
+            foreach (T elem in enumerable)
+            {
+                if (!hashSet.Add(elem))
+                    return true;
+            }
+
+            return false;
+        }
+
         public static IEnumerable<T> DistinctBy<T, T2>(this IEnumerable<T> enumerable, System.Func<T, T2> selector)
         {
             var hashSet = new HashSet<T2>();
@@ -242,6 +310,23 @@ namespace UGameCore.Utilities
             }
 
             return !hasAnyValue ? elementToReturnIfEmpty : minElement;
+        }
+
+        public static void SortBy<T, TBy>(this List<T> list, Func<T, TBy> funcSelector)
+            where TBy : IComparable<TBy>
+        {
+            list.Sort((a, b) => funcSelector(a).CompareTo(funcSelector(b)));
+        }
+
+        public static void Sort<T>(this T[] array)
+        {
+            Array.Sort(array);
+        }
+
+        public static void SortBy<T, TBy>(this T[] array, Func<T, TBy> funcSelector)
+            where TBy : IComparable<TBy>
+        {
+            Array.Sort(array, (a, b) => funcSelector(a).CompareTo(funcSelector(b)));
         }
 
         public static T RandomElement<T>(this IList<T> list)

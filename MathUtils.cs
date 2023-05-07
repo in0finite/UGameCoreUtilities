@@ -18,9 +18,19 @@ namespace UGameCore.Utilities
             return Vector3.Distance(p, projection);
         }
 
+        public static Vector2 MinComponents(Vector2 a, Vector2 b)
+        {
+            return new Vector2(Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y));
+        }
+
         public static Vector3 MinComponents(Vector3 a, Vector3 b)
         {
             return new Vector3(Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y), Mathf.Min(a.z, b.z));
+        }
+
+        public static Vector2 MaxComponents(Vector2 a, Vector2 b)
+        {
+            return new Vector2(Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y));
         }
 
         public static Vector3 MaxComponents(Vector3 a, Vector3 b)
@@ -51,6 +61,15 @@ namespace UGameCore.Utilities
             Vector3 result = v;
             result.Scale(other);
             return result;
+        }
+
+        /// <summary>
+        /// Returns vector with negated component at given index.
+        /// </summary>
+        public static Vector3 NegatedAt(this Vector3 v, int index)
+        {
+            v[index] = -v[index];
+            return v;
         }
 
         public static Vector3 WithMagnitude(this Vector3 v, float newMagnitude)

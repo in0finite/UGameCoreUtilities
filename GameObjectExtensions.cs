@@ -79,5 +79,13 @@ namespace UGameCore.Utilities
 
 			go.SetLayerRecursive(layerint);
 		}
+
+		public static Bounds GetRenderersBounds(this GameObject go)
+        {
+			var bounds = new Bounds(go.transform.position, Vector3.zero);
+            foreach (var r in go.GetComponentsInChildren<Renderer>())
+				bounds.Encapsulate(r.bounds);
+			return bounds;
+        }
 	}
 }
