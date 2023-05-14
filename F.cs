@@ -95,23 +95,6 @@ namespace UGameCore.Utilities
         }
 
 
-        public static IEnumerable<AnimationState> GetAnimationStates(this Animation animation)
-        {
-            foreach (AnimationState animationState in animation)
-                yield return animationState;
-        }
-
-        public static float GetTimePerc (this AnimationState state)
-		{
-			return state.time / state.length;
-		}
-
-		public static void SetTimePerc (this AnimationState state, float perc)
-		{
-			state.time = state.length * perc;
-		}
-
-
 		public static bool RunExceptionSafe (System.Action function, string errorMessagePrefix)
 		{
 			try {
