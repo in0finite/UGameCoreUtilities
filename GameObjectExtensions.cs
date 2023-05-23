@@ -14,7 +14,7 @@ namespace UGameCore.Utilities
 			return comp;
 		}
 
-		public static T GetComponentOrThrow<T>(this GameObject go) where T : Component
+		public static T GetComponentOrThrow<T>(this GameObject go)
 		{
 			T comp = go.GetComponent<T>();
 			if (null == comp)
@@ -22,7 +22,7 @@ namespace UGameCore.Utilities
 			return comp;
 		}
 
-		public static T GetComponentOrLogError<T>(this GameObject go) where T : Component
+		public static T GetComponentOrLogError<T>(this GameObject go)
 		{
 			T comp = go.GetComponent<T>();
 			if (null == comp)
@@ -30,19 +30,19 @@ namespace UGameCore.Utilities
 			return comp;
 		}
 
-		public static void DestroyComponent<T>(this GameObject go) where T : Component
+		public static void DestroyComponent<T>(this GameObject go)
 		{
-			T comp = go.GetComponent<T>();
+			Component comp = go.GetComponent<T>() as Component;
 			if (comp != null)
 				UnityEngine.Object.Destroy(comp);
 		}
 
-		public static IEnumerable<T> GetFirstLevelChildrenComponents<T>(this GameObject go) where T : Component
+		public static IEnumerable<T> GetFirstLevelChildrenComponents<T>(this GameObject go)
 		{
 			return go.transform.GetFirstLevelChildren().SelectMany(c => c.GetComponents<T>());
 		}
 
-		public static IEnumerable<T> GetFirstLevelChildrenSingleComponent<T>(this GameObject go) where T : Component
+		public static IEnumerable<T> GetFirstLevelChildrenSingleComponent<T>(this GameObject go)
 		{
 			return go.transform.GetFirstLevelChildren().Select(c => c.GetComponent<T>()).Where(_ => _ != null);
 		}

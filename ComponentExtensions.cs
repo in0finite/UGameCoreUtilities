@@ -12,12 +12,12 @@ namespace UGameCore.Utilities
             return root.GetComponentsInChildren<T>().FirstOrDefault(x => x.name == name);
         }
 
-        public static T GetComponentOrThrow<T>(this Component comp) where T : Component
+        public static T GetComponentOrThrow<T>(this Component comp)
         {
             return comp.gameObject.GetComponentOrThrow<T>();
         }
 
-        public static T GetComponentOrLogError<T>(this Component comp) where T : Component
+        public static T GetComponentOrLogError<T>(this Component comp)
         {
             return comp.gameObject.GetComponentOrLogError<T>();
         }
