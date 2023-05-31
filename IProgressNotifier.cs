@@ -7,15 +7,20 @@ namespace UGameCore.Utilities
     public interface IProgressNotifier
     {
         /// <summary>
-        /// Is progress currently assigned ?
+        /// Is progress currently assigned or cleared ?
         /// </summary>
         public bool HasProgress { get; }
+
+        /// <summary>
+        /// Last assigned progress.
+        /// </summary>
+        public float Progress { get; }
 
         /// <summary>
         /// Update the progress. The method can throw exception if the operation is cancelled by user.
         /// </summary>
         /// <exception cref="System.OperationCanceledException"></exception>
-        void SetProgress(string title, string description = null, float progressPercentage = 0f);
+        void SetProgress(string title, string description = null, float? progress = null);
 
         /// <summary>
         /// Clear the current progress, along with any visual information about it. For example,
@@ -30,18 +35,22 @@ namespace UGameCore.Utilities
 
         protected class DisposableProgress : System.IDisposable
         {
+            bool m_disposed = false;
             public IProgressNotifier ProgressNotifier { get; set; }
 
             void System.IDisposable.Dispose()
             {
+                if (m_disposed)
+                    return;
+                m_disposed = true;
                 this.ProgressNotifier?.ClearProgress();
             }
         }
 
         /// <summary>
-        /// Set progress that will be cleared when IDisposable is disposed.
+        /// Set progress that will be cleared when returned object is disposed.
         /// </summary>
-        System.IDisposable SetDisposableProgress(string title, string info = null, float progress = 0f)
+        System.IDisposable SetDisposableProgress(string title, string info = null, float? progress = null)
         {
             this.SetProgress(title, info, progress);
             return new DisposableProgress { ProgressNotifier = this };

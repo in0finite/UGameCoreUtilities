@@ -6,11 +6,16 @@ namespace UGameCore.Utilities
 
         public bool HasProgress { get; protected set; } = false;
 
+        public float Progress { get; protected set; } = 0f;
 
-        public virtual void SetProgress(string title, string description, float progressPercentage)
+
+        public virtual void SetProgress(string title, string description, float? progress)
         {
+            if (progress.HasValue)
+                this.Progress = progress.Value;
+
 #if UNITY_EDITOR
-            if (UnityEditor.EditorUtility.DisplayCancelableProgressBar(title, description, progressPercentage))
+            if (UnityEditor.EditorUtility.DisplayCancelableProgressBar(title, description, this.Progress))
             {
                 this.HasProgress = true;
                 this.ClearProgress();
@@ -20,7 +25,7 @@ namespace UGameCore.Utilities
 
             this.HasProgress = true;
 
-            m_ETAMeasurer.UpdateETA(progressPercentage);
+            m_ETAMeasurer.UpdateETA(this.Progress);
         }
 
         public virtual void ClearProgress()
