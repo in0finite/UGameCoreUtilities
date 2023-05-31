@@ -61,6 +61,21 @@ namespace UGameCore.Utilities
             return true;
         }
 
+        public static bool TryFind<T>(this IEnumerable<T> enumerable, System.Predicate<T> predicate, out T result)
+        {
+            foreach (T elem in enumerable)
+            {
+                if (predicate(elem))
+                {
+                    result = elem;
+                    return true;
+                }
+            }
+
+            result = default;
+            return false;
+        }
+
         public static int FindIndex<T>(this IEnumerable<T> enumerable, System.Predicate<T> predicate)
         {
             int i = 0;
@@ -71,6 +86,12 @@ namespace UGameCore.Utilities
                 i++;
             }
             return -1;
+        }
+
+        public static bool TryFindIndex<T>(this IEnumerable<T> enumerable, System.Predicate<T> predicate, out int index)
+        {
+            index = enumerable.FindIndex(predicate);
+            return index != -1;
         }
 
         public static int IndexOf<T>(this IEnumerable<T> enumerable, T value)
@@ -142,6 +163,15 @@ namespace UGameCore.Utilities
         {
             for (int i = 0; i < list.Count; i++)
                 list[i] = new T();
+        }
+
+        /// <summary>
+        /// Replaces each element in the list with the value returned from selector.
+        /// </summary>
+        public static void ReplaceEach<T>(this IList<T> list, Func<T, T> selector)
+        {
+            for (int i = 0; i < list.Count; i++)
+                list[i] = selector(list[i]);
         }
 
         public static void TrimExcessSmart<T>(
@@ -325,6 +355,11 @@ namespace UGameCore.Utilities
         public static void Sort<T>(this T[] array)
         {
             Array.Sort(array);
+        }
+
+        public static void Sort<T>(this T[] array, IComparer<T> comparer)
+        {
+            Array.Sort(array, comparer);
         }
 
         public static void SortBy<T, TBy>(this T[] array, Func<T, TBy> funcSelector)
