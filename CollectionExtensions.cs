@@ -347,9 +347,14 @@ namespace UGameCore.Utilities
         }
 
         public static void SortBy<T, TBy>(this List<T> list, Func<T, TBy> funcSelector)
-            where TBy : IComparable<TBy>
         {
-            list.Sort((a, b) => funcSelector(a).CompareTo(funcSelector(b)));
+            list.SortBy(funcSelector, Comparer<TBy>.Default);
+        }
+
+        public static void SortBy<T, TBy>(
+            this List<T> list, Func<T, TBy> funcSelector, IComparer<TBy> comparer)
+        {
+            list.Sort((a, b) => comparer.Compare(funcSelector(a), funcSelector(b)));
         }
 
         public static void Sort<T>(this T[] array)
