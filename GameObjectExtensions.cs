@@ -30,6 +30,19 @@ namespace UGameCore.Utilities
 			return comp;
 		}
 
+		/// <summary>
+		/// Returns component of given type, if it is the only one attached, otherwise throws exception.
+		/// </summary>
+		public static T GetSingleComponentOrThrow<T>(this GameObject go)
+		{
+			T[] components = go.GetComponents<T>();
+			if (components.Length == 0)
+				throw new MissingComponentException(string.Format("Failed to get component of type: {0}, on game object: {1}", typeof(T), go.name));
+			if (components.Length > 1)
+				throw new System.InvalidOperationException($"Found {components.Length} components of type {typeof(T)} on game object {go.name}, but required exactly 1");
+			return components[0];
+		}
+
 		public static void DestroyComponent<T>(this GameObject go)
 		{
 			Component comp = go.GetComponent<T>() as Component;

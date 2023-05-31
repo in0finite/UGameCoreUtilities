@@ -21,6 +21,14 @@ namespace UGameCore.Utilities
             return child.GetAllParents().Any(p => p == tr);
         }
 
+        /// <summary>
+        /// Get depth level (ie. number of parents) in the hierarchy.
+        /// </summary>
+        public static int GetDepthLevel(this Transform tr)
+        {
+            return tr.GetAllParents().Count();
+        }
+
         public static T GetTopmostParentComponent<T>(this Transform tr)
             where T : Component
         {
@@ -56,6 +64,9 @@ namespace UGameCore.Utilities
             return array;
         }
 
+        /// <summary>
+        /// Recursively searches through transform hierarchy to find a child with specified name.
+        /// </summary>
         public static Transform FindChildRecursive(this Transform transform, string strName)
         {
             if (transform.name.Equals(strName, System.StringComparison.InvariantCultureIgnoreCase))
@@ -68,6 +79,22 @@ namespace UGameCore.Utilities
             }
 
             return null;
+        }
+
+        public static Transform FindChildWithPath(this Transform transform, string path, string pathSeparator)
+        {
+            string[] parts = path.Split(pathSeparator, System.StringSplitOptions.RemoveEmptyEntries);
+
+            Transform currentTr = transform;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                Transform child = currentTr.Find(parts[i]);
+                if (null == child)
+                    return null;
+                currentTr = child;
+            }
+
+            return currentTr;
         }
 
         public static void SetY(this Transform t, float yPos)

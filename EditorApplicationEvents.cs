@@ -44,6 +44,7 @@ namespace UGameCore.Utilities
             if (Application.isPlaying)
                 return;
 
+            s_subscribersUpdateBuffer.Clear();
             s_subscribersUpdateBuffer.AddRange(s_subscribers);
             s_subscribersUpdateBuffer.TrimExcessSmart();
             s_subscribersUpdateBuffer.ForEach(DispatchAwakeToSingleObject);

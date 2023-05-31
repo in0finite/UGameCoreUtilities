@@ -143,7 +143,7 @@ namespace UGameCore.Utilities
 		/// Invokes all subscribed delegates, and makes sure any exception is caught and logged, so that all
 		/// subscribers will get notified.
 		/// </summary>
-		public static void InvokeEventExceptionSafe( MulticastDelegate eventDelegate, params object[] parameters )
+		public static void InvokeEventExceptionSafe( this MulticastDelegate eventDelegate, params object[] parameters )
         {
             RunExceptionSafe( () => {
                 var delegates = eventDelegate.GetInvocationList ();
