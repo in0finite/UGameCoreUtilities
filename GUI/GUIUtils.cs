@@ -20,6 +20,9 @@ namespace UGameCore.Utilities
 			}
 		}
 
+		private static GUIStyle s_leftAlignedButtonStyle = null;
+		public static GUIStyle LeftAlignedButtonStyle => s_leftAlignedButtonStyle ??= new GUIStyle(GUI.skin.button) { alignment = TextAnchor.MiddleLeft };
+
 		public static Rect ScreenRect { get { return new Rect (0, 0, Screen.width, Screen.height); } }
 
 
@@ -365,13 +368,13 @@ namespace UGameCore.Utilities
 			// 2 buttons on left side
 
 			btnRect.position += new Vector2(spacing, 0f);
-			if (GUI.Button(btnRect, "<<"))
+			if (GUI.Button(btnRect, new GUIContent("<<", "Go to 1st page")))
             {
 				resultingPage = 1;
 			}
 
 			btnRect.position += new Vector2(buttonWidth + spacing, 0f);
-			if (GUI.Button(btnRect, "<"))
+			if (GUI.Button(btnRect, new GUIContent("<", $"Go {pagedViewParams.jumpButtonPageCount} pages back")))
 			{
 				resultingPage -= pagedViewParams.jumpButtonPageCount;
 			}
@@ -398,13 +401,13 @@ namespace UGameCore.Utilities
 			// 2 buttons on right side
 
 			btnRect.position += new Vector2(buttonWidth + spacing, 0f);
-			if (GUI.Button(btnRect, ">"))
+			if (GUI.Button(btnRect, new GUIContent(">", $"Go {pagedViewParams.jumpButtonPageCount} pages forward")))
 			{
 				resultingPage += pagedViewParams.jumpButtonPageCount;
 			}
 
 			btnRect.position += new Vector2(buttonWidth + spacing, 0f);
-			if (GUI.Button(btnRect, ">>"))
+			if (GUI.Button(btnRect, new GUIContent(">>", "Go to last page")))
 			{
 				resultingPage = numPages;
 			}
