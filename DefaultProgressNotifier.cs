@@ -2,12 +2,18 @@ namespace UGameCore.Utilities
 {
     public class DefaultProgressNotifier : IProgressNotifier
     {
+        public IProfiler Profiler { get; private set; }
         protected ETAMeasurer m_ETAMeasurer = new ETAMeasurer(0f);
 
         public bool HasProgress { get; protected set; } = false;
 
         public float Progress { get; protected set; } = 0f;
 
+
+        public DefaultProgressNotifier(IProfiler profiler)
+        {
+            this.Profiler = profiler;
+        }
 
         public virtual void SetProgress(string title, string description, float? progress)
         {
@@ -26,6 +32,9 @@ namespace UGameCore.Utilities
             this.HasProgress = true;
 
             m_ETAMeasurer.UpdateETA(this.Progress);
+
+            this.Profiler?.EndSection();
+            this.Profiler?.BeginSection(title);
         }
 
         public virtual void ClearProgress()
