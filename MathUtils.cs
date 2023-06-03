@@ -222,6 +222,14 @@ namespace UGameCore.Utilities
         }
 
         /// <summary>
+        /// Returns 0 if this number is NaN (Not-a-number), otherwise returns original value.
+        /// </summary>
+        public static double ZeroIfNan(this double d)
+        {
+            return double.IsNaN(d) ? 0.0 : d;
+        }
+
+        /// <summary>
 		/// Clamps all coordinates between 0 and 1.
 		/// </summary>
 		public static Rect Clamp01(this Rect rect)
