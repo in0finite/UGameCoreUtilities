@@ -42,7 +42,27 @@ namespace UGameCore.Utilities
                 return;
 
             if (Application.isPlaying)
+            {
+                // Make sure we don't call Awake() or Start() twice - this can happen when
+                // exiting play-mode without assembly reload.
+                // So, we assume that Unity called these methods in play-mode.
+                for (int i = 0; i < s_subscribers.Count; i++)
+                {
+                    var subscriber = s_subscribers[i];
+                    // Awake() should always be called by Unity
+                    bool awakeCalled = true;
+                    // we assume that if object is enabled, his Start() was called
+                    bool startCalled = subscriber.hadFirstUpdate || subscriber.monoBehaviour.enabled;
+                    if (subscriber.awakeCalled != awakeCalled || subscriber.hadFirstUpdate != startCalled)
+                    {
+                        subscriber.awakeCalled = awakeCalled;
+                        subscriber.hadFirstUpdate = startCalled;
+                        s_subscribers[i] = subscriber;
+                    }
+                }
+
                 return;
+            }
 
             s_subscribersUpdateBuffer.Clear();
             s_subscribersUpdateBuffer.AddRange(s_subscribers);
