@@ -24,6 +24,12 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static void ForEachIndexed<T>(this IList<T> list, System.Action<T, int> action)
+        {
+            for (int i = 0; i < list.Count; i++)
+                action(list[i], i);
+        }
+
         public static IEnumerable<T> WhereIf<T>(
             this IEnumerable<T> enumerable, bool condition, System.Func<T, bool> predicate)
         {
