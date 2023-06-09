@@ -143,6 +143,20 @@ namespace UGameCore.Utilities
             m_currentParentIndex = currentSection.parentIndex;
         }
 
+        public long CurrentSectionId => m_currentParentIndex == 0 ? -1 : m_currentParentIndex; // don't return fake root
+
+        public bool TryGetSection(long sectionId, out IProfiler.Section section)
+        {
+            if (sectionId <= 0 || sectionId >= m_allSections.Count)
+            {
+                section = default;
+                return false;
+            }
+
+            section = m_allSections[(int)sectionId].data;
+            return true;
+        }
+
         public IEnumerable<IProfiler.Section> GetSections(long parentSectionId)
         {
             CustomSection parentSection = m_allSections[parentSectionId < 0 ? 0 : (int)parentSectionId];

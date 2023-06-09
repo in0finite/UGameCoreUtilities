@@ -8,7 +8,7 @@ namespace UGameCore.Utilities
     /// </summary>
     public class NonNestingProfiler : IProfiler
     {
-        IProfiler m_profiler;
+        readonly IProfiler m_profiler;
         bool m_sectionOpened = false;
 
 
@@ -42,9 +42,12 @@ namespace UGameCore.Utilities
             m_profiler.EndSection();
         }
 
+        public long CurrentSectionId => m_profiler.CurrentSectionId;
+
+        public bool TryGetSection(long sectionId, out IProfiler.Section section)
+            => m_profiler.TryGetSection(sectionId, out section);
+
         public IEnumerable<IProfiler.Section> GetSections(long parentSectionId)
-        {
-            return m_profiler.GetSections(parentSectionId);
-        }
+            => m_profiler.GetSections(parentSectionId);
     }
 }

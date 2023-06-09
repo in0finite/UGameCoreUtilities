@@ -6,6 +6,12 @@ namespace UGameCore.Utilities
 {
     public static class ProfilerExtensions
     {
+        public static void EndAllSections(this IProfiler profiler)
+        {
+            while (profiler.CurrentSectionId >= 0)
+                profiler.EndSection();
+        }
+
         public static double GetTotalTime(this IProfiler profiler)
         {
             return profiler.GetSections(-1).Sum(_ => _.TotalDurationMs);
@@ -13,7 +19,7 @@ namespace UGameCore.Utilities
 
         public static void Log(this IProfiler profiler, string prefix = null)
         {
-            var stringBuilder = new StringBuilder($"{prefix} total time: {(profiler.GetTotalTime() / 1000):F1} s:\n");
+            var stringBuilder = new StringBuilder($"{prefix} total time: {(profiler.GetTotalTime() / 1000):F3} s:\n");
             profiler.Dump(stringBuilder);
             Debug.Log(stringBuilder.ToString());
         }

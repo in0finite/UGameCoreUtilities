@@ -26,6 +26,13 @@ namespace UGameCore.Utilities
         void EndSection();
 
         /// <summary>
+        /// Get id of currently opened section. Returns -1 if there is no active section.
+        /// </summary>
+        long CurrentSectionId { get; }
+
+        bool TryGetSection(long sectionId, out Section section);
+
+        /// <summary>
         /// Get all sections that are child of given section. Pass in -1 to get root sections.
         /// </summary>
         IEnumerable<Section> GetSections(long parentSectionId);
