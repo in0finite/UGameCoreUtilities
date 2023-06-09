@@ -14,12 +14,17 @@ namespace UGameCore.Utilities
 
             protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
             {
+                JsonProperty jsonProperty = base.CreateProperty(member, memberSerialization);
+                string memberName = member.Name;
+
                 if (Array.Exists(
                     this.ignoredProperties,
-                    _ => _.name.Equals(member.Name, StringComparison.InvariantCulture) && member.DeclaringType.IsAssignableFrom(_.type)))
-                    return null;
+                    _ => _.name.Equals(memberName, StringComparison.Ordinal) && member.DeclaringType.IsAssignableFrom(_.type)))
+                {
+                    jsonProperty.ShouldSerialize = _ => false;
+                }
 
-                return base.CreateProperty(member, memberSerialization);
+                return jsonProperty;
             }
         }
 
