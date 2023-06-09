@@ -67,9 +67,9 @@ namespace UGameCore.Utilities
             s_subscribersUpdateBuffer.Clear();
             s_subscribersUpdateBuffer.AddRange(s_subscribers);
             s_subscribersUpdateBuffer.TrimExcessSmart();
-            s_subscribersUpdateBuffer.ForEach(DispatchAwakeToSingleObject);
-            s_subscribersUpdateBuffer.ForEach(DispatchUpdateToSingleObject);
-            s_subscribersUpdateBuffer.ForEach(objectData => DispatchMethodToSingleObject(objectData, objectData.lateUpdateMethod));
+            s_subscribersUpdateBuffer.ForEachIndexed(DispatchAwakeToSingleObject);
+            s_subscribersUpdateBuffer.ForEachIndexed(DispatchUpdateToSingleObject);
+            s_subscribersUpdateBuffer.ForEachIndexed((objectData, i) => DispatchMethodToSingleObject(objectData, objectData.lateUpdateMethod));
             s_subscribersUpdateBuffer.Clear();
         }
 
@@ -80,6 +80,7 @@ namespace UGameCore.Utilities
 
             objectData.awakeCalled = true;
             s_subscribers[index] = objectData;
+            s_subscribersUpdateBuffer[index] = objectData;
 
             if (objectData.awakeMethod != null)
                 F.RunExceptionSafe(() => objectData.awakeMethod.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
@@ -95,6 +96,7 @@ namespace UGameCore.Utilities
             {
                 objectData.hadFirstUpdate = true;
                 s_subscribers[index] = objectData;
+                s_subscribersUpdateBuffer[index] = objectData;
 
                 if (objectData.startMethod != null)
                     F.RunExceptionSafe(() => objectData.startMethod.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
