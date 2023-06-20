@@ -32,5 +32,11 @@ namespace UGameCore.Utilities
             this.description = description;
             this.SetNotes(notes);
         }
+
+        public void SetNotes(string description, Entry[] notes)
+        {
+            this.description = description;
+            this.notes = notes;
+        }
     }
 }
