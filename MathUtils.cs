@@ -25,7 +25,17 @@ namespace UGameCore.Utilities
 
         public static Vector3 MinComponents(Vector3 a, Vector3 b)
         {
+            return a.Min(b);
+        }
+
+        public static Vector3 Min(this Vector3 a, Vector3 b)
+        {
             return new Vector3(Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y), Mathf.Min(a.z, b.z));
+        }
+
+        public static Vector3 Min(this Vector3 a, float b)
+        {
+            return a.Min(new Vector3(b, b, b));
         }
 
         public static Vector2 MaxComponents(Vector2 a, Vector2 b)
@@ -35,7 +45,32 @@ namespace UGameCore.Utilities
 
         public static Vector3 MaxComponents(Vector3 a, Vector3 b)
         {
+            return a.Max(b);
+        }
+
+        public static Vector3 Max(this Vector3 a, Vector3 b)
+        {
             return new Vector3(Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y), Mathf.Max(a.z, b.z));
+        }
+
+        public static Vector3 Max(this Vector3 a, float b)
+        {
+            return a.Max(new Vector3(b, b, b));
+        }
+
+        public static Vector3 Sign(this Vector3 v)
+        {
+            return new Vector3(v.x.Sign(), v.y.Sign(), v.z.Sign());
+        }
+
+        public static Vector3 Clamp(this Vector3 v, Vector3 a, Vector3 b)
+        {
+            return new Vector3(Mathf.Clamp(v.x, a.x, b.x), Mathf.Clamp(v.y, a.y, b.y), Mathf.Clamp(v.z, a.z, b.z));
+        }
+
+        public static Vector3 Clamp(this Vector3 v, float a, float b)
+        {
+            return new Vector3(Mathf.Clamp(v.x, a, b), Mathf.Clamp(v.y, a, b), Mathf.Clamp(v.z, a, b));
         }
 
         public static Vector3 NormalizedOrZero(this Vector3 vec)
@@ -187,6 +222,27 @@ namespace UGameCore.Utilities
             }
 
             return dir;
+        }
+
+        public static float Min(this float a, float b)
+        {
+            return a < b ? a : b;
+        }
+
+        public static float Max(this float a, float b)
+        {
+            return a > b ? a : b;
+        }
+
+        public static float Clamp(this float x, float a, float b)
+        {
+            return Mathf.Clamp(x, a, b);
+        }
+
+        public static float Sign(this float f)
+        {
+            // note: don't use Unity's Mathf.Sign() - it doesn't return 0
+            return System.Math.Sign(f);
         }
 
         public static bool BetweenInclusive(this float v, float min, float max)
