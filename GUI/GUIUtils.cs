@@ -431,5 +431,28 @@ namespace UGameCore.Utilities
 			return DrawPagedViewNumbers (rect, currentPage, numPages);
 		}
 
+		/// <summary>
+		/// Draw current <see cref="GUI.tooltip"/>.
+		/// </summary>
+        public static void DrawTooltip()
+        {
+            string tooltip = GUI.tooltip;
+            if (tooltip.IsNullOrWhiteSpace())
+				return;
+            
+            Vector2 size = GUIUtils.CalcScreenSizeForText(tooltip, GUI.skin.box);
+
+            Vector2 mousePos = Input.mousePosition;
+            mousePos.y = Screen.height - mousePos.y;
+
+            Vector2 rectPos = mousePos - new Vector2(0, 10 + size.y) - size / 2f;
+
+            // constrain rect pos to screen
+            rectPos.x = Mathf.Clamp(rectPos.x, 0f, Screen.width - size.x);
+            rectPos.y = Mathf.Clamp(rectPos.y, 0f, Screen.height - size.y);
+
+            GUI.Box(new Rect(rectPos, size), tooltip);
+        }
+
     }
 }
