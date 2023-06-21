@@ -33,7 +33,8 @@ namespace UGameCore.Utilities {
 
 			m_colors = new Color[m_fpsTexture.width * m_fpsTexture.height];
 
-			this.fpsImage.texture = this.m_fpsTexture;
+			if (this.fpsImage != null)
+				this.fpsImage.texture = this.m_fpsTexture;
 		}
 		
 		void Update () {
@@ -48,6 +49,8 @@ namespace UGameCore.Utilities {
 
 		void UpdateTexture()
 		{
+			if (null == this.fpsImage)
+				return;
 
 			float fps = 1.0f / Time.unscaledDeltaTime;
 
@@ -98,10 +101,16 @@ namespace UGameCore.Utilities {
 			m_fpsTexture.Apply(false, false);
 			UnityEngine.Profiling.Profiler.EndSample();
 
-		}
+            if (this.fpsImage.texture != this.m_fpsTexture)
+                this.fpsImage.texture = this.m_fpsTexture;
+
+        }
 
 		void UpdateText()
 		{
+			if (null == this.fpsText)
+				return;
+
 			float fps = 1.0f / Time.unscaledDeltaTime;
 			string text = string.Format("{0:0.0} fps", fps);
 			if (this.fpsText.text != text)
