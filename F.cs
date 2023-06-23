@@ -259,6 +259,18 @@ namespace UGameCore.Utilities
             return null;
         }
 
+        public static Camera GetSceneViewCamera()
+        {
+#if UNITY_EDITOR
+            var sceneView = UnityEditor.SceneView.lastActiveSceneView;
+            if (null == sceneView)
+                return null;
+
+            return sceneView.camera;
+#else
+            return null;
+#endif
+        }
 
 		public static void GizmosDrawLineFromCamera ()
 		{
