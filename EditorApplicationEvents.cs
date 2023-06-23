@@ -71,14 +71,8 @@ namespace UGameCore.Utilities
             if (!Application.isPlaying && wasInPlayMode)
                 DispatchOnExitPlayMode();
 
-            if (s_subscribers.Count == 0)
-                return;
-
             s_subscribers.RemoveAll(o => null == o.monoBehaviour);
             s_subscribers.TrimExcessSmart();
-
-            if (s_subscribers.Count == 0)
-                return;
 
             if (Application.isPlaying)
             {
