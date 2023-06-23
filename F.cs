@@ -109,14 +109,19 @@ namespace UGameCore.Utilities
 			return false;
 		}
 
-		public static void RunExceptionSafe (System.Action function)
+		public static void RunExceptionSafe (System.Action function, Object contextObject = null)
 		{
-			try {
+			try
+            {
 				function();
-			} catch(System.Exception ex) {
-				try {
-					Debug.LogException (ex);
-				} catch {}
+			}
+            catch(System.Exception ex)
+            {
+				try
+                {
+					Debug.LogException (ex, contextObject);
+				}
+                catch {}
 			}
 		}
 
