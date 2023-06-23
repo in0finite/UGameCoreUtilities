@@ -1,3 +1,4 @@
+#if !UGAMECORE_DONT_SET_INVARIANT_CULTURE // allow users to modify behavior
 using System.Globalization;
 
 namespace UGameCore.Utilities
@@ -30,3 +31,4 @@ namespace UGameCore.Utilities
         }
     }
 }
+#endif
