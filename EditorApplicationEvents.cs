@@ -82,23 +82,7 @@ namespace UGameCore.Utilities
 
             if (Application.isPlaying)
             {
-                // Make sure we don't call Awake() or Start() twice - this can happen when
-                // exiting play-mode without assembly reload.
-                // So, we assume that Unity called these methods in play-mode.
-                for (int i = 0; i < s_subscribers.Count; i++)
-                {
-                    var subscriber = s_subscribers[i];
-                    // Awake() should always be called by Unity
-                    bool awakeCalled = true;
-                    // we assume that if object is enabled, his Start() was called
-                    bool startCalled = subscriber.hadFirstUpdate || subscriber.monoBehaviour.enabled;
-                    if (subscriber.awakeCalled != awakeCalled || subscriber.hadFirstUpdate != startCalled)
-                    {
-                        subscriber.awakeCalled = awakeCalled;
-                        subscriber.hadFirstUpdate = startCalled;
-                    }
-                }
-
+                UpdateInPlayMode();
                 return;
             }
 
@@ -159,6 +143,26 @@ namespace UGameCore.Utilities
             {
                 if (obj.monoBehaviour != null && obj.monoBehaviour is IEditorApplicationEventsReceiver receiver)
                     F.RunExceptionSafe(receiver.OnExitPlayMode, obj.monoBehaviour);
+            }
+        }
+
+        private static void UpdateInPlayMode()
+        {
+            // Make sure we don't call Awake() or Start() twice - this can happen when
+            // exiting play-mode without assembly reload.
+            // So, we assume that Unity called these methods in play-mode.
+            for (int i = 0; i < s_subscribers.Count; i++)
+            {
+                var subscriber = s_subscribers[i];
+                // Awake() should always be called by Unity
+                bool awakeCalled = true;
+                // we assume that if object is enabled, his Start() was called
+                bool startCalled = subscriber.hadFirstUpdate || subscriber.monoBehaviour.enabled;
+                if (subscriber.awakeCalled != awakeCalled || subscriber.hadFirstUpdate != startCalled)
+                {
+                    subscriber.awakeCalled = awakeCalled;
+                    subscriber.hadFirstUpdate = startCalled;
+                }
             }
         }
 
