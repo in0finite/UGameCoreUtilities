@@ -4,6 +4,21 @@ using UnityEngine;
 
 namespace UGameCore.Utilities
 {
+    /// <summary>
+    /// Implement this interface to receive some Editor Application events.
+    /// You are required to implement this interface if you are receiving messages that are not available as integrated
+    /// Unity messages (Awake, Start, etc).
+    /// Note that you also have to register the object, using <see cref="EditorApplicationEvents.Register"/>.
+    /// </summary>
+    public interface IEditorApplicationEventsReceiver
+    {
+        void OnExitPlayMode() { }
+    }
+
+    /// <summary>
+    /// Dispathes some common Unity messages (Awake, Start, etc) and Editor Application messages to 
+    /// registered objects, during edit-mode.
+    /// </summary>
 #if UNITY_EDITOR
     [UnityEditor.InitializeOnLoad]
 #endif
@@ -23,6 +38,8 @@ namespace UGameCore.Utilities
         private readonly static List<ObjectData> s_subscribers = new List<ObjectData>();
         private readonly static List<ObjectData> s_subscribersUpdateBuffer = new List<ObjectData>();
 
+        private static bool s_wasInPlayModeLastTime = false;
+
 
 
 #if UNITY_EDITOR
@@ -30,11 +47,30 @@ namespace UGameCore.Utilities
         {
             UnityEditor.EditorApplication.update -= EditorUpdate;
             UnityEditor.EditorApplication.update += EditorUpdate;
+
+            UnityEditor.EditorApplication.playModeStateChanged -= PlayModeStateChanged;
+            UnityEditor.EditorApplication.playModeStateChanged += PlayModeStateChanged;
+        }
+#endif
+
+#if UNITY_EDITOR
+        static void PlayModeStateChanged(UnityEditor.PlayModeStateChange playModeStateChange)
+        {
+            if (playModeStateChange != UnityEditor.PlayModeStateChange.EnteredEditMode)
+                return;
+
+            //DispatchOnExitPlayMode();
         }
 #endif
 
         private static void EditorUpdate()
         {
+            bool wasInPlayMode = s_wasInPlayModeLastTime;
+            s_wasInPlayModeLastTime = Application.isPlaying;
+
+            if (!Application.isPlaying && wasInPlayMode)
+                DispatchOnExitPlayMode();
+
             if (s_subscribers.Count == 0)
                 return;
 
@@ -117,6 +153,18 @@ namespace UGameCore.Utilities
 
             if (methodInfo != null)
                 F.RunExceptionSafe(() => methodInfo.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
+        }
+
+        private static void DispatchOnExitPlayMode()
+        {
+            Debug.Log("OnExitPlayMode()");
+
+            ObjectData[] copyArray = s_subscribers.ToArray(); // prevent concurrent modification
+            foreach (ObjectData obj in copyArray)
+            {
+                if (obj.monoBehaviour != null && obj.monoBehaviour is IEditorApplicationEventsReceiver receiver)
+                    F.RunExceptionSafe(receiver.OnExitPlayMode, obj.monoBehaviour);
+            }
         }
 
         public static bool Register(MonoBehaviour subscriber)
