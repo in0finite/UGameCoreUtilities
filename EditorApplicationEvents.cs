@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace UGameCore.Utilities
 {
+#if UNITY_EDITOR
+    [UnityEditor.InitializeOnLoad]
+#endif
     public static class EditorApplicationEvents
     {
         private struct ObjectData
