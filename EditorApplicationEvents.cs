@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace UGameCore.Utilities
@@ -130,7 +131,7 @@ namespace UGameCore.Utilities
 
         private static void DispatchOnExitPlayMode()
         {
-            Debug.Log("OnExitPlayMode()");
+            Debug.Log($"OnExitPlayMode(), {s_subscribers.Count} objects, {s_subscribers.Where(_ => _.monoBehaviour != null).Count()} alive");
 
             ObjectData[] copyArray = s_subscribers.ToArray(); // prevent concurrent modification
             foreach (ObjectData obj in copyArray)
@@ -160,12 +161,20 @@ namespace UGameCore.Utilities
             }
         }
 
-        public static bool Register(MonoBehaviour subscriber)
+        public static void Register(MonoBehaviour subscriber)
         {
 #if UNITY_EDITOR
 
-            if (s_subscribers.Exists(o => o.monoBehaviour == subscriber))
-                return false;
+            if (null == subscriber)
+                throw new ArgumentNullException();
+
+            // Here we have to use object.ReferenceEquals(), because something strange is happening.
+            // When exiting playmode, Unity kills all objects and creates new objects that are part of the scene.
+            // When this function is called from constructor of created object, his reference will point to
+            // something different, but his MonoBehaviour will be equal to one of destroyed object's MonoBehaviour.
+
+            if (s_subscribers.Exists(o => object.ReferenceEquals(o.monoBehaviour, subscriber)))
+                throw new ArgumentException("Already registered");
 
             ObjectData objectData = new ObjectData { monoBehaviour = subscriber };
 
@@ -180,10 +189,6 @@ namespace UGameCore.Utilities
             objectData.lateUpdateMethod = type.GetMethod("LateUpdate", bindingFlags);
 
             s_subscribers.Add(objectData);
-
-            return true;
-#else
-            return false;
 #endif
         }
     }
