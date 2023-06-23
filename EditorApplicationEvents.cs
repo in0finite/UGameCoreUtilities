@@ -39,8 +39,6 @@ namespace UGameCore.Utilities
         private readonly static List<ObjectData> s_subscribers = new List<ObjectData>();
         private readonly static List<ObjectData> s_subscribersUpdateBuffer = new List<ObjectData>();
 
-        private static bool s_wasInPlayModeLastTime = false;
-
 
 
 #if UNITY_EDITOR
@@ -60,18 +58,12 @@ namespace UGameCore.Utilities
             if (playModeStateChange != UnityEditor.PlayModeStateChange.EnteredEditMode)
                 return;
 
-            //DispatchOnExitPlayMode();
+            DispatchOnExitPlayMode();
         }
 #endif
 
         private static void EditorUpdate()
         {
-            bool wasInPlayMode = s_wasInPlayModeLastTime;
-            s_wasInPlayModeLastTime = Application.isPlaying;
-
-            if (!Application.isPlaying && wasInPlayMode)
-                DispatchOnExitPlayMode();
-
             s_subscribers.RemoveAll(o => null == o.monoBehaviour);
             s_subscribers.TrimExcessSmart();
 
