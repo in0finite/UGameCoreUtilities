@@ -24,7 +24,7 @@ namespace UGameCore.Utilities
 #endif
     public static class EditorApplicationEvents
     {
-        private struct ObjectData
+        private class ObjectData
         {
             public MonoBehaviour monoBehaviour;
             public bool awakeCalled;
@@ -96,7 +96,6 @@ namespace UGameCore.Utilities
                     {
                         subscriber.awakeCalled = awakeCalled;
                         subscriber.hadFirstUpdate = startCalled;
-                        s_subscribers[i] = subscriber;
                     }
                 }
 
@@ -118,8 +117,6 @@ namespace UGameCore.Utilities
                 return;
 
             objectData.awakeCalled = true;
-            s_subscribers[index] = objectData;
-            s_subscribersUpdateBuffer[index] = objectData;
 
             if (objectData.awakeMethod != null)
                 F.RunExceptionSafe(() => objectData.awakeMethod.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
@@ -134,9 +131,7 @@ namespace UGameCore.Utilities
             if (!objectData.hadFirstUpdate)
             {
                 objectData.hadFirstUpdate = true;
-                s_subscribers[index] = objectData;
-                s_subscribersUpdateBuffer[index] = objectData;
-
+                
                 if (objectData.startMethod != null)
                     F.RunExceptionSafe(() => objectData.startMethod.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
             }
