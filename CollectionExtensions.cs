@@ -36,6 +36,12 @@ namespace UGameCore.Utilities
             return condition ? enumerable.Where(predicate) : enumerable;
         }
 
+        public static IEnumerable<T> WhereIf<T>(
+            this IEnumerable<T> enumerable, bool condition, System.Func<T, int, bool> predicate)
+        {
+            return condition ? enumerable.Where(predicate) : enumerable;
+        }
+
         public static T SingleOr<T>(this IEnumerable<T> enumerable, T defaultValue)
         {
             return enumerable.TryGetSingle(out T singleElem) ? singleElem : defaultValue;
