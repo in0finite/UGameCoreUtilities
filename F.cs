@@ -109,11 +109,12 @@ namespace UGameCore.Utilities
 			return false;
 		}
 
-		public static void RunExceptionSafe (System.Action function, Object contextObject = null)
+		public static bool RunExceptionSafe (System.Action function, Object contextObject = null)
 		{
 			try
             {
 				function();
+                return true;
 			}
             catch(System.Exception ex)
             {
@@ -123,6 +124,8 @@ namespace UGameCore.Utilities
 				}
                 catch {}
 			}
+
+            return false;
 		}
 
 		public	static	void	Invoke( this System.Object obj, string methodName, params object[] args ) {
