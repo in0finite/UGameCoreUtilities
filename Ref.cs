@@ -1,6 +1,9 @@
 ﻿namespace UGameCore.Utilities
 {
-    public class Ref<T>
+    /// <summary>
+    /// Reference to an object.
+    /// </summary>
+    public sealed class Ref<T>
     {
         public T value;
 
