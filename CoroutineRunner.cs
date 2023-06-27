@@ -141,37 +141,36 @@ namespace UGameCore.Utilities
 
         object IEnumerator.Current => m_current;
 
-        public bool MoveNext()
+        bool IEnumerator.MoveNext()
         {
-            if (m_stack.Count == 0)
-                return false;
-
-            bool catchExceptions = m_noExceptions && m_stack.Count == 1;
-
-            IEnumerator enumerator = m_stack.Peek();
-            bool hasNext = MoveNextSafe(enumerator, catchExceptions);
-            if (!hasNext)
+            while (true)
             {
-                m_stack.Pop();
-                return this.MoveNext();
-            }
+                if (m_stack.Count == 0)
+                    return false;
 
-            object current = GetCurrentSafe(enumerator, catchExceptions);
-            if (current is IEnumerator nestedEnumerator)
-            {
-                m_stack.Push(nestedEnumerator);
-                bool nestedHasNext = this.MoveNext();
-                if (nestedHasNext)
-                    return true;
+                bool catchExceptions = m_noExceptions && m_stack.Count == 1;
 
-                return this.MoveNext();
+                IEnumerator enumerator = m_stack.Peek();
+                bool hasNext = MoveNextSafe(enumerator, catchExceptions);
+                if (!hasNext)
+                {
+                    m_stack.Pop();
+                    continue;
+                }
+
+                object current = GetCurrentSafe(enumerator, catchExceptions);
+                if (current is IEnumerator nestedEnumerator)
+                {
+                    m_stack.Push(nestedEnumerator);
+                    continue;
+                }
+                else if (current != null)
+                    throw new System.Exception("Unknown iterator current value"); // TODO: remove this
+
+                m_current = current;
+
+                return true;
             }
-            else if (current != null)
-                throw new System.Exception("Unknown iterator current value"); // TODO: remove this
-            
-            m_current = current;
-            
-            return true;
         }
 
         void IEnumerator.Reset()
