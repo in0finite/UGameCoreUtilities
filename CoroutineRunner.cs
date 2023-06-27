@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace UGameCore.Utilities
 {
-    public class CoroutineInfo
+    public sealed class CoroutineInfo
     {
         private static long s_lastId = 0;
         public long Id { get; } = ++s_lastId;
@@ -13,22 +13,27 @@ namespace UGameCore.Utilities
         public IEnumerator coroutine { get; }
         public System.Action onFinishSuccess { get; }
         public System.Action<System.Exception> onFinishError { get; }
+        public event System.Action<System.Exception> onFinish = delegate { };
 
-        public CoroutineInfo(IEnumerator coroutine, Action onFinishSuccess, Action<Exception> onFinishError)
+        public bool IsRunning { get; internal set; } = true;
+
+        internal CoroutineInfo(IEnumerator coroutine, Action onFinishSuccess, Action<Exception> onFinishError)
         {
-            this.coroutine = coroutine;
+            this.coroutine = new NestingEnumerator(() => coroutine, false);
             this.onFinishSuccess = onFinishSuccess;
             this.onFinishError = onFinishError;
         }
+
+        internal void NotifyOnFinish(System.Exception ex) => this.onFinish.InvokeEventExceptionSafe(ex);
     }
 
-    public class CoroutineRunner
+    public sealed class CoroutineRunner
     {
         private List<CoroutineInfo> m_coroutines = new List<CoroutineInfo>();
         private List<CoroutineInfo> m_newCoroutines = new List<CoroutineInfo>();
         
 
-        public CoroutineInfo StartCoroutine(IEnumerator coroutine, System.Action onFinishSuccess, System.Action<System.Exception> onFinishError)
+        public CoroutineInfo StartCoroutine(IEnumerator coroutine, System.Action onFinishSuccess = null, System.Action<System.Exception> onFinishError = null)
         {
             var coroutineInfo = new CoroutineInfo(coroutine, onFinishSuccess, onFinishError);
             m_newCoroutines.Add(coroutineInfo);
@@ -42,7 +47,10 @@ namespace UGameCore.Utilities
 
             int index = m_coroutines.IndexOf(coroutineInfo);
             if (index >= 0)
+            {
+                coroutineInfo.IsRunning = false;
                 m_coroutines[index] = null;
+            }
 
             m_newCoroutines.Remove(coroutineInfo);
         }
@@ -52,12 +60,12 @@ namespace UGameCore.Utilities
             if (null == coroutineInfo)
                 return false;
 
-            return m_coroutines.Contains(coroutineInfo) || m_newCoroutines.Contains(coroutineInfo);
+            return coroutineInfo.IsRunning;
         }
 
         public void Update()
         {
-            m_coroutines.RemoveAll(c => null == c);
+            m_coroutines.RemoveAll(c => null == c || !c.IsRunning);
 
             m_coroutines.AddRange(m_newCoroutines);
             m_newCoroutines.Clear();
@@ -93,7 +101,11 @@ namespace UGameCore.Utilities
 
             if (isFinished)
             {
+                coroutine.IsRunning = false;
+
                 m_coroutines[coroutineIndex] = null;
+
+                coroutine.NotifyOnFinish(failureException);
 
                 if (isSuccess)
                 {
@@ -106,6 +118,116 @@ namespace UGameCore.Utilities
                         F.RunExceptionSafe(() => coroutine.onFinishError(failureException));
                 }
             }
+        }
+    }
+
+    public class NestingEnumerator : IEnumerator
+    {
+        readonly IEnumerator m_startingEnumerator;
+        object m_current;
+        readonly Stack<IEnumerator> m_stack = new Stack<IEnumerator>();
+        readonly bool m_noExceptions;
+
+
+        public NestingEnumerator(Func<IEnumerator> enumeratorFunc, bool noExceptions)
+        {
+            m_noExceptions = noExceptions;
+
+            m_startingEnumerator = GetEnumeratorSafe(enumeratorFunc, m_noExceptions);
+            
+            if (m_startingEnumerator != null)
+                m_stack.Push(m_startingEnumerator);
+        }
+
+        object IEnumerator.Current => m_current;
+
+        public bool MoveNext()
+        {
+            if (m_stack.Count == 0)
+                return false;
+
+            bool catchExceptions = m_noExceptions && m_stack.Count == 1;
+
+            IEnumerator enumerator = m_stack.Peek();
+            bool hasNext = MoveNextSafe(enumerator, catchExceptions);
+            if (!hasNext)
+            {
+                m_stack.Pop();
+                return this.MoveNext();
+            }
+
+            object current = GetCurrentSafe(enumerator, catchExceptions);
+            if (current is IEnumerator nestedEnumerator)
+            {
+                m_stack.Push(nestedEnumerator);
+                bool nestedHasNext = this.MoveNext();
+                if (nestedHasNext)
+                    return true;
+
+                return this.MoveNext();
+            }
+            else if (current != null)
+                throw new System.Exception("Unknown iterator current value"); // TODO: remove this
+            
+            m_current = current;
+            
+            return true;
+        }
+
+        void IEnumerator.Reset()
+        {
+            if (m_startingEnumerator != null)
+                ResetSafe(m_startingEnumerator, m_noExceptions);
+
+            m_stack.Clear();
+
+            if (m_startingEnumerator != null)
+                m_stack.Push(m_startingEnumerator);
+
+            m_current = null;
+        }
+
+        // "safe" methods
+
+        static IEnumerator GetEnumeratorSafe(Func<IEnumerator> func, bool catchExceptions)
+        {
+            if (!catchExceptions)
+                return func();
+
+            IEnumerator enumerator = null;
+            F.RunExceptionSafe(() => enumerator = func());
+            return enumerator;
+        }
+
+        static bool MoveNextSafe(IEnumerator enumerator, bool catchExceptions)
+        {
+            if (!catchExceptions)
+                return enumerator.MoveNext();
+
+            bool hasNext = false;
+            F.RunExceptionSafe(() => hasNext = enumerator.MoveNext());
+            return hasNext;
+        }
+
+        static object GetCurrentSafe(IEnumerator enumerator, bool catchExceptions)
+        {
+            if (!catchExceptions)
+                return enumerator.Current;
+
+            object current = null;
+            F.RunExceptionSafe(() => current = enumerator.Current);
+            return current;
+        }
+
+        static void ResetSafe(IEnumerator enumerator, bool catchExceptions)
+        {
+            if (!catchExceptions)
+            {
+                enumerator.Reset();
+                return;
+            }
+
+            F.RunExceptionSafe(enumerator.Reset);
         }
     }
 }
