@@ -141,35 +141,65 @@ namespace UGameCore.Utilities
 
         object IEnumerator.Current => m_current;
 
+        bool? MoveNextOneIteration()
+        {
+            if (m_stack.Count == 0)
+                return false;
+
+            bool catchExceptions = false;
+
+            IEnumerator enumerator = m_stack.Peek();
+            bool hasNext = MoveNextSafe(enumerator, catchExceptions);
+            if (!hasNext)
+            {
+                m_stack.Pop();
+                return null;
+            }
+
+            object current = GetCurrentSafe(enumerator, catchExceptions);
+            if (current is IEnumerator nestedEnumerator)
+            {
+                m_stack.Push(nestedEnumerator);
+                return null;
+            }
+            else if (current != null)
+                throw new System.Exception("Unknown iterator current value"); // TODO: remove this
+
+            m_current = current;
+
+            return true;
+        }
+
         bool IEnumerator.MoveNext()
         {
             while (true)
             {
-                if (m_stack.Count == 0)
-                    return false;
+                bool? bResult = null;
 
-                bool catchExceptions = m_noExceptions && m_stack.Count == 1;
-
-                IEnumerator enumerator = m_stack.Peek();
-                bool hasNext = MoveNextSafe(enumerator, catchExceptions);
-                if (!hasNext)
+                if (m_noExceptions)
                 {
-                    m_stack.Pop();
-                    continue;
+                    bool thrownException = !F.RunExceptionSafe(() => bResult = MoveNextOneIteration());
+
+                    if (thrownException)
+                    {
+                        /*if (m_stack.Count == 1) // root thrown exception
+                            return false;
+
+                        while (m_stack.Count > 1) // remove all except root
+                            m_stack.Pop();
+
+                        continue; // continue with root's enumeration*/
+
+                        return false;
+                    }
+                }
+                else
+                {
+                    bResult = MoveNextOneIteration();
                 }
 
-                object current = GetCurrentSafe(enumerator, catchExceptions);
-                if (current is IEnumerator nestedEnumerator)
-                {
-                    m_stack.Push(nestedEnumerator);
-                    continue;
-                }
-                else if (current != null)
-                    throw new System.Exception("Unknown iterator current value"); // TODO: remove this
-
-                m_current = current;
-
-                return true;
+                if (bResult.HasValue)
+                    return bResult.Value;
             }
         }
 
