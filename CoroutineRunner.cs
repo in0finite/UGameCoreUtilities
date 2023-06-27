@@ -162,8 +162,6 @@ namespace UGameCore.Utilities
                 m_stack.Push(nestedEnumerator);
                 return null;
             }
-            else if (current != null)
-                throw new System.Exception("Unknown iterator current value"); // TODO: remove this
 
             m_current = current;
 
@@ -181,17 +179,7 @@ namespace UGameCore.Utilities
                     bool thrownException = !F.RunExceptionSafe(() => bResult = MoveNextOneIteration());
 
                     if (thrownException)
-                    {
-                        /*if (m_stack.Count == 1) // root thrown exception
-                            return false;
-
-                        while (m_stack.Count > 1) // remove all except root
-                            m_stack.Pop();
-
-                        continue; // continue with root's enumeration*/
-
                         return false;
-                    }
                 }
                 else
                 {
