@@ -8,31 +8,31 @@ namespace UGameCore.Utilities
         IEnumerator IFileSystemAccessorAsync.FileExistsAsync(Ref<bool> result, string path)
         {
             result.value = File.Exists(path);
-            return null;
+            yield break;
         }
 
         IEnumerator IFileSystemAccessorAsync.FileOpenAsync(Ref<Stream> result, string path, FileMode mode, FileAccess access, FileShare share)
         {
             result.value = File.Open(path, mode, access, share);
-            return null;
+            yield break;
         }
 
         IEnumerator IFileSystemAccessorAsync.DirectoryExistsAsync(Ref<bool> result, string path)
         {
             result.value = Directory.Exists(path);
-            return null;
+            yield break;
         }
 
         IEnumerator IFileSystemAccessorAsync.DirectoryGetFilesAsync(Ref<string[]> result, string path, string searchPattern, SearchOption searchOption)
         {
             result.value = Directory.GetFiles(path, searchPattern, searchOption);
-            return null;
+            yield break;
         }
 
         IEnumerator IFileSystemAccessorAsync.DirectoryGetDirectoriesAsync(Ref<string[]> result, string path, string searchPattern, SearchOption searchOption)
         {
             result.value = Directory.GetDirectories(path, searchPattern, searchOption);
-            return null;
+            yield break;
         }
     }
 }
