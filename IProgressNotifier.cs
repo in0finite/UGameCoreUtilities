@@ -17,6 +17,11 @@ namespace UGameCore.Utilities
         public float Progress { get; }
 
         /// <summary>
+        /// Last assigned progress title.
+        /// </summary>
+        public string ProgressTitle { get; }
+
+        /// <summary>
         /// Update the progress. The method can throw exception if the operation is cancelled by user.
         /// </summary>
         /// <exception cref="System.OperationCanceledException"></exception>

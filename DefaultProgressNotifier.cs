@@ -9,6 +9,8 @@ namespace UGameCore.Utilities
 
         public float Progress { get; protected set; } = 0f;
 
+        public string ProgressTitle { get; protected set; } = string.Empty;
+
 
         public DefaultProgressNotifier(IProfiler profiler)
         {
@@ -19,6 +21,8 @@ namespace UGameCore.Utilities
         {
             if (progress.HasValue)
                 this.Progress = progress.Value;
+
+            this.ProgressTitle = title;
 
 #if UNITY_EDITOR
             if (UnityEditor.EditorUtility.DisplayCancelableProgressBar(title, description, this.Progress))
