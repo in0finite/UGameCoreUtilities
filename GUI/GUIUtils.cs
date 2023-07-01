@@ -445,7 +445,7 @@ namespace UGameCore.Utilities
             Vector2 mousePos = Input.mousePosition;
             mousePos.y = Screen.height - mousePos.y;
 
-            Vector2 rectPos = mousePos - new Vector2(0, 10 + size.y) - size / 2f;
+            Vector2 rectPos = mousePos - new Vector2(0, 7 + size.y) - size / 2f;
 
             // constrain rect pos to screen
             rectPos.x = Mathf.Clamp(rectPos.x, 0f, Screen.width - size.x);
