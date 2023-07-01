@@ -17,9 +17,9 @@ namespace UGameCore.Utilities
 
         public bool IsRunning { get; internal set; } = true;
 
-        internal CoroutineInfo(IEnumerator coroutine, Action onFinishSuccess, Action<Exception> onFinishError)
+        internal CoroutineInfo(Func<IEnumerator> coroutineFunc, Action onFinishSuccess, Action<Exception> onFinishError)
         {
-            this.coroutine = new NestingEnumerator(() => coroutine, false);
+            this.coroutine = new NestingEnumerator(coroutineFunc, false);
             this.onFinishSuccess = onFinishSuccess;
             this.onFinishError = onFinishError;
         }
@@ -31,14 +31,17 @@ namespace UGameCore.Utilities
     {
         private List<CoroutineInfo> m_coroutines = new List<CoroutineInfo>();
         private List<CoroutineInfo> m_newCoroutines = new List<CoroutineInfo>();
-        
 
-        public CoroutineInfo StartCoroutine(IEnumerator coroutine, System.Action onFinishSuccess = null, System.Action<System.Exception> onFinishError = null)
+
+        public CoroutineInfo StartCoroutine(Func<IEnumerator> coroutineFunc, System.Action onFinishSuccess = null, System.Action<System.Exception> onFinishError = null)
         {
-            var coroutineInfo = new CoroutineInfo(coroutine, onFinishSuccess, onFinishError);
+            var coroutineInfo = new CoroutineInfo(coroutineFunc, onFinishSuccess, onFinishError);
             m_newCoroutines.Add(coroutineInfo);
             return coroutineInfo;
         }
+
+        public CoroutineInfo StartCoroutine(IEnumerator coroutine, System.Action onFinishSuccess = null, System.Action<System.Exception> onFinishError = null)
+            => this.StartCoroutine(() => coroutine, onFinishSuccess, onFinishError);
 
         public void StopCoroutine(CoroutineInfo coroutineInfo)
         {
