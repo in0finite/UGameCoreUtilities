@@ -1,15 +1,19 @@
+using UnityEngine;
+
 namespace UGameCore.Utilities
 {
     public class DefaultProgressNotifier : IProgressNotifier
     {
         public IProfiler Profiler { get; private set; }
         protected ETAMeasurer m_ETAMeasurer = new ETAMeasurer(0f);
+        public bool ShowEditorProgressBarInPlayMode { get; set; } = true;
 
         public bool HasProgress { get; protected set; } = false;
 
         public float Progress { get; protected set; } = 0f;
 
         public string ProgressTitle { get; protected set; } = string.Empty;
+
 
 
         public DefaultProgressNotifier(IProfiler profiler)
@@ -25,11 +29,14 @@ namespace UGameCore.Utilities
             this.ProgressTitle = title;
 
 #if UNITY_EDITOR
-            if (UnityEditor.EditorUtility.DisplayCancelableProgressBar(title, description, this.Progress))
+            if (this.ShowEditorProgressBarInPlayMode || !Application.isPlaying)
             {
-                this.HasProgress = true;
-                this.ClearProgress();
-                throw new System.OperationCanceledException($"Operation cancellled by user by clicking on Editor dialog");
+                if (UnityEditor.EditorUtility.DisplayCancelableProgressBar(title, description, this.Progress))
+                {
+                    this.HasProgress = true;
+                    this.ClearProgress();
+                    throw new System.OperationCanceledException($"Operation cancellled by user by clicking on Editor dialog");
+                }
             }
 #endif
 
