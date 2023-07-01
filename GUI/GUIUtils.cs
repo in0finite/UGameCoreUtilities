@@ -359,15 +359,22 @@ namespace UGameCore.Utilities
 			// always display 2 buttons for fast scrolling - they move the view for 10 pages
 			// display as many page number buttons as possible in the middle
 
-			float minWidth = spacing + buttonWidth + spacing + buttonWidth + spacing + buttonWidth + spacing + buttonWidth;
-			float widthLeftForMiddleButtons = rect.width - minWidth;
-			int numMiddleButtonsToShow = Mathf.FloorToInt(widthLeftForMiddleButtons / (buttonWidth + spacing));
-			if (numMiddleButtonsToShow > numPages)
-				numMiddleButtonsToShow = numPages;
+			int numMiddleButtonsToShow = CalcNumMiddleButtons(spacing, buttonWidth, rect.width, numPages);
 
-			// 2 buttons on left side
+			// readjust button width if highest number requires more width to be drawn
 
-			btnRect.position += new Vector2(spacing, 0f);
+			int numberForCalcSize = currentPage + numMiddleButtonsToShow / 2 + 1;
+			Vector2 screenSizeForMaxNumber = GUI.skin.button.CalcSize(new GUIContent(numberForCalcSize.ToString()));
+			if (buttonWidth < screenSizeForMaxNumber.x)
+            {
+                buttonWidth = screenSizeForMaxNumber.x;
+                btnRect.width = buttonWidth;
+                numMiddleButtonsToShow = CalcNumMiddleButtons(spacing, buttonWidth, rect.width, numPages);
+            }
+
+            // 2 buttons on left side
+
+            btnRect.position += new Vector2(spacing, 0f);
 			if (GUI.Button(btnRect, new GUIContent("<<", "Go to 1st page")))
             {
 				resultingPage = 1;
@@ -417,7 +424,17 @@ namespace UGameCore.Utilities
 			pagedViewParams.currentPage = resultingPage;
 		}
 
-		public static void LayoutDrawPagedViewNumbers(PagedViewParams pagedViewParams)
+		static int CalcNumMiddleButtons(float spacing, float buttonWidth, float rectWidth, int numPages)
+		{
+            float minWidth = spacing + buttonWidth + spacing + buttonWidth + spacing + buttonWidth + spacing + buttonWidth;
+            float widthLeftForMiddleButtons = rectWidth - minWidth;
+            int numMiddleButtonsToShow = Mathf.FloorToInt(widthLeftForMiddleButtons / (buttonWidth + spacing));
+            if (numMiddleButtonsToShow > numPages)
+                numMiddleButtonsToShow = numPages;
+			return numMiddleButtonsToShow;
+        }
+
+        public static void LayoutDrawPagedViewNumbers(PagedViewParams pagedViewParams)
 		{
 			pagedViewParams.FixValues();
 			float width = pagedViewParams.width ?? FindOutLayoutWidth();
