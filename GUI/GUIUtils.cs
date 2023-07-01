@@ -405,9 +405,9 @@ namespace UGameCore.Utilities
 				}
 			}
 
-			// 2 buttons on right side
+			// 2 buttons on right side (aligned to the right)
 
-			btnRect.position += new Vector2(buttonWidth + spacing, 0f);
+			btnRect.position = new Vector2(rect.width - buttonWidth - spacing - buttonWidth - spacing, btnRect.position.y);
 			if (GUI.Button(btnRect, new GUIContent(">", $"Go {pagedViewParams.jumpButtonPageCount} pages forward")))
 			{
 				resultingPage += pagedViewParams.jumpButtonPageCount;
