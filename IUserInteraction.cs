@@ -8,9 +8,19 @@ namespace UGameCore.Utilities
     public interface IUserInteraction
     {
         /// <summary>
-        /// Shows message to the user.
+        /// Shows message to the user. Note that this function does not have to be synchronous (it can return immediately).
+        /// </summary>
+        void ShowMessage(string title, string message);
+
+        /// <summary>
+        /// Shows message to the user and return <see cref="IEnumerator"/> which finishes when user closes the message.
         /// </summary>
         IEnumerator ShowMessageAsync(string title, string message);
+
+        /// <summary>
+        /// Is Confirm supported by this implementation ?
+        /// </summary>
+        bool SupportsConfirm { get; }
 
         /// <summary>
         /// Asks user to confirm, using 2 options (Ok and Cancel).
