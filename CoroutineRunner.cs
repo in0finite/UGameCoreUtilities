@@ -10,7 +10,7 @@ namespace UGameCore.Utilities
         private static long s_lastId = 0;
         public long Id { get; } = ++s_lastId;
 
-        public IEnumerator coroutine { get; }
+        internal IEnumerator coroutine { get; }
         public System.Action onFinishSuccess { get; }
         public System.Action<System.Exception> onFinishError { get; }
         public event System.Action<System.Exception> onFinish = delegate { };
@@ -126,20 +126,18 @@ namespace UGameCore.Utilities
 
     public class NestingEnumerator : IEnumerator
     {
-        readonly IEnumerator m_startingEnumerator;
+        IEnumerator m_startingEnumerator;
+        Func<IEnumerator> m_enumeratorFunc;
         object m_current;
         readonly Stack<IEnumerator> m_stack = new Stack<IEnumerator>();
         readonly bool m_noExceptions;
+        bool m_initialized = false;
 
 
         public NestingEnumerator(Func<IEnumerator> enumeratorFunc, bool noExceptions)
         {
+            m_enumeratorFunc = enumeratorFunc;
             m_noExceptions = noExceptions;
-
-            m_startingEnumerator = GetEnumeratorSafe(enumeratorFunc, m_noExceptions);
-            
-            if (m_startingEnumerator != null)
-                m_stack.Push(m_startingEnumerator);
         }
 
         object IEnumerator.Current => m_current;
@@ -171,8 +169,26 @@ namespace UGameCore.Utilities
             return true;
         }
 
+        void Initialize()
+        {
+            if (m_initialized)
+                return;
+
+            m_initialized = true;
+
+            var tempFunc = m_enumeratorFunc;
+            m_enumeratorFunc = null; // we don't need it anymore, release references
+
+            m_startingEnumerator = GetEnumeratorSafe(tempFunc, m_noExceptions);
+
+            if (m_startingEnumerator != null)
+                m_stack.Push(m_startingEnumerator);
+        }
+
         bool IEnumerator.MoveNext()
         {
+            this.Initialize();
+
             while (true)
             {
                 bool? bResult = null;
