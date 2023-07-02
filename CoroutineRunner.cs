@@ -17,6 +17,8 @@ namespace UGameCore.Utilities
 
         public bool IsRunning { get; internal set; } = true;
 
+        public Exception FailureException { get; internal set; }
+
         internal CoroutineInfo(Func<IEnumerator> coroutineFunc, Action onFinishSuccess, Action<Exception> onFinishError)
         {
             this.coroutine = new NestingEnumerator(coroutineFunc, false);
@@ -105,6 +107,7 @@ namespace UGameCore.Utilities
             if (isFinished)
             {
                 coroutine.IsRunning = false;
+                coroutine.FailureException = failureException;
 
                 m_coroutines[coroutineIndex] = null;
 
