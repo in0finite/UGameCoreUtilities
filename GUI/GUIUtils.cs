@@ -323,7 +323,7 @@ namespace UGameCore.Utilities
             }
         }
 
-		public static float FindOutLayoutWidth()
+        public static float FindOutLayoutWidth()
         {
 			GUILayout.Space(1);
 			return GUILayoutUtility.GetLastRect().width;
@@ -462,7 +462,7 @@ namespace UGameCore.Utilities
             Vector2 mousePos = Input.mousePosition;
             mousePos.y = Screen.height - mousePos.y;
 
-            Vector2 rectPos = mousePos - new Vector2(0, 7 + size.y) - size / 2f;
+            Vector2 rectPos = mousePos - new Vector2(0, 5 + size.y) - size / 2f;
 
             // constrain rect pos to screen
             rectPos.x = Mathf.Clamp(rectPos.x, 0f, Screen.width - size.x);
