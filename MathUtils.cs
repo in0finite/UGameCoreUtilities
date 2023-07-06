@@ -98,6 +98,16 @@ namespace UGameCore.Utilities
             return result;
         }
 
+        public static Vector3 Pow(this Vector3 v, float p)
+        {
+            return new Vector3(Mathf.Pow(v.x, p), Mathf.Pow(v.y, p), Mathf.Pow(v.z, p));
+        }
+
+        public static Vector4 Pow(this Vector4 v, float p)
+        {
+            return new Vector4(Mathf.Pow(v.x, p), Mathf.Pow(v.y, p), Mathf.Pow(v.z, p), Mathf.Pow(v.w, p));
+        }
+
         /// <summary>
         /// Returns vector with negated component at given index.
         /// </summary>
