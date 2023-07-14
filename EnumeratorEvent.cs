@@ -4,29 +4,29 @@ using System.Collections.Generic;
 
 namespace UGameCore.Utilities
 {
-    public class EnumeratorEvent
+    public class EnumeratorEvent<T>
     {
-        List<Func<IEnumerator>> m_subscribers = new List<Func<IEnumerator>>();
+        List<Func<T, IEnumerator>> m_subscribers = new List<Func<T, IEnumerator>>();
 
 
-        public void Subscribe(Func<IEnumerator> enumeratorFunc) => m_subscribers.Add(enumeratorFunc);
+        public void Subscribe(Func<T, IEnumerator> enumeratorFunc) => m_subscribers.Add(enumeratorFunc);
 
-        public void Unsubscribe(Func<IEnumerator> enumeratorFunc) => m_subscribers.Remove(enumeratorFunc);
+        public void Unsubscribe(Func<T, IEnumerator> enumeratorFunc) => m_subscribers.Remove(enumeratorFunc);
 
-        public Func<IEnumerator>[] GetSubscribers() => m_subscribers.ToArray();
+        public Func<T, IEnumerator>[] GetSubscribers() => m_subscribers.ToArray();
 
-        public IEnumerator Invoke()
+        public IEnumerator Invoke(T eventParameter)
         {
             var listCopy = m_subscribers.ToArray();
             foreach (var enumeratorFunc in listCopy)
-                yield return new NestingEnumerator(enumeratorFunc, false);
+                yield return new NestingEnumerator(() => enumeratorFunc(eventParameter), false);
         }
 
-        public IEnumerator InvokeNoException()
+        public IEnumerator InvokeNoException(T eventParameter)
         {
             var listCopy = m_subscribers.ToArray();
             foreach (var enumeratorFunc in listCopy)
-                yield return new NestingEnumerator(enumeratorFunc, true);
+                yield return new NestingEnumerator(() => enumeratorFunc(eventParameter), true);
         }
     }
 }
