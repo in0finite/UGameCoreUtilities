@@ -65,6 +65,22 @@ namespace UGameCore.Utilities
         }
 
         /// <summary>
+        /// Find first-level (direct) children of specified <see cref="Transform"/> that have specified name.
+        /// </summary>
+        public static List<Transform> FindFirstLevelChildrenWithName(this Transform transform, string strName)
+        {
+            var resultList = new List<Transform>();
+            int childCount = transform.childCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = transform.GetChild(i);
+                if (child.name.Equals(strName, System.StringComparison.Ordinal))
+                    resultList.Add(child);
+            }
+            return resultList;
+        }
+
+        /// <summary>
         /// Recursively searches through transform hierarchy to find a child with specified name.
         /// </summary>
         public static Transform FindChildRecursive(this Transform transform, string strName)
