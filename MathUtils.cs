@@ -28,6 +28,11 @@ namespace UGameCore.Utilities
             return a.Min(b);
         }
 
+        public static float MinComponent(this Vector3 v)
+        {
+            return Mathf.Min(Mathf.Min(v.x, v.y), v.z);
+        }
+
         public static Vector3 Min(this Vector3 a, Vector3 b)
         {
             return new Vector3(Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y), Mathf.Min(a.z, b.z));
@@ -41,6 +46,11 @@ namespace UGameCore.Utilities
         public static Vector2 MaxComponents(Vector2 a, Vector2 b)
         {
             return new Vector2(Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y));
+        }
+
+        public static float MaxComponent(this Vector3 v)
+        {
+            return Mathf.Max(Mathf.Max(v.x, v.y), v.z);
         }
 
         public static Vector3 MaxComponents(Vector3 a, Vector3 b)
