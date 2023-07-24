@@ -374,6 +374,11 @@ namespace UGameCore.Utilities
             Array.Sort(array, comparer);
         }
 
+        public static void Sort<T>(this T[] array, Comparison<T> comparison)
+        {
+            Array.Sort(array, comparison);
+        }
+
         public static void SortBy<T, TBy>(this T[] array, Func<T, TBy> funcSelector)
             where TBy : IComparable<TBy>
         {

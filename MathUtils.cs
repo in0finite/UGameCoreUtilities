@@ -108,6 +108,11 @@ namespace UGameCore.Utilities
             return result;
         }
 
+        public static Vector3 Mul(this Vector3 v, Vector3 other)
+        {
+            return new Vector3(v.x * other.x, v.y * other.y, v.z * other.z);
+        }
+
         public static Vector3 Pow(this Vector3 v, float p)
         {
             return new Vector3(Mathf.Pow(v.x, p), Mathf.Pow(v.y, p), Mathf.Pow(v.z, p));
@@ -116,6 +121,16 @@ namespace UGameCore.Utilities
         public static Vector4 Pow(this Vector4 v, float p)
         {
             return new Vector4(Mathf.Pow(v.x, p), Mathf.Pow(v.y, p), Mathf.Pow(v.z, p), Mathf.Pow(v.w, p));
+        }
+
+        public static Vector3 Round(this Vector3 v)
+        {
+            return new Vector3(Mathf.Round(v.x), Mathf.Round(v.y), Mathf.Round(v.z));
+        }
+
+        public static Vector3Int RoundToInt(this Vector3 v)
+        {
+            return new Vector3Int(Mathf.RoundToInt(v.x), Mathf.RoundToInt(v.y), Mathf.RoundToInt(v.z));
         }
 
         /// <summary>
@@ -140,6 +155,11 @@ namespace UGameCore.Utilities
         public static Vector2 ToVec2WithXAndZ(this Vector3 vec3)
         {
             return new Vector2(vec3.x, vec3.z);
+        }
+
+        public static Vector4 ToVec4WithW(this Vector3 vec3, float w)
+        {
+            return new Vector4(vec3.x, vec3.y, vec3.z, w);
         }
 
         public static Vector3 ToVec3XZ(this Vector2 vec)
