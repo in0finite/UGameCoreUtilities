@@ -318,6 +318,18 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static bool IsIL2CPPBuild
+        {
+            get
+            {
+#if ENABLE_IL2CPP
+                return true;
+#else
+                return false;
+#endif
+            }
+        }
+
         public static bool ScreenHasHighDensity => Application.isMobilePlatform;
 
 
