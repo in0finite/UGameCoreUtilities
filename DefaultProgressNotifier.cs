@@ -13,6 +13,7 @@ namespace UGameCore.Utilities
         public float Progress { get; protected set; } = 0f;
 
         public string ProgressTitle { get; protected set; } = string.Empty;
+        public string ProgressDescription { get; protected set; } = string.Empty;
 
 
 
@@ -27,6 +28,7 @@ namespace UGameCore.Utilities
                 this.Progress = progress.Value;
 
             this.ProgressTitle = title;
+            this.ProgressDescription = description;
 
 #if UNITY_EDITOR
             if (this.ShowEditorProgressBarInPlayMode || !Application.isPlaying)
