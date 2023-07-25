@@ -23,9 +23,8 @@ public class GLDebug : MonoBehaviour
         public bool DurationExpired => Time.timeAsDouble - this.startTime >= this.duration;
     }
 
-    private static GLDebug instance;
-    private static Material matZOn;
-    private static Material matZOff;
+    private Material matZOn;
+    private Material matZOff;
 
     public KeyCode toggleKey;
     public bool displayLines = true;
@@ -42,13 +41,6 @@ public class GLDebug : MonoBehaviour
 
     void Awake()
     {
-        if (instance)
-        {
-            DestroyImmediate(this);
-            return;
-        }
-
-        instance = this;
         SetMaterial();
 
         if (null == this.GetComponent<Camera>())
@@ -135,36 +127,36 @@ public class GLDebug : MonoBehaviour
         GL.End();
     }
 
-    private static void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0, bool depthTest = false)
+    private void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0, bool depthTest = false)
     {
-        if (duration == 0 && !instance.displayLines)
+        if (duration == 0 && !displayLines)
             return;
         if (start == end)
             return;
         if (depthTest)
-            instance.linesZOn.Add(new Line(start, end, color, Time.timeAsDouble, duration));
+            linesZOn.Add(new Line(start, end, color, Time.timeAsDouble, duration));
         else
-            instance.linesZOff.Add(new Line(start, end, color, Time.timeAsDouble, duration));
+            linesZOff.Add(new Line(start, end, color, Time.timeAsDouble, duration));
     }
 
-    public static void DrawLine(Vector3 start, Vector3 end, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawLine(Vector3 start, Vector3 end, Color? color = null, float duration = 0, bool depthTest = false)
     {
         DrawLine(start, end, color ?? Color.white, duration, depthTest);
     }
 
-    public static void DrawRay(Vector3 start, Vector3 dir, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawRay(Vector3 start, Vector3 dir, Color? color = null, float duration = 0, bool depthTest = false)
     {
         if (dir == Vector3.zero)
             return;
         DrawLine(start, start + dir, color, duration, depthTest);
     }
 
-    public static void DrawLineArrow(Vector3 start, Vector3 end, float arrowHeadLength = 0.25f, float arrowHeadAngle = 20, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawLineArrow(Vector3 start, Vector3 end, float arrowHeadLength = 0.25f, float arrowHeadAngle = 20, Color? color = null, float duration = 0, bool depthTest = false)
     {
         DrawArrow(start, end - start, arrowHeadLength, arrowHeadAngle, color, duration, depthTest);
     }
 
-    public static void DrawArrow(Vector3 start, Vector3 dir, float arrowHeadLength = 0.25f, float arrowHeadAngle = 20, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawArrow(Vector3 start, Vector3 dir, float arrowHeadLength = 0.25f, float arrowHeadAngle = 20, Color? color = null, float duration = 0, bool depthTest = false)
     {
         if (dir == Vector3.zero)
             return;
@@ -175,17 +167,17 @@ public class GLDebug : MonoBehaviour
         DrawRay(start + dir, left * arrowHeadLength, color, duration, depthTest);
     }
 
-    public static void DrawSquare(Vector3 pos, Vector3? rot = null, Vector3? scale = null, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawSquare(Vector3 pos, Vector3? rot = null, Vector3? scale = null, Color? color = null, float duration = 0, bool depthTest = false)
     {
         DrawSquare(Matrix4x4.TRS(pos, Quaternion.Euler(rot ?? Vector3.zero), scale ?? Vector3.one), color, duration, depthTest);
     }
     
-    public static void DrawSquare(Vector3 pos, Quaternion? rot = null, Vector3? scale = null, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawSquare(Vector3 pos, Quaternion? rot = null, Vector3? scale = null, Color? color = null, float duration = 0, bool depthTest = false)
     {
         DrawSquare(Matrix4x4.TRS(pos, rot ?? Quaternion.identity, scale ?? Vector3.one), color, duration, depthTest);
     }
     
-    public static void DrawSquare(Matrix4x4 matrix, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawSquare(Matrix4x4 matrix, Color? color = null, float duration = 0, bool depthTest = false)
     {
         Vector3
                 p_1 = matrix.MultiplyPoint3x4(new Vector3(.5f, 0, .5f)),
@@ -199,17 +191,17 @@ public class GLDebug : MonoBehaviour
         DrawLine(p_4, p_1, color, duration, depthTest);
     }
 
-    public static void DrawCube(Vector3 pos, Vector3? rot = null, Vector3? scale = null, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawCube(Vector3 pos, Vector3? rot = null, Vector3? scale = null, Color? color = null, float duration = 0, bool depthTest = false)
     {
         DrawCube(Matrix4x4.TRS(pos, Quaternion.Euler(rot ?? Vector3.zero), scale ?? Vector3.one), color, duration, depthTest);
     }
     
-    public static void DrawCube(Vector3 pos, Quaternion? rot = null, Vector3? scale = null, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawCube(Vector3 pos, Quaternion? rot = null, Vector3? scale = null, Color? color = null, float duration = 0, bool depthTest = false)
     {
         DrawCube(Matrix4x4.TRS(pos, rot ?? Quaternion.identity, scale ?? Vector3.one), color, duration, depthTest);
     }
     
-    public static void DrawCube(Matrix4x4 matrix, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawCube(Matrix4x4 matrix, Color? color = null, float duration = 0, bool depthTest = false)
     {
         Vector3
                 down_1 = matrix.MultiplyPoint3x4(new Vector3(.5f, -.5f, .5f)),
@@ -237,7 +229,7 @@ public class GLDebug : MonoBehaviour
         DrawLine(up_4, up_1, color, duration, depthTest);
     }
 
-    public static void DrawCircle(Vector3 center, float radius, Color? color = null, float duration = 0, bool depthTest = false)
+    public void DrawCircle(Vector3 center, float radius, Color? color = null, float duration = 0, bool depthTest = false)
     {
         for (float theta = 0.0f; theta < (2 * Mathf.PI); theta += 0.2f)
         {
