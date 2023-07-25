@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class GLDebug : MonoBehaviour
 {
@@ -8,25 +9,18 @@ public class GLDebug : MonoBehaviour
         public Vector3 start;
         public Vector3 end;
         public Color color;
-        public double startTime;
-        public float duration;
 
-        public Line(Vector3 start, Vector3 end, Color color, double startTime, float duration)
+        public Line(Vector3 start, Vector3 end, Color color)
         {
             this.start = start;
             this.end = end;
             this.color = color;
-            this.startTime = startTime;
-            this.duration = duration;
         }
-
-        public bool DurationExpired => Time.timeAsDouble - this.startTime >= this.duration;
     }
 
     private Material matZOn;
     private Material matZOff;
 
-    public KeyCode toggleKey = KeyCode.None;
     public bool displayLines = true;
 #if UNITY_EDITOR
     public bool displayGizmos = true;
@@ -35,8 +29,6 @@ public class GLDebug : MonoBehaviour
     private List<Line> linesZOn = new List<Line>();
     private List<Line> linesZOff = new List<Line>();
     
-    public Shader zOnShader;
-    public Shader zOffShader;
 
 
     void Awake()
@@ -65,23 +57,25 @@ public class GLDebug : MonoBehaviour
 
     void SetupMaterials()
     {
-        matZOn = new Material(this.zOnShader);
+        Shader shader = Shader.Find("Hidden/Internal-Colored");
+
+        matZOn = new Material(shader);
         matZOn.hideFlags = HideFlags.HideAndDontSave;
-        
-        matZOff = new Material(this.zOffShader);
+        SetupMaterialProperties(matZOn);
+
+        matZOff = new Material(shader);
         matZOff.hideFlags = HideFlags.HideAndDontSave;
+        SetupMaterialProperties(matZOff);
+
+        matZOff.SetInt("_ZTest", (int)CompareFunction.Always); // render over everything
     }
 
-    void Update()
+    void SetupMaterialProperties(Material material)
     {
-        if (toggleKey != KeyCode.None && Input.GetKeyDown(toggleKey))
-            displayLines = !displayLines;
-
-        if (!displayLines)
-        {
-            linesZOn.RemoveAll(_ => _.DurationExpired);
-            linesZOff.RemoveAll(_ => _.DurationExpired);
-        }
+        material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+        material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+        material.SetInt("_Cull", (int)CullMode.Off);
+        material.SetInt("_ZWrite", 0);
     }
 
 #if UNITY_EDITOR
@@ -111,30 +105,24 @@ public class GLDebug : MonoBehaviour
 
         matZOn.SetPass(0);
 
-        GL.Begin(GL.LINES);
-
-        linesZOn.RemoveAll(line =>
-        {
-            GL.Color(line.color);
-            GL.Vertex(line.start);
-            GL.Vertex(line.end);
-            return line.DurationExpired;
-        });
-
-        GL.End();
+        RenderLines(linesZOn);
 
         matZOff.SetPass(0);
 
-        GL.Begin(GL.LINES);
+        RenderLines(linesZOff);
+    }
 
-        linesZOff.RemoveAll(line =>
+    void RenderLines(List<Line> lines)
+    {
+        GL.Begin(GL.LINES);
+        for (int i = 0; i < lines.Count; i++)
         {
+            Line line = lines[i];
             GL.Color(line.color);
             GL.Vertex(line.start);
             GL.Vertex(line.end);
-            return line.DurationExpired;
-        });
-
+        }
+        lines.Clear();
         GL.End();
     }
 
@@ -147,7 +135,7 @@ public class GLDebug : MonoBehaviour
         if (start == end)
             return;
 
-        Line line = new Line(start, end, color, Time.timeAsDouble, duration);
+        Line line = new Line(start, end, color);
 
         if (depthTest)
             linesZOn.Add(line);
