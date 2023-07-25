@@ -26,7 +26,7 @@ public class GLDebug : MonoBehaviour
     private Material matZOn;
     private Material matZOff;
 
-    public KeyCode toggleKey;
+    public KeyCode toggleKey = KeyCode.None;
     public bool displayLines = true;
 #if UNITY_EDITOR
     public bool displayGizmos = true;
@@ -41,29 +41,40 @@ public class GLDebug : MonoBehaviour
 
     void Awake()
     {
-        SetMaterial();
-
         if (null == this.GetComponent<Camera>())
         {
             Debug.LogError("There should be camera attached to the same game object");
         }
-
     }
 
-    void SetMaterial()
+    private void OnEnable()
+    {
+        this.SetupMaterials();
+    }
+
+    private void OnDisable()
+    {
+        if (matZOn != null)
+            Destroy(matZOn);
+        matZOn = null;
+
+        if (matZOff != null)
+            Destroy(matZOff);
+        matZOff = null;
+    }
+
+    void SetupMaterials()
     {
         matZOn = new Material(this.zOnShader);
         matZOn.hideFlags = HideFlags.HideAndDontSave;
-        //matZOn.shader.hideFlags = HideFlags.HideAndDontSave;
-
+        
         matZOff = new Material(this.zOffShader);
         matZOff.hideFlags = HideFlags.HideAndDontSave;
-        //matZOff.shader.hideFlags = HideFlags.HideAndDontSave;
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(toggleKey))
+        if (toggleKey != KeyCode.None && Input.GetKeyDown(toggleKey))
             displayLines = !displayLines;
 
         if (!displayLines)
@@ -129,14 +140,19 @@ public class GLDebug : MonoBehaviour
 
     private void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0, bool depthTest = false)
     {
-        if (duration == 0 && !displayLines)
+        if (!displayLines)
+            return;
+        if (duration == 0)
             return;
         if (start == end)
             return;
+
+        Line line = new Line(start, end, color, Time.timeAsDouble, duration);
+
         if (depthTest)
-            linesZOn.Add(new Line(start, end, color, Time.timeAsDouble, duration));
+            linesZOn.Add(line);
         else
-            linesZOff.Add(new Line(start, end, color, Time.timeAsDouble, duration));
+            linesZOff.Add(line);
     }
 
     public void DrawLine(Vector3 start, Vector3 end, Color? color = null, float duration = 0, bool depthTest = false)
