@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class GLDebug : MonoBehaviour
@@ -21,16 +20,7 @@ public class GLDebug : MonoBehaviour
             this.duration = duration;
         }
 
-        public bool DurationElapsed(bool drawLine)
-        {
-            if (drawLine)
-            {
-                GL.Color(color);
-                GL.Vertex(start);
-                GL.Vertex(end);
-            }
-            return Time.timeAsDouble - startTime >= duration;
-        }
+        public bool DurationExpired => Time.timeAsDouble - this.startTime >= this.duration;
     }
 
     private static GLDebug instance;
@@ -57,6 +47,7 @@ public class GLDebug : MonoBehaviour
             DestroyImmediate(this);
             return;
         }
+
         instance = this;
         SetMaterial();
 
@@ -85,8 +76,8 @@ public class GLDebug : MonoBehaviour
 
         if (!displayLines)
         {
-            linesZOn = linesZOn.Where(l => !l.DurationElapsed(false)).ToList();
-            linesZOff = linesZOff.Where(l => !l.DurationElapsed(false)).ToList();
+            linesZOn.RemoveAll(_ => _.DurationExpired);
+            linesZOff.RemoveAll(_ => _.DurationExpired);
         }
     }
 
@@ -112,18 +103,36 @@ public class GLDebug : MonoBehaviour
 
     void OnPostRender()
     {
-        if (!displayLines) return;
+        if (!displayLines)
+            return;
 
         matZOn.SetPass(0);
+
         GL.Begin(GL.LINES);
-        linesZOn = linesZOn.Where(l => !l.DurationElapsed(true)).ToList();
+
+        linesZOn.RemoveAll(line =>
+        {
+            GL.Color(line.color);
+            GL.Vertex(line.start);
+            GL.Vertex(line.end);
+            return line.DurationExpired;
+        });
+
         GL.End();
 
         matZOff.SetPass(0);
-        GL.Begin(GL.LINES);
-        linesZOff = linesZOff.Where(l => !l.DurationElapsed(true)).ToList();
-        GL.End();
 
+        GL.Begin(GL.LINES);
+
+        linesZOff.RemoveAll(line =>
+        {
+            GL.Color(line.color);
+            GL.Vertex(line.start);
+            GL.Vertex(line.end);
+            return line.DurationExpired;
+        });
+
+        GL.End();
     }
 
     private static void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0, bool depthTest = false)
@@ -228,11 +237,8 @@ public class GLDebug : MonoBehaviour
         DrawLine(up_4, up_1, color, duration, depthTest);
     }
 
-
-    // EXTRAS
     public static void DrawCircle(Vector3 center, float radius, Color? color = null, float duration = 0, bool depthTest = false)
     {
-        //            float degRad = Mathf.PI / 180;
         for (float theta = 0.0f; theta < (2 * Mathf.PI); theta += 0.2f)
         {
             Vector3 ci = (new Vector3(Mathf.Cos(theta) * radius + center.x, Mathf.Sin(theta) * radius + center.y, center.z));
