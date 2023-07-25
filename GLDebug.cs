@@ -18,14 +18,14 @@ public class GLDebug : MonoBehaviour
         }
     }
 
-    private Material matZOn;
-    private Material matZOff;
+    private Material m_matZOn;
+    private Material m_matZOff;
 
     public bool displayLines = true;
     public bool displayGizmos = true;
     
-    private List<Line> linesZOn = new List<Line>();
-    private List<Line> linesZOff = new List<Line>();
+    private List<Line> m_linesZOn = new List<Line>();
+    private List<Line> m_linesZOff = new List<Line>();
 
     public int maxNumLines = 32 * 1024;
     
@@ -43,31 +43,31 @@ public class GLDebug : MonoBehaviour
         Camera.onPostRender -= this.OnCamPostRender;
         RenderPipelineManager.endCameraRendering -= this.OnEndCameraRendering;
 
-        if (matZOn != null)
-            Destroy(matZOn);
-        matZOn = null;
+        if (m_matZOn != null)
+            Destroy(m_matZOn);
+        m_matZOn = null;
 
-        if (matZOff != null)
-            Destroy(matZOff);
-        matZOff = null;
+        if (m_matZOff != null)
+            Destroy(m_matZOff);
+        m_matZOff = null;
 
-        linesZOn = new List<Line>();
-        linesZOff = new List<Line>();
+        m_linesZOn = new List<Line>();
+        m_linesZOff = new List<Line>();
     }
 
     void SetupMaterials()
     {
         Shader shader = Shader.Find("Hidden/Internal-Colored");
 
-        matZOn = new Material(shader);
-        matZOn.hideFlags = HideFlags.HideAndDontSave;
-        SetupMaterialProperties(matZOn);
+        m_matZOn = new Material(shader);
+        m_matZOn.hideFlags = HideFlags.HideAndDontSave;
+        SetupMaterialProperties(m_matZOn);
 
-        matZOff = new Material(shader);
-        matZOff.hideFlags = HideFlags.HideAndDontSave;
-        SetupMaterialProperties(matZOff);
+        m_matZOff = new Material(shader);
+        m_matZOff.hideFlags = HideFlags.HideAndDontSave;
+        SetupMaterialProperties(m_matZOff);
 
-        matZOff.SetInt("_ZTest", (int)CompareFunction.Always); // render over everything
+        m_matZOff.SetInt("_ZTest", (int)CompareFunction.Always); // render over everything
     }
 
     void SetupMaterialProperties(Material material)
@@ -83,16 +83,16 @@ public class GLDebug : MonoBehaviour
         if (!displayGizmos || !Application.isPlaying)
             return;
 
-        for (int i = 0; i < linesZOn.Count; i++)
+        for (int i = 0; i < m_linesZOn.Count; i++)
         {
-            Gizmos.color = linesZOn[i].color;
-            Gizmos.DrawLine(linesZOn[i].start, linesZOn[i].end);
+            Gizmos.color = m_linesZOn[i].color;
+            Gizmos.DrawLine(m_linesZOn[i].start, m_linesZOn[i].end);
         }
 
-        for (int i = 0; i < linesZOff.Count; i++)
+        for (int i = 0; i < m_linesZOff.Count; i++)
         {
-            Gizmos.color = linesZOff[i].color;
-            Gizmos.DrawLine(linesZOff[i].start, linesZOff[i].end);
+            Gizmos.color = m_linesZOff[i].color;
+            Gizmos.DrawLine(m_linesZOff[i].start, m_linesZOff[i].end);
         }
     }
 
@@ -108,19 +108,19 @@ public class GLDebug : MonoBehaviour
 
     void RenderInternal(Camera camera)
     {
-        if (!displayLines)
+        if (!this.displayLines)
             return;
 
         if (camera != Camera.main)
             return;
 
-        matZOn.SetPass(0);
+        m_matZOn.SetPass(0);
 
-        RenderLines(linesZOn);
+        RenderLines(m_linesZOn);
 
-        matZOff.SetPass(0);
+        m_matZOff.SetPass(0);
 
-        RenderLines(linesZOff);
+        RenderLines(m_linesZOff);
     }
 
     void RenderLines(List<Line> lines)
@@ -139,10 +139,10 @@ public class GLDebug : MonoBehaviour
 
     private void DrawLine(Vector3 start, Vector3 end, Color color, float duration = 0, bool depthTest = false)
     {
-        if (!displayLines)
+        if (!this.displayLines)
             return;
         
-        if (linesZOn.Count + linesZOff.Count >= maxNumLines)
+        if (m_linesZOn.Count + m_linesZOff.Count >= this.maxNumLines)
             return;
 
         if (start == end)
@@ -151,9 +151,9 @@ public class GLDebug : MonoBehaviour
         Line line = new Line(start, end, color);
 
         if (depthTest)
-            linesZOn.Add(line);
+            m_linesZOn.Add(line);
         else
-            linesZOff.Add(line);
+            m_linesZOff.Add(line);
     }
 
     public void DrawLine(Vector3 start, Vector3 end, Color? color = null, float duration = 0, bool depthTest = false)
