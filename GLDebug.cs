@@ -22,30 +22,27 @@ public class GLDebug : MonoBehaviour
     private Material matZOff;
 
     public bool displayLines = true;
-#if UNITY_EDITOR
     public bool displayGizmos = true;
-#endif
     
     private List<Line> linesZOn = new List<Line>();
     private List<Line> linesZOff = new List<Line>();
+
+    public int maxNumLines = 32 * 1024;
     
 
-
-    void Awake()
-    {
-        if (null == this.GetComponent<Camera>())
-        {
-            Debug.LogError("There should be camera attached to the same game object");
-        }
-    }
 
     private void OnEnable()
     {
         this.SetupMaterials();
+        Camera.onPostRender += this.OnCamPostRender;
+        RenderPipelineManager.endCameraRendering += this.OnEndCameraRendering;
     }
 
     private void OnDisable()
     {
+        Camera.onPostRender -= this.OnCamPostRender;
+        RenderPipelineManager.endCameraRendering -= this.OnEndCameraRendering;
+
         if (matZOn != null)
             Destroy(matZOn);
         matZOn = null;
@@ -53,6 +50,9 @@ public class GLDebug : MonoBehaviour
         if (matZOff != null)
             Destroy(matZOff);
         matZOff = null;
+
+        linesZOn = new List<Line>();
+        linesZOff = new List<Line>();
     }
 
     void SetupMaterials()
@@ -78,7 +78,6 @@ public class GLDebug : MonoBehaviour
         material.SetInt("_ZWrite", 0);
     }
 
-#if UNITY_EDITOR
     void OnDrawGizmos()
     {
         if (!displayGizmos || !Application.isPlaying)
@@ -96,11 +95,23 @@ public class GLDebug : MonoBehaviour
             Gizmos.DrawLine(linesZOff[i].start, linesZOff[i].end);
         }
     }
-#endif
 
-    void OnPostRender()
+    private void OnCamPostRender(Camera camera)
+    {
+        RenderInternal(camera);
+    }
+
+    private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
+    {
+        RenderInternal(camera);
+    }
+
+    void RenderInternal(Camera camera)
     {
         if (!displayLines)
+            return;
+
+        if (camera != Camera.main)
             return;
 
         matZOn.SetPass(0);
@@ -130,8 +141,10 @@ public class GLDebug : MonoBehaviour
     {
         if (!displayLines)
             return;
-        if (duration == 0)
+        
+        if (linesZOn.Count + linesZOff.Count >= maxNumLines)
             return;
+
         if (start == end)
             return;
 
