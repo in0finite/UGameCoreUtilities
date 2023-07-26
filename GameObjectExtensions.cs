@@ -95,10 +95,22 @@ namespace UGameCore.Utilities
 
 		public static Bounds GetRenderersBounds(this GameObject go)
         {
-			var bounds = new Bounds(go.transform.position, Vector3.zero);
-            foreach (var r in go.GetComponentsInChildren<Renderer>())
-				bounds.Encapsulate(r.bounds);
-			return bounds;
+			var renderers = go.GetComponentsInChildren<Renderer>();
+			if (renderers.Length == 0)
+				return new Bounds(go.transform.position, Vector3.zero);
+
+            Bounds bounds = default;
+			bool hasBounds = false;
+            foreach (var r in renderers)
+            {
+				if (hasBounds)
+					bounds.Encapsulate(r.bounds);
+				else
+					bounds = r.bounds;
+				hasBounds = true;
+            }
+
+            return bounds;
         }
 	}
 }
