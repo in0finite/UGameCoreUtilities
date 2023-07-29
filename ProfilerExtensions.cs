@@ -99,7 +99,7 @@ namespace UGameCore.Utilities
             double selfDuration = section.TotalDurationMs - childrenTotalDuration;
 
             for (int i = 0; i < level; i++)
-                sb.Append("    ");
+                sb.Append("        ");
             
             sb.Append($"{section.Name.PadRight(30).Substring(0, 30)}  |  ");
             sb.Append($"{(section.TotalDurationMs / totalTime * 100).ZeroIfNan():F1}%  |  ");
