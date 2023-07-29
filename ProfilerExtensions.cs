@@ -39,7 +39,7 @@ namespace UGameCore.Utilities
             for (int i = 0; i < level; i++)
                 sb.Append("    ");
             
-            sb.Append($"{section.Name.PadRight(20).Substring(0, 20)}  |  ");
+            sb.Append($"{section.Name.PadRight(30).Substring(0, 30)}  |  ");
             sb.Append($"{(section.TotalDurationMs / totalTime * 100).ZeroIfNan():F1}%  |  ");
             sb.Append($"self {(selfDuration / totalTime * 100).ZeroIfNan():F1}%  |  ");
             sb.Append($"calls {section.NumCalls}  |  ");
