@@ -49,5 +49,7 @@ namespace UGameCore.Utilities
 
         public IEnumerable<IProfiler.Section> GetSections(long parentSectionId)
             => m_profiler.GetSections(parentSectionId);
+
+        public long GetParentSectionId(long sectionId) => m_profiler.GetParentSectionId(sectionId);
     }
 }

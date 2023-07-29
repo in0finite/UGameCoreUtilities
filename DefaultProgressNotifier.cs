@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UGameCore.Utilities.IProgressNotifier;
 
 namespace UGameCore.Utilities
 {
@@ -36,7 +37,7 @@ namespace UGameCore.Utilities
                 if (UnityEditor.EditorUtility.DisplayCancelableProgressBar(title, description, this.Progress))
                 {
                     this.HasProgress = true;
-                    this.ClearProgress();
+                    this.ClearProgress(null);
                     throw new System.OperationCanceledException($"Operation cancellled by user by clicking on Editor dialog");
                 }
             }
@@ -46,12 +47,14 @@ namespace UGameCore.Utilities
 
             m_ETAMeasurer.UpdateETA(this.Progress);
 
-            this.Profiler?.EndSection();
             this.Profiler?.BeginSection(title);
         }
 
-        public virtual void ClearProgress()
+        public virtual void ClearProgress(DisposableProgress disposableProgress)
         {
+            if (disposableProgress != null)
+                this.Profiler?.EndSectionWithChildren(disposableProgress.Id);
+            
             if (!this.HasProgress)
                 return;
 
@@ -62,8 +65,17 @@ namespace UGameCore.Utilities
 #endif
 
             m_ETAMeasurer = new ETAMeasurer(0f);
+
+            if (disposableProgress == null) // function was manually called, close the current section
+                this.Profiler?.EndSection();
         }
 
         public virtual string ETAText => m_ETAMeasurer.ETA;
+
+        System.IDisposable IProgressNotifier.SetDisposableProgress(string title, string info, float? progress)
+        {
+            this.SetProgress(title, info, progress);
+            return new DisposableProgress { ProgressNotifier = this, Id = this.Profiler?.CurrentSectionId ?? -1 };
+        }
     }
 }

@@ -36,24 +36,25 @@ namespace UGameCore.Utilities
         /// Clear the current progress, along with any visual information about it. For example,
         /// if dialog is being shown about current progress, it will be closed.
         /// </summary>
-        void ClearProgress();
+        void ClearProgress(DisposableProgress progress = null);
 
         /// <summary>
         /// ETA calculated based on previous progress updates.
         /// </summary>
         string ETAText { get; }
 
-        protected class DisposableProgress : System.IDisposable
+        public class DisposableProgress : System.IDisposable
         {
             bool m_disposed = false;
             public IProgressNotifier ProgressNotifier { get; set; }
+            public long Id { get; set; } = -1;
 
             void System.IDisposable.Dispose()
             {
                 if (m_disposed)
                     return;
                 m_disposed = true;
-                this.ProgressNotifier?.ClearProgress();
+                this.ProgressNotifier?.ClearProgress(this);
             }
         }
 
