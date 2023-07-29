@@ -37,6 +37,8 @@ namespace UGameCore.Utilities
         /// </summary>
         IEnumerable<Section> GetSections(long parentSectionId);
 
+        long GetParentSectionId(long sectionId);
+
         /// <summary>
         /// Clear all data held by profiler.
         /// </summary>

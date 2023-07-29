@@ -168,5 +168,17 @@ namespace UGameCore.Utilities
                 child = section.nextSiblingIndex;
             }
         }
+
+        public long GetParentSectionId(long sectionId)
+        {
+            if (sectionId == 0) // don't return fake root
+                return -1;
+
+            int parentId = m_allSections[(int)sectionId].parentIndex;
+            if (parentId == 0) // don't return fake root
+                return -1;
+
+            return parentId;
+        }
     }
 }
