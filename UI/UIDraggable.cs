@@ -7,6 +7,7 @@ namespace uGameCore.Utilities
     {
         public bool updateAnchors = true;
         public bool updateOffset = false;
+        public bool updateAnchoredPosition = false;
 
 
         public void OnDrag(PointerEventData eventData)
@@ -27,6 +28,11 @@ namespace uGameCore.Utilities
                 scaledDelta.y /= parent.rect.height;
                 rt.anchorMin += scaledDelta;
                 rt.anchorMax += scaledDelta;
+            }
+
+            if (this.updateAnchoredPosition)
+            {
+                rt.anchoredPosition += eventData.delta;
             }
         }
     }
