@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -20,6 +19,19 @@ namespace UGameCore.Utilities
         public static T GetComponentOrLogError<T>(this Component comp)
         {
             return comp.gameObject.GetComponentOrLogError<T>();
+        }
+
+        /// <summary>
+		/// Returns component of given type, if it is the only one attached, otherwise throws exception.
+		/// </summary>
+		public static T GetSingleComponentOrThrow<T>(this Component component)
+        {
+            return component.gameObject.GetSingleComponentOrThrow<T>();
+        }
+
+        public static T GetComponentInChildrenOrThrow<T>(this Component component)
+        {
+            return component.gameObject.GetComponentInChildrenOrThrow<T>();
         }
 
         public static Transform GetTransformOrNull(this Component component)

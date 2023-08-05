@@ -43,7 +43,15 @@ namespace UGameCore.Utilities
 			return components[0];
 		}
 
-		public static void DestroyComponent<T>(this GameObject go)
+        public static T GetComponentInChildrenOrThrow<T>(this GameObject go)
+        {
+            T comp = go.GetComponentInChildren<T>();
+            if (null == comp)
+                throw new MissingComponentException(string.Format("Failed to get component in children of type: {0}, on game object: {1}", typeof(T), go.name));
+            return comp;
+        }
+
+        public static void DestroyComponent<T>(this GameObject go)
 		{
 			Component comp = go.GetComponent<T>() as Component;
 			if (comp != null)
