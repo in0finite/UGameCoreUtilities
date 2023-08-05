@@ -123,8 +123,6 @@ namespace UGameCore.Utilities
 
         private static void DispatchOnExitPlayMode()
         {
-            Debug.Log($"OnExitPlayMode(), {s_subscribers.Count} objects, {s_subscribers.Where(_ => _.monoBehaviour != null).Count()} alive");
-
             ObjectData[] copyArray = s_subscribers.ToArray(); // prevent concurrent modification
             foreach (ObjectData obj in copyArray)
             {

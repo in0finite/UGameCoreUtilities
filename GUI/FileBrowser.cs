@@ -272,7 +272,7 @@ public class FileBrowser {
 		}
 	}
 
-	static List<(string, string)> GetDirectoriesForTopPanel()
+	public static List<(string, string)> GetDirectoriesForTopPanel()
 	{
 		if (Application.platform == RuntimePlatform.Android)
 		{
