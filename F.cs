@@ -13,21 +13,10 @@ namespace UGameCore.Utilities
     /// </summary>
     public static class F
     {
+        public const string kEditorMenuName = nameof(UGameCore);
+
         private static readonly Vector3[] s_fourCornersArray = new Vector3[4];
 
-
-        public static Mesh GetSharedMesh(this Collider col)
-        {
-            if (col is MeshCollider)
-            {
-                return ((MeshCollider)col).sharedMesh;
-            }
-            else
-            {
-                MeshFilter f = col.gameObject.GetComponent<MeshFilter>();
-                return f != null ? f.sharedMesh : null;
-            }
-        }
 
         public static Vector3 ClosestPointOrBoundsCenter(this Collider collider, Vector3 position)
         {
