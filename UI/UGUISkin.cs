@@ -42,10 +42,8 @@ namespace UGameCore.Utilities
 
             foreach (UIBehaviour uiBehaviour in uiBehaviours)
             {
-                if (uiBehaviour is not Text or Image)
-                    continue;
-
-                Apply(uiBehaviour);
+                if (uiBehaviour is Text or Image)
+                    Apply(uiBehaviour);
             }
 
             foreach (UIBehaviour uiBehaviour in uiBehaviours)
