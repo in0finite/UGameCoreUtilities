@@ -21,6 +21,10 @@ namespace UGameCore.Utilities
 
         public ElementStyle button, text, image, inputField, scrollRect, scrollBar;
 
+        [Space(15)]
+        [Tooltip("Drag a GameObject here to apply skin to it")]
+        [SerializeField]
+        GameObject m_appliedGameObject;
 
 
         public void Apply(GameObject go, bool includeChildren)
@@ -106,6 +110,16 @@ namespace UGameCore.Utilities
                 text.font = elementStyle.font;
             if (elementStyle.fontSize > 0)
                 text.fontSize = elementStyle.fontSize;
+        }
+
+        [ContextMenu("Apply skin")]
+        void ApplyContextMenu()
+        {
+            if (null == m_appliedGameObject)
+                return;
+
+            Apply(m_appliedGameObject, true);
+            EditorUtilityEx.MarkObjectAsDirty(m_appliedGameObject);
         }
     }
 }
