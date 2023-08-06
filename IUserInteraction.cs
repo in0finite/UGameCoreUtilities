@@ -10,7 +10,7 @@ namespace UGameCore.Utilities
         /// <summary>
         /// Shows message to the user. Note that this function does not have to be synchronous (it can return immediately).
         /// </summary>
-        void ShowMessage(string title, string message);
+        void ShowMessage(string title, string message) => ShowMessageAsync(title, message).EnumerateToEnd();
 
         /// <summary>
         /// Shows message to the user and return <see cref="IEnumerator"/> which finishes when user closes the message.
