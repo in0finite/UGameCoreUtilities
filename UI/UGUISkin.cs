@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -20,7 +19,8 @@ namespace UGameCore.Utilities
             public Sprite sprite;
         }
 
-        public ElementStyle button, text, inputField, scrollRect, scrollBar;
+        public ElementStyle button, text, image, inputField, scrollRect, scrollBar;
+
 
 
         public void Apply(GameObject go, bool includeChildren)
@@ -34,16 +34,19 @@ namespace UGameCore.Utilities
 
         public void Apply(UIBehaviour[] uiBehaviours)
         {
-            // first apply to Text components, because they can be overriden later
+            // first apply to Text and Image components, because they can be overriden later
 
-            foreach (Text t in uiBehaviours.OfType<Text>())
+            foreach (UIBehaviour uiBehaviour in uiBehaviours)
             {
-                Apply(t);
+                if (uiBehaviour is not Text or Image)
+                    continue;
+
+                Apply(uiBehaviour);
             }
 
             foreach (UIBehaviour uiBehaviour in uiBehaviours)
             {
-                if (uiBehaviour is Text)
+                if (uiBehaviour is Text or Image)
                     continue;
 
                 Apply(uiBehaviour);
@@ -65,6 +68,10 @@ namespace UGameCore.Utilities
             {
                 ApplyToTextComponent(text, this.text);
             }
+            else if (uiBehaviour is Image image)
+            {
+                ApplyToGraphicComponent(image, this.image);
+            }
             else if (uiBehaviour is InputField inputField)
             {
                 if (inputField.targetGraphic != null)
@@ -75,8 +82,8 @@ namespace UGameCore.Utilities
             }
             else if (uiBehaviour is ScrollRect scrollRect)
             {
-                if (scrollRect.TryGetComponent<Image>(out var image))
-                    ApplyToGraphicComponent(image, this.scrollRect);
+                if (scrollRect.TryGetComponent<Image>(out var imageComponent))
+                    ApplyToGraphicComponent(imageComponent, this.scrollRect);
             }
             else if (uiBehaviour is Scrollbar scrollBar)
             {
