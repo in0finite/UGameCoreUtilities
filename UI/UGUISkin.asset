@@ -34,8 +34,8 @@ MonoBehaviour:
     useSprite: 1
     sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   inputField:
-    backgroundColor: {r: 0.74509805, g: 0.74509805, b: 0.74509805, a: 1}
-    textColor: {r: 0, g: 0, b: 0, a: 1}
+    backgroundColor: {r: 0.46257564, g: 0.52079695, b: 0.5943396, a: 1}
+    textColor: {r: 1, g: 1, b: 1, a: 1}
     fontSize: 14
     font: {fileID: 0}
     useSprite: 1
@@ -48,7 +48,7 @@ MonoBehaviour:
     useSprite: 1
     sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   scrollBar:
-    backgroundColor: {r: 1, g: 1, b: 1, a: 1}
+    backgroundColor: {r: 0.4031684, g: 0.4734984, b: 0.5660378, a: 1}
     textColor: {r: 0, g: 0, b: 0, a: 1}
     fontSize: 14
     font: {fileID: 0}

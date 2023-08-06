@@ -21,11 +21,6 @@ namespace UGameCore.Utilities
 
         public ElementStyle button, text, image, inputField, scrollRect, scrollBar;
 
-        [Space(15)]
-        [Tooltip("Drag a GameObject here to apply skin to it")]
-        [SerializeField]
-        GameObject m_appliedGameObject;
-
 
         public void Apply(GameObject go, bool includeChildren)
         {
@@ -42,13 +37,13 @@ namespace UGameCore.Utilities
 
             foreach (UIBehaviour uiBehaviour in uiBehaviours)
             {
-                if (uiBehaviour is Text or Image)
+                if (uiBehaviour is Text || uiBehaviour is Image)
                     Apply(uiBehaviour);
             }
 
             foreach (UIBehaviour uiBehaviour in uiBehaviours)
             {
-                if (uiBehaviour is Text or Image)
+                if (uiBehaviour is Text || uiBehaviour is Image)
                     continue;
 
                 Apply(uiBehaviour);
@@ -89,8 +84,8 @@ namespace UGameCore.Utilities
             }
             else if (uiBehaviour is Scrollbar scrollBar)
             {
-                if (scrollBar.targetGraphic != null)
-                    ApplyToGraphicComponent(scrollBar.targetGraphic, this.scrollBar);
+                if (scrollBar.handleRect != null && scrollBar.handleRect.TryGetComponent<Image>(out var imageComponent))
+                    ApplyToGraphicComponent(imageComponent, this.scrollBar);
             }
         }
 
@@ -108,16 +103,6 @@ namespace UGameCore.Utilities
                 text.font = elementStyle.font;
             if (elementStyle.fontSize > 0)
                 text.fontSize = elementStyle.fontSize;
-        }
-
-        [ContextMenu("Apply skin")]
-        void ApplyContextMenu()
-        {
-            if (null == m_appliedGameObject)
-                return;
-
-            Apply(m_appliedGameObject, true);
-            EditorUtilityEx.MarkObjectAsDirty(m_appliedGameObject);
         }
     }
 }
