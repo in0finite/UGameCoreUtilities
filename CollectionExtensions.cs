@@ -225,6 +225,23 @@ namespace UGameCore.Utilities
             });
         }
 
+        public static int EnqueueRange<T>(this Queue<T> queue, IEnumerable<T> range)
+        {
+            int numAdded = 0;
+            foreach (T item in range)
+            {
+                queue.Enqueue(item);
+                numAdded++;
+            }
+            return numAdded;
+        }
+
+        public static void DequeueMultiple<T>(this Queue<T> queue, int num)
+        {
+            for (int i = 0; i < num; i++)
+                queue.Dequeue();
+        }
+
         public static Queue<T> ToQueue<T>(this IEnumerable<T> enumerable)
         {
             return new Queue<T>(enumerable);
