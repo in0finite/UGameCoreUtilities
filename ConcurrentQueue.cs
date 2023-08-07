@@ -63,7 +63,43 @@ namespace UGameCore.Utilities
 			}
 		}
 
-		public int Count
+        public int DequeueToArray(T[] array, int offset, int maxNumItems)
+        {
+            lock (_queueLock)
+            {
+                int numAdded = 0;
+                while (_queue.Count > 0 && numAdded < maxNumItems)
+                {
+                    array[offset + numAdded] = _queue.Dequeue();
+                    numAdded++;
+                }
+                return numAdded;
+            }
+        }
+
+        public int DequeueUntilCountReaches(int targetCount)
+        {
+            lock (_queueLock)
+            {
+                int numRemoved = 0;
+                while (_queue.Count > targetCount)
+                {
+                    _queue.Dequeue();
+                    numRemoved++;
+                }
+                return numRemoved;
+            }
+        }
+
+        public void Clear()
+        {
+            lock (_queueLock)
+            {
+                _queue.Clear();
+            }
+        }
+
+        public int Count
 		{
 			get
 			{
