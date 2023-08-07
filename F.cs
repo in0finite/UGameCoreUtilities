@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
 
 namespace UGameCore.Utilities
@@ -196,6 +197,24 @@ namespace UGameCore.Utilities
 
 		public static Color OrangeColor { get { return Color.Lerp (Color.yellow, Color.red, 0.5f); } }
 
+        /// <summary>
+        /// Does User Interface have focus currently ?
+        /// </summary>
+        public static bool UIHasFocus()
+        {
+            if (GUIUtility.hotControl != 0)
+                return true;
+
+            EventSystem evSys = EventSystem.current;
+            if (evSys == null)
+                return false;
+
+            if (evSys.currentSelectedGameObject != null)
+                return true;
+
+            return false;
+        }
+
         public static Rect GetRect (this RectTransform rectTransform)
         {
 
@@ -318,8 +337,6 @@ namespace UGameCore.Utilities
 #endif
             }
         }
-
-        public static bool ScreenHasHighDensity => Application.isMobilePlatform;
 
 
         public static int GetAudioClipSizeInBytes(AudioClip clip)
