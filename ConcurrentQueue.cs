@@ -77,6 +77,20 @@ namespace UGameCore.Utilities
             }
         }
 
+        public int DequeueToList(List<T> list, int maxNumItems)
+        {
+            lock (_queueLock)
+            {
+                int numAdded = 0;
+                while (_queue.Count > 0 && numAdded < maxNumItems)
+                {
+                    list.Add(_queue.Dequeue());
+                    numAdded++;
+                }
+                return numAdded;
+            }
+        }
+
         public int DequeueUntilCountReaches(int targetCount)
         {
             lock (_queueLock)
