@@ -22,7 +22,7 @@ namespace UGameCore.Utilities
             yield break;
         }
 
-        public IEnumerator ShowMessageAsync(string title, string message)
+        public void ShowMessage(string title, string message)
         {
             if (!Application.isEditor)
                 throw new System.NotSupportedException("Only works in Editor");
@@ -30,7 +30,11 @@ namespace UGameCore.Utilities
 #if UNITY_EDITOR
             UnityEditor.EditorUtility.DisplayDialog(title, message, "Ok");
 #endif
+        }
 
+        public IEnumerator ShowMessageAsync(string title, string message)
+        {
+            ShowMessage(title, message);
             yield break;
         }
     }
