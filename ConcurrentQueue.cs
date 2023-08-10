@@ -51,7 +51,10 @@ namespace UGameCore.Utilities
 
 		public int DequeueToQueue(Queue<T> collection, int maxNumItems)
 		{
-			lock (_queueLock)
+            if (maxNumItems < 0)
+                throw new System.ArgumentException();
+
+            lock (_queueLock)
 			{
 				int numAdded = 0;
 				while (_queue.Count > 0 && numAdded < maxNumItems)
@@ -65,6 +68,11 @@ namespace UGameCore.Utilities
 
         public int DequeueToArray(T[] array, int offset, int maxNumItems)
         {
+            if (maxNumItems < 0)
+                throw new System.ArgumentException();
+            if (offset < 0)
+                throw new System.ArgumentException();
+
             lock (_queueLock)
             {
                 int numAdded = 0;
@@ -79,6 +87,9 @@ namespace UGameCore.Utilities
 
         public int DequeueToList(List<T> list, int maxNumItems)
         {
+            if (maxNumItems < 0)
+                throw new System.ArgumentException();
+
             lock (_queueLock)
             {
                 int numAdded = 0;
@@ -93,6 +104,9 @@ namespace UGameCore.Utilities
 
         public int DequeueUntilCountReaches(int targetCount)
         {
+			if (targetCount < 0)
+				throw new System.ArgumentException();
+
             lock (_queueLock)
             {
                 int numRemoved = 0;
