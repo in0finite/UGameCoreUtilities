@@ -215,6 +215,30 @@ namespace UGameCore.Utilities
             return false;
         }
 
+        /// <summary>
+        /// Does User Interface have keyboard focus currently ?
+        /// </summary>
+        public static bool UIHasKeyboardFocus()
+        {
+            if (GUIUtility.keyboardControl != 0)
+                return true;
+
+            EventSystem evSys = EventSystem.current;
+            if (evSys == null)
+                return false;
+
+            if (evSys.currentSelectedGameObject == null)
+                return false;
+
+            if (!evSys.currentSelectedGameObject.TryGetComponent<UnityEngine.UI.InputField>(out var inputField))
+                return false;
+
+            if (!inputField.isFocused)
+                return false;
+
+            return true;
+        }
+
         public static Rect GetRect (this RectTransform rectTransform)
         {
 
