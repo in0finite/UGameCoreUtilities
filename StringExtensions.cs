@@ -32,5 +32,13 @@ namespace UGameCore.Utilities
         {
             return str.IndexOf(containedString, stringComparison) >= 0;
         }
+
+        public static string SubstringCountClamped(this string str, int count)
+        {
+            if (count < 0)
+                throw new ArgumentException();
+
+            return str[..Math.Min(count, str.Length)];
+        }
     }
 }

@@ -27,6 +27,10 @@ namespace UGameCore.Utilities
             }
         }
 
+        /// <summary>
+        /// Checks that all serializable <see cref="UnityEngine.Object"/> properties of this object are assigned.
+        /// If not, an exception is thrown with details.
+        /// </summary>
         public static void EnsureSerializableReferencesAssigned(this UnityEngine.Object obj)
         {
             Type objectType = typeof(UnityEngine.Object);
