@@ -119,17 +119,17 @@ namespace UGameCore.Utilities
             if (!this.displayLines)
                 return;
 
-            m_matZOn.SetPass(0);
-
-            RenderLines(m_linesZOn);
-
-            m_matZOff.SetPass(0);
-
-            RenderLines(m_linesZOff);
+            RenderLines(m_linesZOn, m_matZOn);
+            RenderLines(m_linesZOff, m_matZOff);
         }
 
-        void RenderLines(List<Line> lines)
+        void RenderLines(List<Line> lines, Material mat)
         {
+            if (lines.Count == 0)
+                return;
+
+            mat.SetPass(0);
+
             GL.Begin(GL.LINES);
             for (int i = 0; i < lines.Count; i++)
             {
