@@ -40,13 +40,13 @@ namespace UGameCore.Utilities
         {
             this.SetupMaterials();
             Camera.onPostRender += this.OnCamPostRender;
-            RenderPipelineManager.endCameraRendering += this.OnEndCameraRendering;
+            RenderPipelineManager.endContextRendering += this.OnEndContextRendering;
         }
 
         private void OnDisable()
         {
             Camera.onPostRender -= this.OnCamPostRender;
-            RenderPipelineManager.endCameraRendering -= this.OnEndCameraRendering;
+            RenderPipelineManager.endContextRendering -= this.OnEndContextRendering;
 
             if (m_matZOn != null)
                 Destroy(m_matZOn);
@@ -103,20 +103,20 @@ namespace UGameCore.Utilities
 
         private void OnCamPostRender(Camera camera)
         {
-            RenderInternal(camera);
-        }
-
-        private void OnEndCameraRendering(ScriptableRenderContext context, Camera camera)
-        {
-            RenderInternal(camera);
-        }
-
-        void RenderInternal(Camera camera)
-        {
-            if (!this.displayLines)
+            if (camera != Camera.main)
                 return;
 
-            if (camera != Camera.main)
+            RenderInternal();
+        }
+
+        private void OnEndContextRendering(ScriptableRenderContext context, List<Camera> cameras)
+        {
+            RenderInternal();
+        }
+
+        void RenderInternal()
+        {
+            if (!this.displayLines)
                 return;
 
             m_matZOn.SetPass(0);
