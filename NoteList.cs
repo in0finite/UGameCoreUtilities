@@ -38,5 +38,11 @@ namespace UGameCore.Utilities
             this.description = description;
             this.notes = notes;
         }
+
+        [ContextMenu("Sort notes by title")]
+        void SortByTitle()
+        {
+            this.notes.SortBy(n => n.title, StringComparer.Ordinal);
+        }
     }
 }

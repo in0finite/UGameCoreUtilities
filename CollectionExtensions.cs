@@ -402,6 +402,11 @@ namespace UGameCore.Utilities
             Array.Sort(array, (a, b) => funcSelector(a).CompareTo(funcSelector(b)));
         }
 
+        public static void SortBy<T, TBy>(this T[] array, Func<T, TBy> funcSelector, IComparer<TBy> comparer)
+        {
+            Array.Sort(array, (a, b) => comparer.Compare(funcSelector(a), funcSelector(b)));
+        }
+
         public static T RandomElement<T>(this IList<T> list)
         {
             if (list.Count < 1)
