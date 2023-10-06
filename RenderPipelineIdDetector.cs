@@ -15,6 +15,9 @@ namespace UGameCore.Utilities
         public const string URPShaderTag = "UniversalPipeline";
         public const string HDRPShaderTag = "HDRenderPipeline";
 
+        public const string URPAssetTypeName = "UniversalRenderPipelineAsset";
+        public const string HDRPAssetTypeName = "HDRenderPipelineAsset";
+
 
         public static RenderPipelineId GetCurrentPipeline()
         {
@@ -22,13 +25,15 @@ namespace UGameCore.Utilities
             if (rp == null)
                 return RenderPipelineId.BiRP;
 
-            string shaderTag = rp.renderPipelineShaderTag;
+            // here we could use "RenderPipelineAsset.renderPipelineShaderTag", however it doesn't work in a build
 
-            if (URPShaderTag.Equals(shaderTag, System.StringComparison.OrdinalIgnoreCase))
-                return RenderPipelineId.URP;
+            string typeName = rp.GetType().Name;
 
-            if (HDRPShaderTag.Equals(shaderTag, System.StringComparison.OrdinalIgnoreCase))
+            if (typeName.Equals(HDRPAssetTypeName, System.StringComparison.Ordinal))
                 return RenderPipelineId.HDRP;
+
+            if (typeName.Equals(URPAssetTypeName, System.StringComparison.Ordinal))
+                return RenderPipelineId.URP;
 
             return RenderPipelineId.Unknown;
         }
