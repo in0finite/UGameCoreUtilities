@@ -162,6 +162,18 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static T[] EnsureCount<T>(this T[] array, int count)
+        {
+            if (array.Length < count)
+            {
+                T[] newArray = new T[count];
+                array.CopyTo(newArray, 0);
+                return newArray;
+            }
+
+            return array;
+        }
+
         /// <summary>
         /// Initializes every element of the list by calling the default constructor.
         /// </summary>

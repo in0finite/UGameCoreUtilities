@@ -150,6 +150,17 @@ namespace UGameCore.Utilities
             return Quaternion.LookRotation(tr.TransformDirection(localForward), tr.TransformDirection(localUp));
         }
 
+        /// <summary>
+		/// Transforms the rotation from world space to local space.
+		/// </summary>
+		public static Quaternion InverseTransformRotation(this Transform tr, Quaternion rot)
+        {
+            Vector3 localForward = rot * Vector3.forward;
+            Vector3 localUp = rot * Vector3.up;
+
+            return Quaternion.LookRotation(tr.InverseTransformDirection(localForward), tr.InverseTransformDirection(localUp));
+        }
+
         public static void SetGlobalScale(this Transform tr, Vector3 globalScale)
         {
             Vector3 parentGlobalScale = tr.parent != null ? tr.parent.lossyScale : Vector3.one;
