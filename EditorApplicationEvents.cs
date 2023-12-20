@@ -96,6 +96,9 @@ namespace UGameCore.Utilities
 
         private static void DispatchUpdateToSingleObject(ObjectData objectData, int index)
         {
+            if (null == objectData.monoBehaviour) // he could've been destroyed in Awake()
+                return;
+
             if (!objectData.monoBehaviour.isActiveAndEnabled)
                 return;
 
@@ -105,6 +108,9 @@ namespace UGameCore.Utilities
                 
                 if (objectData.startMethod != null)
                     F.RunExceptionSafe(() => objectData.startMethod.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
+
+                if (null == objectData.monoBehaviour) // he could've been destroyed in Start()
+                    return;
             }
             
             if (objectData.updateMethod != null)
@@ -114,6 +120,9 @@ namespace UGameCore.Utilities
         private static void DispatchMethodToSingleObject(
             ObjectData objectData, System.Reflection.MethodInfo methodInfo)
         {
+            if (null == objectData.monoBehaviour) // he could've been destroyed in previous step
+                return;
+
             if (!objectData.monoBehaviour.isActiveAndEnabled)
                 return;
 
