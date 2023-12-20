@@ -161,6 +161,18 @@ namespace UGameCore.Utilities
             return Quaternion.LookRotation(tr.InverseTransformDirection(localForward), tr.InverseTransformDirection(localUp));
         }
 
+        public static void CopyPositionAndRotation(this Transform tr, Transform target)
+        {
+            tr.GetPositionAndRotation(out Vector3 pos, out Quaternion rotation);
+            target.SetPositionAndRotation(pos, rotation);
+        }
+
+        public static void CopyLocalPositionAndRotation(this Transform tr, Transform target)
+        {
+            tr.GetLocalPositionAndRotation(out Vector3 pos, out Quaternion rotation);
+            target.SetLocalPositionAndRotation(pos, rotation);
+        }
+
         public static void SetGlobalScale(this Transform tr, Vector3 globalScale)
         {
             Vector3 parentGlobalScale = tr.parent != null ? tr.parent.lossyScale : Vector3.one;

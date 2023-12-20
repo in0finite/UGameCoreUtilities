@@ -142,6 +142,11 @@ namespace UGameCore.Utilities
             return v;
         }
 
+        public static Vector2 WithMagnitude(this Vector2 v, float newMagnitude)
+        {
+            return v.normalized * newMagnitude;
+        }
+
         public static Vector3 WithMagnitude(this Vector3 v, float newMagnitude)
         {
             return v.normalized * newMagnitude;
