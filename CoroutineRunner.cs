@@ -11,8 +11,8 @@ namespace UGameCore.Utilities
         public long Id { get; } = ++s_lastId;
 
         internal IEnumerator coroutine { get; }
-        public System.Action onFinishSuccess { get; }
-        public System.Action<System.Exception> onFinishError { get; }
+        internal System.Action onFinishSuccess { get; }
+        internal System.Action<System.Exception> onFinishError { get; }
         public event System.Action<System.Exception> onFinish = delegate { };
 
         public bool IsRunning { get; internal set; } = true;
