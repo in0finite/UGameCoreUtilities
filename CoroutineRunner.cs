@@ -17,6 +17,11 @@ namespace UGameCore.Utilities
 
         public bool IsRunning { get; internal set; } = true;
 
+        /// <summary>
+        /// True if coroutine reached end without throwing exception and without being manually stopped.
+        /// </summary>
+        public bool FinishedSuccessfully { get; internal set; } = false;
+
         public Exception FailureException { get; internal set; }
 
         internal CoroutineInfo(Func<IEnumerator> coroutineFunc, Action onFinishSuccess, Action<Exception> onFinishError)
@@ -107,6 +112,7 @@ namespace UGameCore.Utilities
             if (isFinished)
             {
                 coroutine.IsRunning = false;
+                coroutine.FinishedSuccessfully = isSuccess;
                 coroutine.FailureException = failureException;
 
                 m_coroutines[coroutineIndex] = null;
