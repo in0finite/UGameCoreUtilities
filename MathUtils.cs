@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace UGameCore.Utilities
@@ -320,6 +321,21 @@ namespace UGameCore.Utilities
         public static float ZeroIfNan(this float f)
         {
             return float.IsNaN(f) ? 0f : f;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNan(this float f)
+        {
+            return float.IsNaN(f);
+        }
+
+        /// <summary>
+        /// Returns 0 if this number is not finite (Infinity or Nan), otherwise returns original value.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float ZeroIfNotFinite(this float f)
+        {
+            return float.IsFinite(f) ? f : 0f;
         }
 
         /// <summary>

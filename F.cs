@@ -362,6 +362,9 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static bool IsOnDesktopPlatform => 
+            !Application.isMobilePlatform && !Application.isConsolePlatform && SystemInfo.deviceType == DeviceType.Desktop;
+
 
         public static int GetAudioClipSizeInBytes(AudioClip clip)
         {

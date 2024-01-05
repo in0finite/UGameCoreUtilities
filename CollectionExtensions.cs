@@ -473,5 +473,62 @@ namespace UGameCore.Utilities
                 result = enumerator.Current;
             return result;
         }
+
+        public static int RemoveAll<TKey, TValue>(
+            this IDictionary<TKey, TValue> dictionary, Predicate<KeyValuePair<TKey, TValue>> predicate)
+        {
+            if (dictionary.Count == 0) // early exit, no memory allocation below for IEnumerator
+                return 0;
+
+            List<TKey> keysToRemove = null;
+
+            foreach (var pair in dictionary)
+            {
+                if (predicate(pair))
+                {
+                    keysToRemove ??= new List<TKey>();
+                    keysToRemove.Add(pair.Key);
+                }
+            }
+
+            if (keysToRemove == null)
+                return 0;
+
+            int numRemoved = 0;
+            foreach (TKey key in keysToRemove)
+            {
+                if (dictionary.Remove(key))
+                    numRemoved++;
+            }
+
+            return numRemoved;
+        }
+
+        public static LinkedListNode<T> InsertSorted<T>(
+            this LinkedList<T> linkedList, T valueToAdd, Comparison<T> comparison)
+        {
+            var nodeToAdd = new LinkedListNode<T>(valueToAdd);
+
+            if (linkedList.Count == 0)
+            {
+                linkedList.AddFirst(nodeToAdd);
+                return nodeToAdd;
+            }
+
+            var node = linkedList.First;
+            while (node != null)
+            {
+                if (comparison(valueToAdd, node.Value) < 0)
+                {
+                    linkedList.AddBefore(node, nodeToAdd);
+                    return nodeToAdd;
+                }
+
+                node = node.Next;
+            }
+
+            linkedList.AddLast(nodeToAdd);
+            return nodeToAdd;
+        }
     }
 }
