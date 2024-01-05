@@ -270,32 +270,38 @@ namespace UGameCore.Utilities
             return dir;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Min(this float a, float b)
         {
             return a < b ? a : b;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Max(this float a, float b)
         {
             return a > b ? a : b;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Clamp(this float x, float a, float b)
         {
             return Mathf.Clamp(x, a, b);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Sign(this float f)
         {
             // note: don't use Unity's Mathf.Sign() - it doesn't return 0
             return System.Math.Sign(f);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool BetweenInclusive(this float v, float min, float max)
         {
             return v >= min && v <= max;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool BetweenExclusive(this float v, float min, float max)
         {
             return v > min && v < max;
@@ -318,6 +324,7 @@ namespace UGameCore.Utilities
         /// <summary>
         /// Returns 0 if this number is NaN (Not-a-number), otherwise returns original value.
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float ZeroIfNan(this float f)
         {
             return float.IsNaN(f) ? 0f : f;
@@ -341,6 +348,7 @@ namespace UGameCore.Utilities
         /// <summary>
         /// Returns 0 if this number is NaN (Not-a-number), otherwise returns original value.
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static double ZeroIfNan(this double d)
         {
             return double.IsNaN(d) ? 0.0 : d;
