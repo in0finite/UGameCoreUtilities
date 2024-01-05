@@ -53,12 +53,21 @@ namespace UGameCore.Utilities
 
         public static void DestroyComponent<T>(this GameObject go)
 		{
-			Component comp = go.GetComponent<T>() as Component;
-			if (comp != null)
-				UnityEngine.Object.Destroy(comp);
+            if (!go.TryGetComponent(out T component))
+                return;
+
+			UnityEngine.Object.Destroy(component as Component);
 		}
 
-		public static IEnumerable<T> GetFirstLevelChildrenComponents<T>(this GameObject go)
+        public static void DestroyComponentEvenInEditMode<T>(this GameObject go)
+        {
+			if (!go.TryGetComponent(out T component))
+				return;
+
+			F.DestroyEvenInEditMode(component as Component);
+        }
+
+        public static IEnumerable<T> GetFirstLevelChildrenComponents<T>(this GameObject go)
 		{
 			return go.transform.GetFirstLevelChildren().SelectMany(c => c.GetComponents<T>());
 		}
