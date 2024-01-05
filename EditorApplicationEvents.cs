@@ -90,8 +90,12 @@ namespace UGameCore.Utilities
             objectData.awakeCalled = true;
 
             if (objectData.awakeMethod != null)
-                F.RunExceptionSafe(() => objectData.awakeMethod.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
-            
+            {
+                bool awakeOk = F.RunExceptionSafe(() => objectData.awakeMethod.Invoke(objectData.monoBehaviour, Array.Empty<object>()));
+                // mimic behavior from Unity : if Awake() throws exception, disable the script
+                if (!awakeOk)
+                    F.RunExceptionSafe(() => objectData.monoBehaviour.enabled = false);
+            }
         }
 
         private static void DispatchUpdateToSingleObject(ObjectData objectData, int index)
