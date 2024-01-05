@@ -7,7 +7,7 @@ namespace UGameCore.Utilities
 {
     public sealed class CoroutineInfo
     {
-        private static long s_lastId = 0;
+        private static long s_lastId = 0; // not thread-safe
         public long Id { get; } = ++s_lastId;
 
         internal IEnumerator coroutine { get; }
@@ -22,6 +22,10 @@ namespace UGameCore.Utilities
         /// </summary>
         public bool FinishedSuccessfully { get; internal set; } = false;
 
+        /// <summary>
+        /// Exception that caused this coroutine to fail. Note that coroutine can be stopped manually. In this case,
+        /// exception will be null, but you can still check for success using <see cref="FinishedSuccessfully"/>.
+        /// </summary>
         public Exception FailureException { get; internal set; }
 
         internal CoroutineInfo(Func<IEnumerator> coroutineFunc, Action onFinishSuccess, Action<Exception> onFinishError)
@@ -55,14 +59,7 @@ namespace UGameCore.Utilities
             if (null == coroutineInfo)
                 return;
 
-            int index = m_coroutines.IndexOf(coroutineInfo);
-            if (index >= 0)
-            {
-                coroutineInfo.IsRunning = false;
-                m_coroutines[index] = null;
-            }
-
-            m_newCoroutines.Remove(coroutineInfo);
+            coroutineInfo.IsRunning = false;
         }
 
         public bool IsCoroutineRunning(CoroutineInfo coroutineInfo)
@@ -75,10 +72,10 @@ namespace UGameCore.Utilities
 
         public void Update()
         {
-            m_coroutines.RemoveAll(c => null == c || !c.IsRunning);
-
             m_coroutines.AddRange(m_newCoroutines);
             m_newCoroutines.Clear();
+
+            m_coroutines.RemoveAll(c => null == c || !c.IsRunning);
 
             for (int i = 0; i < m_coroutines.Count; i++)
             {
