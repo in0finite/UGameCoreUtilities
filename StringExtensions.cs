@@ -22,7 +22,7 @@ namespace UGameCore.Utilities
             for (int i = 0; i < str.Length; i++)
             {
                 if (!char.IsLower(str[i]))
-                    return str.ToLower();
+                    return str.ToLowerInvariant();
             }
             return str;
         }
