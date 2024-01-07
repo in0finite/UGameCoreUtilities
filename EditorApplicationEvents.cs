@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace UGameCore.Utilities
@@ -168,9 +167,14 @@ namespace UGameCore.Utilities
         {
 #if UNITY_EDITOR
 
-            if (null == subscriber)
-                throw new ArgumentNullException();
+            // Note: this function must not call any of Unity APIs, the reasons are listed below.
 
+            // Do not use UnityEngine.Object's '==' operator here. When editing a prefab and saving it, Unity will try
+            // to reset the object first, calling it's contructor, during which the MonoBehaviour '==' operator will
+            // return null. This will cause some errors in the console, and sometimes will even crash the engine.
+            if (object.ReferenceEquals(subscriber, null))
+                throw new ArgumentNullException();
+            
             // Here we have to use object.ReferenceEquals(), because something strange is happening.
             // When exiting playmode, Unity kills all objects and creates new objects that are part of the scene.
             // When this function is called from constructor of created object, his reference will point to
