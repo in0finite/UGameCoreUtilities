@@ -251,9 +251,22 @@ namespace UGameCore.Utilities
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 TransformDirection(this Quaternion rot, Vector3 dir)
         {
             return rot * dir;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 GetForward(this Quaternion rot)
+        {
+            return rot.TransformDirection(Vector3.forward);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 GetUp(this Quaternion rot)
+        {
+            return rot.TransformDirection(Vector3.up);
         }
 
         public static Vector3 ClampDirection(Vector3 dir, Vector3 referenceVec, float maxAngle)
