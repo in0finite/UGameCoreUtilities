@@ -10,6 +10,7 @@ namespace UGameCore.Utilities
 	{
 
 		public	event	Action<PointerEventData>	onPointerClick = delegate {};
+		public	event	Action<PointerEventData>	onPointerDoubleClick = delegate {};
 		public	event	Action<PointerEventData>	onPointerEnter = delegate {};
 		public	event	Action<PointerEventData>	onPointerExit = delegate {};
 		public	event	Action<PointerEventData>	onPointerDown = delegate {};
@@ -19,17 +20,40 @@ namespace UGameCore.Utilities
 		public bool IsPointerInside { get; private set; } = false;
 		public bool IsPointerDown { get; private set; } = false;
 
+		public bool IsWaitingForDoubleClick { get; private set; } = false;
+		public double TimeWhenClicked { get; private set; } = double.NegativeInfinity;
+		public float doubleClickDuration = 0.5f;
+
 
 
 		void OnDisable()
 		{
 			this.IsPointerInside = false;
 			this.IsPointerDown = false;
-		}
+			this.IsWaitingForDoubleClick = false;
+        }
 
 		public void OnPointerClick (PointerEventData eventData)
 		{
-			onPointerClick (eventData);
+			double timeNow = Time.realtimeSinceStartupAsDouble; // works in edit-mode also
+
+            double oldTimeWhenClicked = this.TimeWhenClicked;
+            this.TimeWhenClicked = timeNow;
+
+            if (this.IsWaitingForDoubleClick)
+			{
+				if (timeNow - oldTimeWhenClicked < this.doubleClickDuration)
+				{
+                    this.IsWaitingForDoubleClick = false;
+                    onPointerDoubleClick(eventData);
+                }
+            }
+			else
+			{
+                this.IsWaitingForDoubleClick = true;
+            }
+
+            onPointerClick (eventData);
 		}
 
 		public void OnPointerEnter (PointerEventData eventData)
