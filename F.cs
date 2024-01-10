@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
 
@@ -42,24 +43,76 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static Span<T> CopyFromOther<T>(this Span<T> destinationSpan, ReadOnlySpan<T> other)
+        {
+            if (destinationSpan.Length < other.Length)
+                throw new ArgumentOutOfRangeException($"Destination span is shorter ({destinationSpan.Length}) than source span ({other.Length})");
+            other.CopyTo(destinationSpan);
+            return destinationSpan.Slice(other.Length);
+        }
+
+        public static void CopyFromOther<T>(this Span<T> destinationSpan, ReadOnlySpan<T> other, out int otherLength)
+        {
+            destinationSpan.CopyFromOther(other);
+            otherLength = other.Length;
+        }
+
         /// <summary>
         /// Formats the elapsed time (in seconds) in format [d].[hh]:mm:ss.[fff].
         /// For example, 40 seconds will return 00:40, 70 will return 01:10, 3700 will return 01:01:40.
         /// </summary>
         public static string FormatElapsedTime(double elapsedTimeSeconds, bool useMilliseconds = false)
         {
+            Span<char> chars = stackalloc char[32];
+            FormatElapsedTime(chars, out int charsWritten, elapsedTimeSeconds, useMilliseconds);
+            return new string(chars[..charsWritten]);
+        }
+
+        /// <summary>
+        /// Formats the elapsed time (in seconds) in format [d].[hh]:mm:ss.[fff].
+        /// For example, 40 seconds will return 00:40, 70 will return 01:10, 3700 will return 01:01:40.
+        /// </summary>
+        public static void FormatElapsedTime(
+            Span<char> resultSpan, out int charsWritten, double elapsedTimeSeconds, bool useMilliseconds = false)
+        {
             if (double.IsNaN(elapsedTimeSeconds))
-                return "NaN";
+            {
+                resultSpan.CopyFromOther("NaN", out charsWritten);
+                return;
+            }
 
             if (TimeSpan.MaxValue.TotalSeconds < elapsedTimeSeconds)
-                return double.PositiveInfinity.ToString(CultureInfo.InvariantCulture);
+            {
+                resultSpan.CopyFromOther("Infinity", out charsWritten);
+                return;
+            }
 
             if (TimeSpan.MinValue.TotalSeconds > elapsedTimeSeconds)
-                return double.NegativeInfinity.ToString(CultureInfo.InvariantCulture);
+            {
+                resultSpan.CopyFromOther("-Infinity", out charsWritten);
+                return;
+            }
 
             TimeSpan timeSpan = TimeSpan.FromSeconds(elapsedTimeSeconds);
-            string format = (timeSpan.Days > 0 ? "d\\." : "") + (timeSpan.Hours > 0 || timeSpan.Days > 0 ? "hh\\:" : "") + "mm\\:ss" + (useMilliseconds ? "\\.fff" : "");
-            return timeSpan.ToString(format, CultureInfo.InvariantCulture);
+
+            Span<char> formatSpan = stackalloc char[20];
+            Span<char> tempSpan = formatSpan;
+
+            if (timeSpan.Days > 0)
+                tempSpan = tempSpan.CopyFromOther("d\\.");
+
+            if (timeSpan.Hours > 0 || timeSpan.Days > 0)
+                tempSpan = tempSpan.CopyFromOther("hh\\:");
+
+            tempSpan = tempSpan.CopyFromOther("mm\\:ss");
+
+            if (useMilliseconds)
+                tempSpan = tempSpan.CopyFromOther("\\.fff");
+
+            formatSpan = formatSpan[..(formatSpan.Length - tempSpan.Length)];
+
+            if (!timeSpan.TryFormat(resultSpan, out charsWritten, formatSpan, CultureInfo.InvariantCulture))
+                throw new ArgumentException("Failed to format time span");
         }
 
 
