@@ -2,10 +2,11 @@ using System.Collections;
 
 namespace UGameCore.Utilities
 {
-    public interface ISelectFolderDialogHandler
+    /// <summary>
+    /// Allows user to select a folder through a dialog.
+    /// </summary>
+    public interface ISelectFolderDialog
     {
-        string Select(string title, string folder, string defaultName);
-
         IEnumerator SelectAsync(Ref<string> resultRef, string title, string folder, string defaultName);
     }
 }
