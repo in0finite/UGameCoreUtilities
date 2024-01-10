@@ -292,6 +292,18 @@ namespace UGameCore.Utilities
             return true;
         }
 
+        public static void RemoveThenAddListener(this UnityEvent unityEvent, UnityAction action)
+        {
+            unityEvent.RemoveListener(action);
+            unityEvent.AddListener(action);
+        }
+
+        public static void RemoveThenAddListener<T>(this UnityEvent<T> unityEvent, UnityAction<T> action)
+        {
+            unityEvent.RemoveListener(action);
+            unityEvent.AddListener(action);
+        }
+
         public static Rect GetRect (this RectTransform rectTransform)
         {
 

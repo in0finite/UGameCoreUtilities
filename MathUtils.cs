@@ -302,6 +302,12 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float Clamp01(this float x)
+        {
+            return Mathf.Clamp(x, 0f, 1f);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Sign(this float f)
         {
             // note: don't use Unity's Mathf.Sign() - it doesn't return 0
