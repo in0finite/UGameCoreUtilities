@@ -10,9 +10,9 @@ namespace UGameCore.Utilities
         private static long s_lastId = 0; // not thread-safe
         public long Id { get; } = ++s_lastId;
 
-        internal IEnumerator coroutine { get; }
-        internal System.Action onFinishSuccess { get; }
-        internal System.Action<System.Exception> onFinishError { get; }
+        internal IEnumerator coroutine;
+        internal System.Action onFinishSuccess;
+        internal System.Action<System.Exception> onFinishError;
         public event System.Action<System.Exception> onFinish = delegate { };
 
         public bool IsRunning { get; internal set; } = true;
@@ -28,6 +28,7 @@ namespace UGameCore.Utilities
         /// </summary>
         public Exception FailureException { get; internal set; }
 
+
         internal CoroutineInfo(Func<IEnumerator> coroutineFunc, Action onFinishSuccess, Action<Exception> onFinishError)
         {
             this.coroutine = new NestingEnumerator(coroutineFunc, false);
@@ -36,6 +37,14 @@ namespace UGameCore.Utilities
         }
 
         internal void NotifyOnFinish(System.Exception ex) => this.onFinish.InvokeEventExceptionSafe(ex);
+
+        internal void ReleaseReferences()
+        {
+            this.coroutine = null;
+            this.onFinishSuccess = null;
+            this.onFinishError = null;
+            this.onFinish = null;
+        }
     }
 
     public sealed class CoroutineRunner
@@ -60,6 +69,7 @@ namespace UGameCore.Utilities
                 return;
 
             coroutineInfo.IsRunning = false;
+            coroutineInfo.ReleaseReferences();
         }
 
         public bool IsCoroutineRunning(CoroutineInfo coroutineInfo)
@@ -81,7 +91,6 @@ namespace UGameCore.Utilities
             {
                 this.UpdateCoroutine(m_coroutines[i], i);
             }
-            
         }
 
         void UpdateCoroutine(CoroutineInfo coroutine, int coroutineIndex)
@@ -126,6 +135,10 @@ namespace UGameCore.Utilities
                     if (coroutine.onFinishError != null)
                         F.RunExceptionSafe(() => coroutine.onFinishError(failureException));
                 }
+
+                // coroutine object can still be referenced externally, so make sure to release
+                // references that are no longer needed
+                coroutine.ReleaseReferences();
             }
         }
     }
