@@ -22,7 +22,7 @@ namespace UGameCore.Utilities
             if (!this.editMode && !Application.isPlaying)
                 return;
 
-            var cam = Camera.current;
+            var cam = Application.isPlaying ? Camera.main : Camera.current;
             if (cam == null)
                 return;
             
