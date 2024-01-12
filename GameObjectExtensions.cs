@@ -67,6 +67,11 @@ namespace UGameCore.Utilities
 			F.DestroyEvenInEditMode(component as Component);
         }
 
+        public static IEnumerable<Transform> GetFirstLevelChildren(this GameObject go)
+		{
+			return go.transform.GetFirstLevelChildren();
+        }
+
         public static IEnumerable<T> GetFirstLevelChildrenComponents<T>(this GameObject go)
 		{
 			return go.transform.GetFirstLevelChildren().SelectMany(c => c.GetComponents<T>());

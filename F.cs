@@ -269,6 +269,21 @@ namespace UGameCore.Utilities
         }
 
         /// <summary>
+        /// Get currently focused UI object.
+        /// </summary>
+        public static GameObject UIFocusedObject()
+        {
+            if (GUIUtility.hotControl != 0)
+                return null;
+
+            EventSystem evSys = EventSystem.current;
+            if (evSys == null)
+                return null;
+
+            return evSys.currentSelectedGameObject;
+        }
+
+        /// <summary>
         /// Does User Interface have keyboard focus currently ?
         /// </summary>
         public static bool UIHasKeyboardFocus()
