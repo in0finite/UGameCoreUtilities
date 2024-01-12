@@ -138,5 +138,16 @@ namespace UGameCore.Utilities
 
             m_elapsedTimeList.newActions.Add((m_elapsedTime + deltaTime, action));
         }
+
+        public void RunOutsideOfCurrentPeriod(double currentPeriodDuration, Action action)
+        {
+            // note: this should be changed to support past times, because currently,
+            // if current time is before the specified period, action will not be ran
+
+            // note: action will be executed twice
+
+            this.RunAtTime(m_gameTimeProvider.Time + currentPeriodDuration, action);
+            this.RunAfterElapsed(currentPeriodDuration, action);
+        }
     }
 }

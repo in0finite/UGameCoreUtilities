@@ -4,11 +4,12 @@ namespace UGameCore.Utilities
 {
 	public class PopulateScrollViewWithEvents : MonoBehaviour
 	{
-		private	float	m_timeSinceRemovedEvent = 0 ;
 		public	float	timeToRemoveEvent = 8 ;
 		public	int		maxNumEvents = 5 ;
 
-		[SerializeField]	private	Transform	m_content = null ;
+		public DelayedActionInvoker delayedActionInvoker;
+
+        [SerializeField]	private	Transform	m_content = null ;
 		[SerializeField]	private	GameObject	m_eventPrefab = null ;
 
 
@@ -17,25 +18,14 @@ namespace UGameCore.Utilities
 			EditorApplicationEvents.Register(this);
 		}
 
-        void Update()
+        void Start()
+        {
+            this.EnsureSerializableReferencesAssigned();
+        }
+
+		public void EventHappened(string eventText)
 		{
-			if (this.GetNumEventsInUI() > 0)
-			{
-				m_timeSinceRemovedEvent += Time.deltaTime;
-
-				if( m_timeSinceRemovedEvent >= this.timeToRemoveEvent )
-				{
-					// remove event
-					this.RemoveTopEventFromUI();
-					m_timeSinceRemovedEvent = 0 ;
-				}
-			}
-		}
-
-		public void EventHappened( string eventText )
-		{
-
-			this.AddEventToUI (eventText);
+            GameObject newGo = this.AddEventToUI(eventText);
 
 			if (this.GetNumEventsInUI() > this.maxNumEvents) {
 				// too many events
@@ -43,20 +33,24 @@ namespace UGameCore.Utilities
 				this.RemoveTopEventFromUI();
 			}
 
-			m_timeSinceRemovedEvent = 0;
-
+			this.delayedActionInvoker.RunOutsideOfCurrentPeriod(this.timeToRemoveEvent, () =>
+			{
+				if (newGo != null)
+					F.DestroyEvenInEditMode(newGo);
+			});
 		}
 
-		void	AddEventToUI( string eventText ) {
+		GameObject	AddEventToUI( string eventText ) {
 
 			if (null == m_eventPrefab)
-				return;
+				return null;
 
 			var go = Instantiate( m_eventPrefab );
 			go.transform.SetParent (m_content, false);
 			var text = go.GetComponentInChildren<UnityEngine.UI.Text> ();
 			text.text = eventText ;
 
+			return go;
 		}
 
 		public	void	RemoveTopEventFromUI() {
