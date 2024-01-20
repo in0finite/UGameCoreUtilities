@@ -12,6 +12,7 @@ namespace UGameCore.Utilities
         readonly Stack<IEnumerator> m_stack = new Stack<IEnumerator>();
         readonly bool m_noExceptions;
         bool m_initialized = false;
+        public Exception FailureException { get; private set; }
 
 
         public NestingEnumerator(Func<IEnumerator> enumeratorFunc, bool noExceptions)
@@ -59,7 +60,7 @@ namespace UGameCore.Utilities
             var tempFunc = m_enumeratorFunc;
             m_enumeratorFunc = null; // we don't need it anymore, release references
 
-            m_startingEnumerator = GetEnumeratorSafe(tempFunc, m_noExceptions);
+            m_startingEnumerator = this.GetEnumeratorSafe(tempFunc, m_noExceptions);
 
             if (m_startingEnumerator != null)
                 m_stack.Push(m_startingEnumerator);
@@ -101,6 +102,7 @@ namespace UGameCore.Utilities
                 m_stack.Push(m_startingEnumerator);
 
             m_current = null;
+            this.FailureException = null;
         }
 
         /// <summary>
@@ -113,44 +115,86 @@ namespace UGameCore.Utilities
             m_startingEnumerator = null;
             m_current = null;
             m_initialized = false;
+            this.FailureException = null;
             m_stack.Clear();
 
             m_enumeratorFunc = func;
         }
 
+        void ProcessException(Exception exception)
+        {
+            this.FailureException = exception;
+
+            // no exception should leave this function
+            try
+            {
+                UnityEngine.Debug.LogException(exception);
+            }
+            catch
+            {
+            }
+        }
+
         // "safe" methods
 
-        static IEnumerator GetEnumeratorSafe(Func<IEnumerator> func, bool catchExceptions)
+        IEnumerator GetEnumeratorSafe(Func<IEnumerator> func, bool catchExceptions)
         {
             if (!catchExceptions)
                 return func();
 
             IEnumerator enumerator = null;
-            F.RunExceptionSafe(() => enumerator = func());
+
+            try
+            {
+                enumerator = func();
+            }
+            catch (Exception ex)
+            {
+                this.ProcessException(ex);
+            }
+            
             return enumerator;
         }
 
-        static bool MoveNextSafe(IEnumerator enumerator, bool catchExceptions)
+        bool MoveNextSafe(IEnumerator enumerator, bool catchExceptions)
         {
             if (!catchExceptions)
                 return enumerator.MoveNext();
 
             bool hasNext = false;
-            F.RunExceptionSafe(() => hasNext = enumerator.MoveNext());
+
+            try
+            {
+                hasNext = enumerator.MoveNext();
+            }
+            catch (Exception ex)
+            {
+                this.ProcessException(ex);
+            }
+
             return hasNext;
         }
 
-        static object GetCurrentSafe(IEnumerator enumerator, bool catchExceptions)
+        object GetCurrentSafe(IEnumerator enumerator, bool catchExceptions)
         {
             if (!catchExceptions)
                 return enumerator.Current;
 
             object current = null;
-            F.RunExceptionSafe(() => current = enumerator.Current);
+
+            try
+            {
+                current = enumerator.Current;
+            }
+            catch (Exception ex)
+            {
+                this.ProcessException(ex);
+            }
+
             return current;
         }
 
-        static void ResetSafe(IEnumerator enumerator, bool catchExceptions)
+        void ResetSafe(IEnumerator enumerator, bool catchExceptions)
         {
             if (!catchExceptions)
             {
@@ -158,7 +202,14 @@ namespace UGameCore.Utilities
                 return;
             }
 
-            F.RunExceptionSafe(enumerator.Reset);
+            try
+            {
+                enumerator.Reset();
+            }
+            catch (Exception ex)
+            {
+                this.ProcessException(ex);
+            }
         }
     }
 }
