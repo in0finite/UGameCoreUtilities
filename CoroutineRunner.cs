@@ -159,7 +159,7 @@ namespace UGameCore.Utilities
             m_noExceptions = noExceptions;
         }
 
-        object IEnumerator.Current => m_current;
+        public object Current => m_current;
 
         bool? MoveNextOneIteration()
         {
@@ -204,7 +204,7 @@ namespace UGameCore.Utilities
                 m_stack.Push(m_startingEnumerator);
         }
 
-        bool IEnumerator.MoveNext()
+        public bool MoveNext()
         {
             this.Initialize();
 
@@ -229,7 +229,7 @@ namespace UGameCore.Utilities
             }
         }
 
-        void IEnumerator.Reset()
+        public void Reset()
         {
             if (m_startingEnumerator != null)
                 ResetSafe(m_startingEnumerator, m_noExceptions);
@@ -240,6 +240,21 @@ namespace UGameCore.Utilities
                 m_stack.Push(m_startingEnumerator);
 
             m_current = null;
+        }
+
+        /// <summary>
+        /// Reset enumeration using different <see cref="IEnumerator"/>. The advantage over creating a new
+        /// instance of <see cref="NestingEnumerator"/> is that you avoid 3 memory allocations (instance, stack,
+        /// stack's internal array).
+        /// </summary>
+        public void ResetWithOtherEnumerator(Func<IEnumerator> func)
+        {
+            m_startingEnumerator = null;
+            m_current = null;
+            m_initialized = false;
+            m_stack.Clear();
+
+            m_enumeratorFunc = func;
         }
 
         // "safe" methods
