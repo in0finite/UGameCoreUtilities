@@ -4,8 +4,10 @@ namespace UGameCore.Utilities
 {
 	public class PopulateScrollViewWithEvents : MonoBehaviour
 	{
-		public	float	timeToRemoveEvent = 8 ;
-		public	int		maxNumEvents = 5 ;
+		public	float	timeToRemoveEvent = 8;
+		public	int		maxNumEvents = 5;
+
+		public bool logEventsToConsole = false;
 
 		public DelayedActionInvoker delayedActionInvoker;
 
@@ -25,6 +27,9 @@ namespace UGameCore.Utilities
 
 		public void EventHappened(string eventText)
 		{
+			if (this.logEventsToConsole)
+				Debug.Log(eventText);
+
             GameObject newGo = this.AddEventToUI(eventText);
 
 			if (this.GetNumEventsInUI() > this.maxNumEvents) {
