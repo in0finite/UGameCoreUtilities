@@ -445,6 +445,9 @@ namespace UGameCore.Utilities
         public static bool IsOnDesktopPlatform => 
             !Application.isMobilePlatform && !Application.isConsolePlatform && SystemInfo.deviceType == DeviceType.Desktop;
 
+        public static bool PlatformSupportsCreatingProcesses => 
+            !Application.isMobilePlatform && !Application.isConsolePlatform && Application.platform != RuntimePlatform.WebGLPlayer;
+
 
         public static int GetAudioClipSizeInBytes(AudioClip clip)
         {
