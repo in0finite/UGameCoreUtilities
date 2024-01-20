@@ -112,7 +112,14 @@ namespace UGameCore.Utilities
                 isFinished = true;
                 isSuccess = false;
                 failureException = ex;
-                Debug.LogException(ex);
+
+                try
+                {
+                    Debug.LogException(ex);
+                }
+                catch
+                {
+                }
             }
 
             if (isFinished)
