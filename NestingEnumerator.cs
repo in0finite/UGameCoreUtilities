@@ -211,5 +211,70 @@ namespace UGameCore.Utilities
                 this.ProcessException(ex);
             }
         }
+
+        class EnumeratorInfo
+        {
+            public Func<IEnumerator> enumFunc;
+            public IEnumerator enumerator;
+            public EnumeratorInfo parent;
+            public object current;
+
+            public EnumeratorInfo(Func<IEnumerator> enumFunc, IEnumerator enumerator, EnumeratorInfo parent, object current)
+            {
+                this.enumFunc = enumFunc;
+                this.enumerator = enumerator;
+                this.parent = parent;
+                this.current = current;
+            }
+        }
+
+        public static IEnumerator EnumerateInParallel(List<Func<IEnumerator>> enumFuncs)
+        {
+            if (enumFuncs.Count == 0)
+                yield break;
+
+            var wantWorkEnumerators = new Stack<EnumeratorInfo>(enumFuncs.Count);
+            var wantPauseEnumerators = new Queue<EnumeratorInfo>();
+
+            for (int i = enumFuncs.Count - 1; i >= 0; i--)
+                wantWorkEnumerators.Push(new EnumeratorInfo(enumFuncs[i], null, null, null));
+            
+            while (wantWorkEnumerators.Count > 0 || wantPauseEnumerators.Count > 0)
+            {
+                bool shouldYieldCurrent = wantWorkEnumerators.Count == 0;
+
+                EnumeratorInfo enumInfo = wantWorkEnumerators.Count > 0
+                    ? wantWorkEnumerators.Pop()
+                    : wantPauseEnumerators.Dequeue();
+
+                if (shouldYieldCurrent)
+                    yield return enumInfo.current;
+
+                enumInfo.enumerator ??= enumInfo.enumFunc();
+
+                IEnumerator en = enumInfo.enumerator;
+
+                if (en.MoveNext())
+                {
+                    object current = en.Current;
+
+                    if (current is IEnumerator nestedEnumerator) // he wants to continue working
+                    {
+                        wantWorkEnumerators.Push(new EnumeratorInfo(null, nestedEnumerator, enumInfo, null));
+                    }
+                    else // he wants to pause
+                    {
+                        enumInfo.current = current;
+                        wantPauseEnumerators.Enqueue(enumInfo);
+                    }
+                }
+                else
+                {
+                    // go to parent
+                    if (enumInfo.parent != null)
+                        wantWorkEnumerators.Push(enumInfo.parent);
+                }
+            }
+        }
     }
 }
