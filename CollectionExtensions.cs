@@ -452,28 +452,6 @@ namespace UGameCore.Utilities
             return RandomElement(enumerable, true);
         }
 
-        /// <summary>
-        /// Enumerates this <see cref="IEnumerator{T}"/> to the end, and returns last value retrieved from it.
-        /// </summary>
-        public static T EnumerateToEnd<T>(this IEnumerator<T> enumerator)
-        {
-            T result = default;
-            while (enumerator.MoveNext())
-                result = enumerator.Current;
-            return result;
-        }
-
-        /// <summary>
-        /// Enumerates this <see cref="IEnumerator{T}"/> to the end, and returns last value retrieved from it.
-        /// </summary>
-        public static object EnumerateToEnd(this System.Collections.IEnumerator enumerator)
-        {
-            object result = null;
-            while (enumerator.MoveNext())
-                result = enumerator.Current;
-            return result;
-        }
-
         public static int RemoveAll<TKey, TValue>(
             this IDictionary<TKey, TValue> dictionary, Predicate<KeyValuePair<TKey, TValue>> predicate)
         {
