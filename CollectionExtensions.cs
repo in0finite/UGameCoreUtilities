@@ -482,6 +482,20 @@ namespace UGameCore.Utilities
             return numRemoved;
         }
 
+        public static void ClearAndTrimExcess<T>(this HashSet<T> hashSet, int countToTrimExcess)
+        {
+            int count = hashSet.Count;
+            hashSet.Clear();
+            if (count > countToTrimExcess)
+                hashSet.TrimExcess();
+        }
+
+        public static int RemoveDeadObjects<T>(this HashSet<T> hashSet)
+            where T : UnityEngine.Object
+        {
+            return hashSet.RemoveWhere(obj => null == obj);
+        }
+
         public static LinkedListNode<T> InsertSorted<T>(
             this LinkedList<T> linkedList, T valueToAdd, Comparison<T> comparison)
         {
