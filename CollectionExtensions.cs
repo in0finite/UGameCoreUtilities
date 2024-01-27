@@ -126,6 +126,12 @@ namespace UGameCore.Utilities
                 return true;
             }
 
+            if (enumerable is IReadOnlyCollection<T> collectionGenericReadOnly)
+            {
+                count = collectionGenericReadOnly.Count;
+                return true;
+            }
+
             count = 0;
             return false;
         }
@@ -337,9 +343,10 @@ namespace UGameCore.Utilities
             return false;
         }
 
-        public static IEnumerable<T> DistinctBy<T, T2>(this IEnumerable<T> enumerable, System.Func<T, T2> selector)
+        public static IEnumerable<T> DistinctBy<T, T2>(
+            this IEnumerable<T> enumerable, System.Func<T, T2> selector, IEqualityComparer<T2> equalityComparer)
         {
-            var hashSet = new HashSet<T2>();
+            var hashSet = new HashSet<T2>(equalityComparer);
 
             foreach (T elem in enumerable)
             {
@@ -347,6 +354,11 @@ namespace UGameCore.Utilities
                 if (hashSet.Add(value))
                     yield return elem;
             }
+        }
+
+        public static IEnumerable<T> DistinctBy<T, T2>(this IEnumerable<T> enumerable, System.Func<T, T2> selector)
+        {
+            return enumerable.DistinctBy(selector, EqualityComparer<T2>.Default);
         }
 
         public static T MinBy<T, TComparable>(
