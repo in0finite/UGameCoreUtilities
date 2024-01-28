@@ -15,6 +15,8 @@ namespace UGameCore.Utilities
             public string categoryToProcess;
             public bool allowExpensiveProcessing = true;
             public int initialCapacity = 1024;
+            public string currentPrefix = string.Empty;
+            public const string kIndentPrefixString = "\t";
 
             public StringBuilder GetStringBuilderForCategory(string category)
             {
@@ -29,16 +31,60 @@ namespace UGameCore.Utilities
                 return sb;
             }
 
-            public void AppendCollection<T>(StringBuilder sb, IEnumerable<T> collection, string name)
+            public void IncreaseIndent()
             {
-                bool hasCount = collection.TryGetCountFast(out var count);
+                this.currentPrefix += kIndentPrefixString;
+            }
+
+            public void DecreaseIndent()
+            {
+                if (this.currentPrefix.EndsWith(kIndentPrefixString, StringComparison.OrdinalIgnoreCase))
+                    this.currentPrefix = this.currentPrefix[..^kIndentPrefixString.Length];
+            }
+
+            public void AppendCollection<T>(
+                StringBuilder sb, IEnumerable<T> collection, string name, bool addObjectTypeCounts)
+            {
+                sb.Append(this.currentPrefix);
                 sb.Append(name);
                 sb.Append(": ");
+                bool hasCount = collection.TryGetCountFast(out var count);
                 if (hasCount)
                     sb.Append(count);
                 else
                     sb.Append('?');
                 sb.AppendLine();
+
+                if (addObjectTypeCounts)
+                {
+                    this.IncreaseIndent();
+                    this.AppendCollectionObjectTypesCounts(sb, collection);
+                    this.DecreaseIndent();
+                }
+            }
+
+            public void AppendCollectionObjectTypesCounts<T>(StringBuilder sb, IEnumerable<T> collection)
+            {
+                var dict = new Dictionary<Type, int>();
+                foreach (T item in collection)
+                {
+                    if (item == null)
+                        continue;
+
+                    var type = item.GetType();
+                    dict.TryGetValue(type, out int count);
+                    count++;
+                    dict[type] = count;
+                }
+
+                foreach (var pair in dict)
+                {
+                    sb.Append(this.currentPrefix);
+                    sb.Append(pair.Key.Name);
+                    sb.Append(": ");
+                    sb.Append(pair.Value);
+                    sb.AppendLine();
+                }
             }
         }
 
