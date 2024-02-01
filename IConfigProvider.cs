@@ -29,4 +29,12 @@ namespace UGameCore.Utilities
         /// </summary>
         void Save();
     }
+
+    public static class ConfigProviderExtensions
+    {
+        public static bool HasProperty(this IConfigProvider provider, string key)
+        {
+            return provider.GetProperty(key) != null;
+        }
+    }
 }
