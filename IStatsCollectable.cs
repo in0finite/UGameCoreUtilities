@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace UGameCore.Utilities
@@ -42,8 +43,7 @@ namespace UGameCore.Utilities
                     this.currentPrefix = this.currentPrefix[..^kIndentPrefixString.Length];
             }
 
-            public void AppendCollection<T>(
-                StringBuilder sb, IEnumerable<T> collection, string name, bool addObjectTypeCounts)
+            public void AppendCollection<T>(StringBuilder sb, IEnumerable<T> collection, string name, bool addObjectTypeCounts)
             {
                 sb.Append(this.currentPrefix);
                 sb.Append(name);
@@ -77,7 +77,7 @@ namespace UGameCore.Utilities
                     dict[type] = count;
                 }
 
-                foreach (var pair in dict)
+                foreach (var pair in dict.OrderByDescending(_ => _.Value))
                 {
                     sb.Append(this.currentPrefix);
                     sb.Append(pair.Key.Name);
