@@ -29,6 +29,7 @@ namespace UGameCore.Utilities
         public string SerializationName { get; init; } = string.Empty;
         public string Description { get; init; } = string.Empty;
         public PersistType Persist { get; init; } = PersistType.OnAppStart;
+        public bool ApplyDefaultValueWhenNotPresentInConfig { get; init; } = false;
         public string Category { get; init; } = string.Empty;
         public ConfigVarValue DefaultValue { get; init; }
         ConfigVarValue? LastKnownValue { get; set; }

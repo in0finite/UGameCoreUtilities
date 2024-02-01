@@ -28,6 +28,11 @@ namespace UGameCore.Utilities
         /// Saves configuration to permanent storage.
         /// </summary>
         void Save();
+
+        /// <summary>
+        /// Removes all properties.
+        /// </summary>
+        void Clear();
     }
 
     public static class ConfigProviderExtensions

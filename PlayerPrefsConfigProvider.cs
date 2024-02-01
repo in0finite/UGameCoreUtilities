@@ -34,6 +34,11 @@ namespace UGameCore.Utilities
             PlayerPrefs.Save();
         }
 
+        void IConfigProvider.Clear()
+        {
+            PlayerPrefs.DeleteAll();
+        }
+
         void IConfigProvider.SetProperty(string key, string value)
         {
             PlayerPrefs.SetString(key, value);
