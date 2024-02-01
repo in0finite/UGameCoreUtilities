@@ -315,6 +315,13 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool BetweenInclusive<T>(this T v, T min, T max)
+            where T : System.IComparable<T>
+        {
+            return v.CompareTo(min) >= 0 && v.CompareTo(max) <= 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool BetweenInclusive(this float v, float min, float max)
         {
             return v >= min && v <= max;
@@ -324,6 +331,20 @@ namespace UGameCore.Utilities
         public static bool BetweenExclusive(this float v, float min, float max)
         {
             return v > min && v < max;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsLessThan<T>(this T v, T other)
+            where T : System.IComparable<T>
+        {
+            return v.CompareTo(other) < 0;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsHigherThan<T>(this T v, T other)
+            where T : System.IComparable<T>
+        {
+            return v.CompareTo(other) > 0;
         }
 
         public static int RoundToInt(this float f)
