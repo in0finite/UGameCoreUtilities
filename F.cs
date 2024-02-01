@@ -117,6 +117,19 @@ namespace UGameCore.Utilities
         }
 
 
+        public static T FindObjectByInstanceId<T>(int id)
+            where T : Object
+        {
+            Object obj = Resources.InstanceIDToObject(id);
+            if (obj == null)
+                throw new ArgumentException($"Failed to find {typeof(T).Name} by instance id: {id}");
+
+            if (obj is not T specificTypeObj)
+                throw new ArgumentException($"Object with id {id} is of type {obj.GetType().Name}, so it can not be casted to {typeof(T).Name}");
+
+            return specificTypeObj;
+        }
+
         public static void EnableRigidBody(Rigidbody rb)
         {
             rb.isKinematic = false;
