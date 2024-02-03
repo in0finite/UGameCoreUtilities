@@ -34,7 +34,7 @@ namespace UGameCore.Utilities
                 if (s_cachedSingleton != null)
                     return s_cachedSingleton;
 
-                T[] objects = FindObjectsOfType<T>();
+                T[] objects = FindObjectsByType<T>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
                 if (objects.Length == 0)
                     return null;

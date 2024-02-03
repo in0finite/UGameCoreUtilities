@@ -225,9 +225,10 @@ namespace UGameCore.Utilities
             });
         }
 
-		public static void SendMessageToObjectsOfType<T> (string msg, params object[] args) where T : UnityEngine.Object
+		public static void SendMessageToObjectsOfType<T> (string msg, params object[] args)
+            where T : UnityEngine.Component
 		{
-			var objects = UnityEngine.Object.FindObjectsOfType<T> ();
+			var objects = UnityEngine.Object.FindObjectsByType<T>(FindObjectsSortMode.InstanceID);
 
 			foreach (var obj in objects) {
 				obj.InvokeExceptionSafe (msg, args);
