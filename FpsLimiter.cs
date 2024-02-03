@@ -9,7 +9,7 @@ namespace UGameCore.Utilities
         public IntConfigVar fpsLimitConfigVar = new IntConfigVar
         {
             SerializationName = "fps_max",
-            MinValue = 5,
+            MinValue = -1,
             MaxValue = 1000,
             DefaultValueInt = 60,
             ApplyDefaultValueWhenNotPresentInConfig = true,
@@ -41,7 +41,7 @@ namespace UGameCore.Utilities
         static void SetPlayModeLimit(int value)
         {
             QualitySettings.vSyncCount = 0;
-            Application.targetFrameRate = value;
+            Application.targetFrameRate = value.BetweenExclusive(0, 5) ? 5 : value;
         }
 
         void IConfigVarRegistrator.Register(IConfigVarRegistrator.Context context)
