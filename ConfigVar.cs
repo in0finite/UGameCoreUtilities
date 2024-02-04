@@ -238,12 +238,21 @@ namespace UGameCore.Utilities
 
         public override ConfigVarValue LoadValueFromString(string str)
         {
-            return new ConfigVarValue { BoolValue = bool.Parse(str) };
+            if (int.TryParse(str, NumberStyles.Integer, CultureInfo.InvariantCulture, out int intValue)
+                && (intValue == 1 || intValue == 0))
+            {
+                return new ConfigVarValue { BoolValue = intValue != 0 };
+            }
+
+            if (bool.TryParse(str, out bool boolValue))
+                return new ConfigVarValue { BoolValue = boolValue };
+
+            throw new ArgumentException($"Invalid boolean value provided for '{this.FinalSerializationName}', use 1|0 or true|false");
         }
 
         public override string SaveValueToString(ConfigVarValue configVarValue)
         {
-            return configVarValue.BoolValue.ToString(CultureInfo.InvariantCulture);
+            return configVarValue.BoolValue ? "1" : "0";
         }
 
         public override bool ExtractGenericValue(ConfigVarValue value) => value.BoolValue;
