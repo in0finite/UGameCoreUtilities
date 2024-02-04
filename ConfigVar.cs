@@ -332,6 +332,38 @@ namespace UGameCore.Utilities
             public List<ConfigVar> ConfigVars { get; } = new();
         }
 
-        void Register(Context context);
+        void Register(Context context)
+        {
+            IConfigVarRegistrator registrator = this;
+            var type = registrator.GetType();
+            var fields = type.GetFields(
+                System.Reflection.BindingFlags.Public
+                | System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance);
+            var properties = type.GetProperties(
+                System.Reflection.BindingFlags.Public
+                | System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Instance);
+
+            foreach (var field in fields)
+            {
+                if (!typeof(ConfigVar).IsAssignableFrom(field.FieldType))
+                    continue;
+
+                ConfigVar configVar = (ConfigVar)field.GetValue(registrator);
+                context.ConfigVars.Add(configVar);
+            }
+
+            foreach (var property in properties)
+            {
+                if (!property.CanRead)
+                    continue;
+                if (!typeof(ConfigVar).IsAssignableFrom(property.PropertyType))
+                    continue;
+
+                ConfigVar configVar = (ConfigVar)property.GetValue(registrator);
+                context.ConfigVars.Add(configVar);
+            }
+        }
     }
 }
