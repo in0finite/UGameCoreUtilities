@@ -105,6 +105,16 @@ namespace UGameCore.Utilities
 
     public abstract class ConfigVar<T> : ConfigVar
     {
+        public Func<T> GetValueCallbackGeneric
+        {
+            init => GetValueCallback = () => CreateValueFromGenericValue(value());
+        }
+
+        public Action<T> SetValueCallbackGeneric
+        {
+            init => SetValueCallback = (val) => value(ExtractGenericValue(val));
+        }
+
         public abstract T ExtractGenericValue(ConfigVarValue value);
         public abstract ConfigVarValue CreateValueFromGenericValue(T genericValue);
     }
@@ -139,13 +149,11 @@ namespace UGameCore.Utilities
     {
         public Func<int> GetValueCallbackInt
         {
-            get => () => GetValueCallback().IntValue;
             init => GetValueCallback = () => new ConfigVarValue { IntValue = value() };
         }
 
         public Action<int> SetValueCallbackInt 
         {
-            get => (val) => SetValueCallback(new ConfigVarValue { IntValue = val });
             init => SetValueCallback = (val) => value(val.IntValue);
         }
 
@@ -181,13 +189,11 @@ namespace UGameCore.Utilities
     {
         public Func<float> GetValueCallbackFloat
         {
-            get => () => GetValueCallback().FloatValue;
             init => GetValueCallback = () => new ConfigVarValue { FloatValue = value() };
         }
 
         public Action<float> SetValueCallbackFloat
         {
-            get => (val) => SetValueCallback(new ConfigVarValue { FloatValue = val });
             init => SetValueCallback = (val) => value(val.FloatValue);
         }
 
