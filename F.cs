@@ -468,41 +468,5 @@ namespace UGameCore.Utilities
         {
             return clip.samples * sizeof(float);
         }
-
-        /// <summary>
-        /// Get size in bytes of single vertex in a vertex buffer.
-        /// </summary>
-        public static int GetVBStride(this Mesh mesh)
-        {
-            int vbCount = mesh.vertexBufferCount;
-            int stride = 0;
-            for (int i = 0; i < vbCount; i++)
-                stride += mesh.GetVertexBufferStride(i);
-            return stride;
-        }
-
-        public static long GetVBSize(this Mesh mesh)
-        {
-            return mesh.GetVBStride() * (long)mesh.vertexCount;
-        }
-
-        public static uint GetNumIndexes(this Mesh mesh)
-        {
-            int subMeshCount = mesh.subMeshCount;
-            uint indexCount = 0;
-            for (int i = 0; i < subMeshCount; i++)
-                indexCount += mesh.GetIndexCount(i);
-            return indexCount;
-        }
-
-        public static uint GetNumTriangles(this Mesh mesh)
-        {
-            return mesh.GetNumIndexes() / 3;
-        }
-
-        public static long GetIBSize(this Mesh mesh)
-        {
-            return mesh.GetNumIndexes() * (long)(mesh.indexFormat == IndexFormat.UInt16 ? 2 : 4);
-        }
     }
 }
