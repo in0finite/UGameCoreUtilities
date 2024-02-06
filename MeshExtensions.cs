@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -5,6 +6,17 @@ namespace UGameCore.Utilities
 {
     public static class MeshExtensions
     {
+        delegate void InternalSetVertexBufferData(
+            int stream, IntPtr data, int dataStart, int meshBufferStart, int count, int elemSize, MeshUpdateFlags flags);
+
+        static System.Reflection.MethodInfo s_InternalSetVertexBufferDataFunc;
+
+        delegate void SetSizedNativeArrayForChannel(
+            VertexAttribute channel, VertexAttributeFormat format, int dim, IntPtr values, int valuesArrayLength, int valuesStart, int valuesCount, MeshUpdateFlags flags);
+
+        static System.Reflection.MethodInfo s_SetSizedNativeArrayForChannelFunc;
+
+
         /// <summary>
         /// Get size in bytes of single vertex in a vertex buffer.
         /// </summary>
@@ -39,6 +51,45 @@ namespace UGameCore.Utilities
         public static long GetIBSize(this Mesh mesh)
         {
             return mesh.GetNumIndexes() * (long)(mesh.indexFormat == IndexFormat.UInt16 ? 2 : 4);
+        }
+
+        public static void SetVertexBufferDataFromPtr(
+            this Mesh mesh, int stream, IntPtr data, int dataStart, int meshBufferStart, int count, int elemSize, MeshUpdateFlags flags)
+        {
+            if (null == s_InternalSetVertexBufferDataFunc)
+            {
+                s_InternalSetVertexBufferDataFunc = typeof(Mesh).GetMethod(
+                    "InternalSetVertexBufferData",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            }
+
+            var d = (InternalSetVertexBufferData)Delegate.CreateDelegate(
+                    typeof(InternalSetVertexBufferData), mesh, s_InternalSetVertexBufferDataFunc, throwOnBindFailure: true);
+
+            d(stream, data, dataStart, meshBufferStart, count, elemSize, flags);
+        }
+
+        public static void SetVeticesFromPtr(
+            this Mesh mesh, IntPtr data, int lengthInBytes, MeshUpdateFlags flags)
+        {
+            // note: element size must be 12 bytes
+
+            if (lengthInBytes % 12 != 0)
+                throw new ArgumentException($"Element size must be 12 bytes");
+
+            int lengthInValues = lengthInBytes / 12;
+
+            if (null == s_SetSizedNativeArrayForChannelFunc)
+            {
+                s_SetSizedNativeArrayForChannelFunc = typeof(Mesh).GetMethod(
+                    "SetSizedNativeArrayForChannel",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            }
+
+            var d = (SetSizedNativeArrayForChannel)Delegate.CreateDelegate(
+                    typeof(SetSizedNativeArrayForChannel), mesh, s_SetSizedNativeArrayForChannelFunc, throwOnBindFailure: true);
+
+            d(VertexAttribute.Position, VertexAttributeFormat.Float32, 3, data, lengthInValues, 0, lengthInValues, flags);
         }
 
         public static Mesh CreateWireframeCubeMesh()
