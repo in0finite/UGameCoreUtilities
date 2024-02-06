@@ -11,6 +11,11 @@ namespace UGameCore.Utilities
 
         static System.Reflection.MethodInfo s_InternalSetVertexBufferDataFunc;
 
+        delegate void InternalSetIndexBufferData(
+            IntPtr data, int dataStart, int meshBufferStart, int count, int elemSize, MeshUpdateFlags flags);
+
+        static System.Reflection.MethodInfo s_InternalSetIndexBufferDataFunc;
+
         delegate void SetSizedNativeArrayForChannel(
             VertexAttribute channel, VertexAttributeFormat format, int dim, IntPtr values, int valuesArrayLength, int valuesStart, int valuesCount, MeshUpdateFlags flags);
 
@@ -67,6 +72,22 @@ namespace UGameCore.Utilities
                     typeof(InternalSetVertexBufferData), mesh, s_InternalSetVertexBufferDataFunc, throwOnBindFailure: true);
 
             d(stream, data, dataStart, meshBufferStart, count, elemSize, flags);
+        }
+
+        public static void SetIndexBufferDataFromPtr(
+            this Mesh mesh, IntPtr data, int dataStart, int meshBufferStart, int count, int elemSize, MeshUpdateFlags flags)
+        {
+            if (null == s_InternalSetIndexBufferDataFunc)
+            {
+                s_InternalSetIndexBufferDataFunc = typeof(Mesh).GetMethod(
+                    "InternalSetIndexBufferData",
+                    System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            }
+
+            var d = (InternalSetIndexBufferData)Delegate.CreateDelegate(
+                    typeof(InternalSetIndexBufferData), mesh, s_InternalSetIndexBufferDataFunc, throwOnBindFailure: true);
+
+            d(data, dataStart, meshBufferStart, count, elemSize, flags);
         }
 
         public static void SetVeticesFromPtr(
