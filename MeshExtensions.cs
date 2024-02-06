@@ -68,6 +68,8 @@ namespace UGameCore.Utilities
                     System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
             }
 
+            // this function is marked with [FreeFunction], but it seems it's fine to call it
+
             var d = (InternalSetVertexBufferData)Delegate.CreateDelegate(
                     typeof(InternalSetVertexBufferData), mesh, s_InternalSetVertexBufferDataFunc, throwOnBindFailure: true);
 
@@ -83,6 +85,8 @@ namespace UGameCore.Utilities
                     "InternalSetIndexBufferData",
                     System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
             }
+
+            // this function is marked with [FreeFunction], but it seems it's fine to call it
 
             var d = (InternalSetIndexBufferData)Delegate.CreateDelegate(
                     typeof(InternalSetIndexBufferData), mesh, s_InternalSetIndexBufferDataFunc, throwOnBindFailure: true);
