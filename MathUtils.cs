@@ -284,6 +284,13 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T Max<T>(this T a, T b)
+            where T : System.IComparable<T>
+        {
+            return a.CompareTo(b) < 0 ? b : a;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Min(this float a, float b)
         {
             return a < b ? a : b;
@@ -359,6 +366,11 @@ namespace UGameCore.Utilities
             return Mathf.RoundToInt(f);
         }
 
+        public static int RoundToInt(this double d)
+        {
+            return (int)System.Math.Round(d);
+        }
+
         public static float SqrtOrZero(this float f)
         {
             if (float.IsNaN(f))
@@ -390,6 +402,15 @@ namespace UGameCore.Utilities
         public static float ZeroIfNotFinite(this float f)
         {
             return float.IsFinite(f) ? f : 0f;
+        }
+
+        /// <summary>
+        /// Returns 0 if this number is not finite (Infinity or Nan), otherwise returns original value.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double ZeroIfNotFinite(this double d)
+        {
+            return double.IsFinite(d) ? d : 0.0;
         }
 
         /// <summary>
