@@ -115,6 +115,8 @@ namespace UGameCore.Utilities
             init => SetValueCallback = (val) => value(ExtractGenericValue(val));
         }
 
+        public T ValueGeneric { get => ExtractGenericValue(GetValue()); set => SetValue(CreateValueFromGenericValue(value)); }
+
         public abstract T ExtractGenericValue(ConfigVarValue value);
         public abstract ConfigVarValue CreateValueFromGenericValue(T genericValue);
     }
@@ -124,10 +126,19 @@ namespace UGameCore.Utilities
     {
         public T? MinValue;
         public T? MaxValue;
+        public T[] AdditionalAllowedValues = Array.Empty<T>();
 
         public override void Validate(ConfigVarValue value)
         {
             T genericValue = this.ExtractGenericValue(value);
+
+            bool isAllowedValue = this.AdditionalAllowedValues.Contains(genericValue);
+
+            if (isAllowedValue)
+            {
+                base.Validate(value);
+                return;
+            }
 
             if (this.MinValue.HasValue && this.MaxValue.HasValue) // nicer error message is given in this case
             {
@@ -223,6 +234,14 @@ namespace UGameCore.Utilities
         public override float ExtractGenericValue(ConfigVarValue value) => value.FloatValue;
 
         public override ConfigVarValue CreateValueFromGenericValue(float genericValue) => new ConfigVarValue { FloatValue = genericValue };
+
+        public override void Validate(ConfigVarValue value)
+        {
+            if (float.IsNaN(value.FloatValue))
+                throw new ArgumentException("Value can not be NaN");
+
+            base.Validate(value);
+        }
     }
 
     public class BoolConfigVar : ConfigVar<bool>
