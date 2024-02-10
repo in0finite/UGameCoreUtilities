@@ -32,10 +32,25 @@ namespace UGameCore.Utilities
             public readonly List<(double time, Action action)> newActions = new();
         }
 
+        public struct Period
+        {
+            public double start;
+            public double end;
+
+            public Period(double start, double end)
+            {
+                this.start = start;
+                this.end = end;
+            }
+        }
+
         readonly PerListData m_absoluteTimeList = new();
         readonly PerListData m_elapsedTimeList = new();
 
         double m_elapsedTime = 0;
+
+        readonly LinkedList<(Period period, Action action)> m_outsideOfPeriodActions = new();
+        readonly List<(Period period, Action action)> m_newOutsideOfPeriodActions = new();
 
 
 
@@ -51,10 +66,14 @@ namespace UGameCore.Utilities
 
         void Update()
         {
-            this.UpdateList(m_absoluteTimeList, m_gameTimeProvider.Time);
+            double currentTime = m_gameTimeProvider.Time;
+
+            this.UpdateList(m_absoluteTimeList, currentTime);
 
             m_elapsedTime += m_gameTimeProvider.DeltaTime;
             this.UpdateList(m_elapsedTimeList, m_elapsedTime);
+
+            this.UpdateOutsideOfPeriodList(currentTime);
         }
 
         void UpdateList(PerListData perListData, double currentTime)
@@ -103,6 +122,31 @@ namespace UGameCore.Utilities
                 throw new ShouldNotHappenException();
         }
 
+        void UpdateOutsideOfPeriodList(double currentTime)
+        {
+            foreach (var a in m_newOutsideOfPeriodActions)
+                m_outsideOfPeriodActions.AddLast(a);
+            
+            m_newOutsideOfPeriodActions.Clear();
+
+            var node = m_outsideOfPeriodActions.First;
+
+            while (node != null)
+            {
+                var next = node.Next;
+
+                Period period = node.Value.period;
+
+                if (currentTime < period.start || currentTime > period.end)
+                {
+                    F.RunExceptionSafe(node.Value.action);
+                    m_outsideOfPeriodActions.Remove(node);
+                }
+
+                node = next;
+            }
+        }
+
         void Add(PerListData perListData, double time, Action action)
         {
             // cache min time
@@ -139,15 +183,18 @@ namespace UGameCore.Utilities
             m_elapsedTimeList.newActions.Add((m_elapsedTime + deltaTime, action));
         }
 
+        public void RunOutsideOfPeriod(double periodStart, double periodEnd, Action action)
+        {
+            this.CheckTimeArgument(periodStart);
+            this.CheckTimeArgument(periodEnd);
+
+            m_newOutsideOfPeriodActions.Add((new Period(periodStart, periodEnd), action));
+        }
+
         public void RunOutsideOfCurrentPeriod(double currentPeriodDuration, Action action)
         {
-            // note: this should be changed to support past times, because currently,
-            // if current time is before the specified period, action will not be ran
-
-            // note: action will be executed twice
-
-            this.RunAtTime(m_gameTimeProvider.Time + currentPeriodDuration, action);
-            this.RunAfterElapsed(currentPeriodDuration, action);
+            double timeNow = m_gameTimeProvider.Time;
+            this.RunOutsideOfPeriod(timeNow, timeNow + currentPeriodDuration, action);
         }
     }
 }
