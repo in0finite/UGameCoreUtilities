@@ -464,9 +464,9 @@ namespace UGameCore.Utilities
             !Application.isMobilePlatform && !Application.isConsolePlatform && Application.platform != RuntimePlatform.WebGLPlayer;
 
 
-        public static int GetAudioClipSizeInBytes(AudioClip clip)
+        public static int GetTotalPCMSamplesSizeInBytes(this AudioClip clip)
         {
-            return clip.samples * sizeof(float);
+            return clip.samples * sizeof(float) * clip.channels;
         }
     }
 }
