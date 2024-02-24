@@ -9,11 +9,15 @@ namespace UGameCore.Utilities
         public bool updateOffset = false;
         public bool updateAnchoredPosition = false;
 
+        public Transform transformToDrag = null;
+
 
         public void OnDrag(PointerEventData eventData)
         {
-            var rt = (RectTransform)this.transform;
-            var parent = (RectTransform)this.transform.parent;
+            Transform t = this.transformToDrag != null ? this.transformToDrag : this.transform;
+
+            var rt = (RectTransform)t;
+            var parent = (RectTransform)t.parent;
 
             if (this.updateOffset)
             {

@@ -54,5 +54,29 @@ namespace UGameCore.Utilities
 
             return result;
         }
+
+        public static void Split<T>(this Span<T> span, T splitter, Span<int> indexes, out int numIndexes)
+            where T : IEquatable<T> // Span<IEquatable<T>> has additional extension methods
+        {
+            int globalIndex = 0;
+            numIndexes = 0;
+            var startingSpan = span;
+
+            while (true)
+            {
+                int localIndex = span.IndexOf(splitter);
+                if (localIndex < 0)
+                    break;
+
+                globalIndex += localIndex;
+
+                indexes[numIndexes] = globalIndex;
+                numIndexes++;
+
+                globalIndex++;
+
+                span = startingSpan[globalIndex..];
+            }
+        }
     }
 }

@@ -18,6 +18,8 @@ namespace UGameCore.Utilities
             get => m_fillAmount;
             set
             {
+                if (m_fillAmount == value)
+                    return;
                 m_fillAmount = value;
                 this.Refresh();
             }
