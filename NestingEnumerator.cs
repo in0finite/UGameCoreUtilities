@@ -72,22 +72,27 @@ namespace UGameCore.Utilities
 
             while (true)
             {
-                bool? bResult = null;
+                bool? bMoveNext = null;
 
                 if (m_noExceptions)
                 {
-                    bool thrownException = !F.RunExceptionSafe(() => bResult = MoveNextOneIteration());
-
-                    if (thrownException)
+                    try
+                    {
+                        bMoveNext = MoveNextOneIteration();
+                    }
+                    catch (Exception ex)
+                    {
+                        this.ProcessException(ex);
                         return false;
+                    }
                 }
                 else
                 {
-                    bResult = MoveNextOneIteration();
+                    bMoveNext = MoveNextOneIteration();
                 }
 
-                if (bResult.HasValue)
-                    return bResult.Value;
+                if (bMoveNext.HasValue)
+                    return bMoveNext.Value;
             }
         }
 
