@@ -11,7 +11,8 @@ namespace UGameCore.Utilities
 
 		public	event	Action<PointerEventData>	onPointerClick = delegate {};
 		public	event	Action<PointerEventData>	onPointerDoubleClick = delegate {};
-		public	event	Action<PointerEventData>	onPointerEnter = delegate {};
+        public event Action<PointerEventData> onLeftPointerClick = delegate { };
+        public	event	Action<PointerEventData>	onPointerEnter = delegate {};
 		public	event	Action<PointerEventData>	onPointerExit = delegate {};
 		public	event	Action<PointerEventData>	onPointerDown = delegate {};
 		public	event	Action<PointerEventData>	onPointerUp = delegate {};
@@ -54,7 +55,10 @@ namespace UGameCore.Utilities
             }
 
             onPointerClick (eventData);
-		}
+
+			if (eventData.button == PointerEventData.InputButton.Left)
+				onLeftPointerClick(eventData);
+        }
 
 		public void OnPointerEnter (PointerEventData eventData)
 		{

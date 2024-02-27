@@ -33,5 +33,10 @@ namespace UGameCore.Utilities
 
             camera.transform.position = bounds.Value.center - camera.transform.forward * bounds.Value.size.magnitude.Max(0.5f);
         }
+
+        public static void MoveInFrontOfObject(this Camera camera, GameObject go)
+        {
+            camera.MoveInFrontOfObjects(new GameObject[] { go });
+        }
     }
 }
