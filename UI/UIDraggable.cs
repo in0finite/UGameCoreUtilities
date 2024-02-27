@@ -19,15 +19,20 @@ namespace UGameCore.Utilities
             var rt = (RectTransform)t;
             var parent = (RectTransform)t.parent;
 
+            var canvas = this.GetComponentInParent<Canvas>();
+            Vector2 scaleFactor = canvas != null ? canvas.transform.localScale : Vector2.one;
+
+            Vector2 finalDelta = eventData.delta / scaleFactor;
+
             if (this.updateOffset)
             {
-                rt.offsetMin += eventData.delta;
-                rt.offsetMax += eventData.delta;
+                rt.offsetMin += finalDelta;
+                rt.offsetMax += finalDelta;
             }
 
             if (this.updateAnchors)
             {
-                Vector2 scaledDelta = eventData.delta;
+                Vector2 scaledDelta = finalDelta;
                 scaledDelta.x /= parent.rect.width;
                 scaledDelta.y /= parent.rect.height;
                 rt.anchorMin += scaledDelta;
@@ -36,7 +41,7 @@ namespace UGameCore.Utilities
 
             if (this.updateAnchoredPosition)
             {
-                rt.anchoredPosition += eventData.delta;
+                rt.anchoredPosition += finalDelta;
             }
         }
     }
