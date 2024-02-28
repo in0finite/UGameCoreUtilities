@@ -2,10 +2,12 @@
 
 namespace UGameCore.Utilities
 {
-	public class PopulateScrollViewWithEvents : MonoBehaviour
+    public class PopulateScrollViewWithEvents : MonoBehaviour
 	{
 		public	float	timeToRemoveEvent = 8;
 		public	int		maxNumEvents = 5;
+
+		public bool clearContentOnStart = false;
 
 		public bool logEventsToConsole = false;
 
@@ -22,37 +24,41 @@ namespace UGameCore.Utilities
 
         void Start()
         {
-            this.EnsureSerializableReferencesAssigned();
+			if (this.clearContentOnStart && Application.isPlaying)
+				this.RemoveAllEventsFromUI();
         }
 
-		public void EventHappened(string eventText)
+        public void EventHappened(string eventText)
 		{
-			if (this.logEventsToConsole)
-				Debug.Log(eventText);
-
-            GameObject newGo = this.AddEventToUI(eventText);
-
-			if (this.GetNumEventsInUI() > this.maxNumEvents) {
-				// too many events
-				// remove 1 event
-				this.RemoveTopEventFromUI();
-			}
-
-			this.delayedActionInvoker.RunOutsideOfCurrentPeriod(this.timeToRemoveEvent, () =>
-			{
-				if (newGo != null)
-					F.DestroyEvenInEditMode(newGo);
-			});
+            GameObject newGo = this.CreateGameObjectForEvent(eventText);
+			this.EventHappened(newGo, eventText);
 		}
 
-		GameObject	AddEventToUI( string eventText ) {
+        public void EventHappened(GameObject eventGo, string eventText = null)
+		{
+            if (this.logEventsToConsole)
+                Debug.Log(eventText ?? eventGo.name, this);
 
-			if (null == m_eventPrefab)
-				return null;
+            eventGo.transform.SetParent(m_content, false);
 
+            if (this.GetNumEventsInUI() > this.maxNumEvents)
+            {
+                // too many events
+                // remove 1 event
+                this.RemoveTopEventFromUI();
+            }
+
+            this.delayedActionInvoker.RunOutsideOfCurrentPeriod(this.timeToRemoveEvent, () =>
+            {
+                if (eventGo != null)
+                    eventGo.DestroyEvenInEditMode();
+            });
+        }
+
+        GameObject	CreateGameObjectForEvent(string eventText)
+		{
 			var go = Instantiate( m_eventPrefab );
-			go.transform.SetParent (m_content, false);
-			var text = go.GetComponentInChildren<UnityEngine.UI.Text> ();
+			var text = go.GetComponentInChildrenOrThrow<UnityEngine.UI.Text> ();
 			text.text = eventText ;
 
 			return go;
@@ -77,7 +83,7 @@ namespace UGameCore.Utilities
 
 			for (int i = 0; i < m_content.childCount; i++) {
 				var child = m_content.GetChild (i);
-				F.DestroyEvenInEditMode (child.gameObject);
+				child.gameObject.DestroyEvenInEditMode();
 			}
 
 		}
