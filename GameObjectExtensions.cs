@@ -115,24 +115,40 @@ namespace UGameCore.Utilities
 			go.SetLayerRecursive(layerint);
 		}
 
-		public static Bounds GetRenderersBounds(this GameObject go)
+        public static Bounds CombineBounds(IEnumerable<Bounds> boundsEnumerable)
+		{
+            Bounds bounds = default;
+            bool hasBounds = false;
+            foreach (var b in boundsEnumerable)
+            {
+                if (hasBounds)
+                    bounds.Encapsulate(b);
+                else
+                    bounds = b;
+                hasBounds = true;
+            }
+
+            return bounds;
+        }
+
+        public static Bounds GetRenderersBounds(this GameObject go)
         {
 			var renderers = go.GetComponentsInChildren<Renderer>();
 			if (renderers.Length == 0)
 				return new Bounds(go.transform.position, Vector3.zero);
 
-            Bounds bounds = default;
-			bool hasBounds = false;
-            foreach (var r in renderers)
-            {
-				if (hasBounds)
-					bounds.Encapsulate(r.bounds);
-				else
-					bounds = r.bounds;
-				hasBounds = true;
-            }
-
-            return bounds;
+            return CombineBounds(renderers.Select(r => r.bounds));
         }
-	}
+
+        public static Bounds GetRenderersAndCollidersBounds(this GameObject go)
+		{
+            var renderers = go.GetComponentsInChildren<Renderer>();
+            var colliders = go.GetComponentsInChildren<Collider>();
+
+            if (renderers.Length == 0 && colliders.Length == 0)
+                return new Bounds(go.transform.position, Vector3.zero);
+
+            return CombineBounds(renderers.Select(r => r.bounds).Concat(colliders.Select(c => c.bounds)));
+        }
+    }
 }

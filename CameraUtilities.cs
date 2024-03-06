@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace UGameCore.Utilities
@@ -7,21 +8,12 @@ namespace UGameCore.Utilities
     {
         static Bounds? GetBounds(IEnumerable<GameObject> gos)
         {
-            Bounds? bounds = null;
-            foreach (GameObject go in gos)
-            {
-                Bounds b = go.GetRenderersBounds();
-                if (bounds.HasValue)
-                    bounds.Value.Encapsulate(b);
-                else
-                    bounds = b;
-            }
-            return bounds;
+            return GameObjectExtensions.CombineBounds(gos.Select(g => g.GetRenderersAndCollidersBounds()));
         }
 
         public static void MoveObjectInFrontOf(this Camera camera, GameObject go)
         {
-            Bounds bounds = go.GetRenderersBounds();
+            Bounds bounds = go.GetRenderersAndCollidersBounds();
             go.transform.position = camera.transform.position + camera.transform.forward * bounds.size.magnitude.Max(0.5f);
         }
 
