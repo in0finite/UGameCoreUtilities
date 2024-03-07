@@ -184,6 +184,11 @@ namespace UGameCore.Utilities
             return new Vector3(vec3.x, 0f, vec3.z);
         }
 
+        public static Vector3 WithX(this Vector3 vec3, float xValue)
+        {
+            return new Vector3(xValue, vec3.y, vec3.z);
+        }
+
         public static Vector3 WithY(this Vector3 vec3, float yValue)
         {
             return new Vector3(vec3.x, yValue, vec3.z);
