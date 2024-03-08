@@ -427,6 +427,11 @@ namespace UGameCore.Utilities
             return double.IsNaN(d) ? 0.0 : d;
         }
 
+        public static float CalculateLerpRatioBasedOnDeltaTime(float lerpRatio, float deltaTime)
+        {
+            return 1 - Mathf.Pow(lerpRatio, deltaTime);
+        }
+
         /// <summary>
 		/// Clamps all coordinates between 0 and 1.
 		/// </summary>
