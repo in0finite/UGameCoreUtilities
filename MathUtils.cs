@@ -262,6 +262,17 @@ namespace UGameCore.Utilities
             return rot * dir;
         }
 
+        public static Quaternion TransformRotation(this Quaternion rot, Quaternion rotationToTransform)
+        {
+            Vector3 forward = rotationToTransform.GetForward();
+            Vector3 up = rotationToTransform.GetUp();
+
+            forward = rot.TransformDirection(forward);
+            up = rot.TransformDirection(up);
+
+            return Quaternion.LookRotation(forward, up);
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 GetForward(this Quaternion rot)
         {
