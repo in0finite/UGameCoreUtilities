@@ -15,6 +15,8 @@ namespace UGameCore.Utilities
 
         readonly IEqualityComparer<TKey> m_comparer;
 
+        readonly bool m_throwOnDuplicates;
+
         public int Count
         {
             get
@@ -36,9 +38,15 @@ namespace UGameCore.Utilities
         }
 
         public SerializableDictionary(int capacity, IEqualityComparer<TKey> comparer)
+            : this(capacity, comparer, true)
+        {
+        }
+
+        public SerializableDictionary(int capacity, IEqualityComparer<TKey> comparer, bool throwOnDuplicates)
         {
             m_list = new(capacity);
             m_comparer = comparer;
+            m_throwOnDuplicates = throwOnDuplicates;
         }
 
         void EnsureDictBuilt()
@@ -51,8 +59,8 @@ namespace UGameCore.Utilities
             foreach (var pair in m_list)
             {
                 bool added = m_dict.TryAdd(pair.item1, pair.item2);
-                if (!added) // do not throw, gracefully notify about error
-                    Debug.LogError($"Failed to add duplicated item to {this.GetType().Name} : {pair.item1}");
+                if (!added && m_throwOnDuplicates)
+                    throw new ArgumentException($"Failed to add duplicated item to {this.GetType().Name} : {pair.item1}");
             }
         }
 
