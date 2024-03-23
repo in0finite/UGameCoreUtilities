@@ -248,6 +248,8 @@ namespace UGameCore.Utilities
     {
         public bool DefaultValueBool { get => DefaultValue.BoolValue; init => DefaultValue = new ConfigVarValue { BoolValue = value }; }
 
+        public bool ValueBool { get => ValueGeneric; set => ValueGeneric = value; }
+
         public BoolConfigVar() { }
 
         public BoolConfigVar(string description)
