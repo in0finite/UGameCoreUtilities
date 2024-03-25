@@ -78,6 +78,14 @@ namespace UGameCore.Utilities
             return m_dict[key];
         }
 
+        public void Add(TKey key, TValue value)
+        {
+            this.EnsureDictBuilt();
+
+            m_dict.Add(key, value);
+            m_list.Add(new SerializablePair<TKey, TValue>(key, value));
+        }
+
         public void AddOrReplace(TKey key, TValue value, bool saveChanges)
         {
             this.EnsureDictBuilt();
