@@ -28,12 +28,16 @@ namespace UGameCore.Utilities
         /// </summary>
         public Exception FailureException { get; internal set; }
 
+        public string ProfilerSectionName { get; private set; }
 
-        internal CoroutineInfo(Func<IEnumerator> coroutineFunc, Action onFinishSuccess, Action<Exception> onFinishError)
+
+        internal CoroutineInfo(
+            Func<IEnumerator> coroutineFunc, Action onFinishSuccess, Action<Exception> onFinishError, string profilerSectionName)
         {
             this.coroutine = new NestingEnumerator(coroutineFunc, false);
             this.onFinishSuccess = onFinishSuccess;
             this.onFinishError = onFinishError;
+            this.ProfilerSectionName = profilerSectionName;
         }
 
         internal void NotifyOnFinish(System.Exception ex) => this.onFinish.InvokeEventExceptionSafe(ex);
@@ -44,6 +48,7 @@ namespace UGameCore.Utilities
             this.onFinishSuccess = null;
             this.onFinishError = null;
             this.onFinish = null;
+            this.ProfilerSectionName = null;
         }
     }
 
@@ -53,9 +58,13 @@ namespace UGameCore.Utilities
         private List<CoroutineInfo> m_newCoroutines = new List<CoroutineInfo>();
 
 
-        public CoroutineInfo StartCoroutine(Func<IEnumerator> coroutineFunc, System.Action onFinishSuccess = null, System.Action<System.Exception> onFinishError = null)
+        public CoroutineInfo StartCoroutine(
+            Func<IEnumerator> coroutineFunc,
+            System.Action onFinishSuccess = null,
+            System.Action<System.Exception> onFinishError = null,
+            string profilerSectionName = null)
         {
-            var coroutineInfo = new CoroutineInfo(coroutineFunc, onFinishSuccess, onFinishError);
+            var coroutineInfo = new CoroutineInfo(coroutineFunc, onFinishSuccess, onFinishError, profilerSectionName);
             m_newCoroutines.Add(coroutineInfo);
             return coroutineInfo;
         }
@@ -82,6 +91,8 @@ namespace UGameCore.Utilities
 
         public void Update()
         {
+            UnityEngine.Profiling.Profiler.BeginSample("CoroutineRunner Update");
+
             m_coroutines.AddRange(m_newCoroutines);
             m_newCoroutines.Clear();
 
@@ -91,6 +102,8 @@ namespace UGameCore.Utilities
             {
                 this.UpdateCoroutine(m_coroutines[i], i);
             }
+
+            UnityEngine.Profiling.Profiler.EndSample();
         }
 
         void UpdateCoroutine(CoroutineInfo coroutine, int coroutineIndex)
@@ -98,6 +111,10 @@ namespace UGameCore.Utilities
             bool isFinished = false;
             bool isSuccess = false;
             System.Exception failureException = null;
+            bool hasProfilerSection = !string.IsNullOrWhiteSpace(coroutine.ProfilerSectionName);
+
+            if (hasProfilerSection)
+                UnityEngine.Profiling.Profiler.BeginSample(coroutine.ProfilerSectionName);
 
             try
             {
@@ -121,6 +138,9 @@ namespace UGameCore.Utilities
                 {
                 }
             }
+
+            if (hasProfilerSection)
+                UnityEngine.Profiling.Profiler.EndSample();
 
             if (isFinished)
             {
