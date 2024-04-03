@@ -264,6 +264,11 @@ namespace UGameCore.Utilities
             System.Array.Clear(array, 0, array.Length);
         }
 
+        public static void Clear(this System.Array array, int index, int length)
+        {
+            System.Array.Clear(array, index, length);
+        }
+
         public static int EnqueueRange<T>(this Queue<T> queue, IEnumerable<T> range)
         {
             int numAdded = 0;
