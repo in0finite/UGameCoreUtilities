@@ -78,6 +78,12 @@ namespace UGameCore.Utilities
             return m_dict[key];
         }
 
+        public bool TryGetValue(TKey key, out TValue value)
+        {
+            this.EnsureDictBuilt();
+            return m_dict.TryGetValue(key, out value);
+        }
+
         public void Add(TKey key, TValue value)
         {
             this.EnsureDictBuilt();

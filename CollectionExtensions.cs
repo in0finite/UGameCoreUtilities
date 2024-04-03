@@ -168,6 +168,22 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static void EnsureCountExactly<T>(this List<T> list, int count)
+        {
+            if (count < 0)
+                throw new ArgumentOutOfRangeException();
+
+            if (list.Count <= count)
+            {
+                list.EnsureCount(count);
+            }
+            else
+            {
+                int numToRemove = list.Count - count;
+                list.RemoveRange(count, numToRemove);
+            }
+        }
+
         public static T[] EnsureCount<T>(this T[] array, int count)
         {
             if (array.Length < count)
