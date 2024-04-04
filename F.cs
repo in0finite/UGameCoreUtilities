@@ -151,6 +151,11 @@ namespace UGameCore.Utilities
                 Object.Destroy(obj);
         }
 
+        public static void DestroyImmediate(this Object obj)
+        {
+            Object.DestroyImmediate(obj, false);
+        }
+
 
 		public static bool RunExceptionSafe (System.Action function, string errorMessagePrefix)
 		{
