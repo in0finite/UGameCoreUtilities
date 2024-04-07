@@ -497,5 +497,11 @@ namespace UGameCore.Utilities
         {
             return new Rect(center - size / 2.0f, size);
         }
+
+        public static Bounds WithCenter(this Bounds bounds, Vector3 center)
+        {
+            bounds.center = center;
+            return bounds;
+        }
     }
 }

@@ -161,9 +161,25 @@ namespace UGameCore.Utilities
             return Quaternion.LookRotation(tr.InverseTransformDirection(localForward), tr.InverseTransformDirection(localUp));
         }
 
+        /// <summary>
+        /// Transforms the bounds from local space to world space.
+        /// </summary>
+        public static Bounds TransformBounds(this Transform tr, in Bounds bounds)
+        {
+            // note: Transform scale is not applied
+            Vector3 center = tr.TransformPoint(bounds.center);
+            return new Bounds(center, bounds.size);
+        }
+
         public static void CopyPositionAndRotation(this Transform tr, Transform target)
         {
             tr.GetPositionAndRotation(out Vector3 pos, out Quaternion rotation);
+            target.SetPositionAndRotation(pos, rotation);
+        }
+
+        public static void CopyPositionAndRotation(this Transform tr, Transform target, out Vector3 pos, out Quaternion rotation)
+        {
+            tr.GetPositionAndRotation(out pos, out rotation);
             target.SetPositionAndRotation(pos, rotation);
         }
 
