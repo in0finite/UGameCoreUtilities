@@ -520,6 +520,15 @@ namespace UGameCore.Utilities
             return numRemoved;
         }
 
+        public static void Replace<TKey, TValue>(
+            this IDictionary<TKey, TValue> dictionary, TKey key, TValue value)
+        {
+            if (!dictionary.ContainsKey(key))
+                throw new InvalidOperationException($"Specified key {key} not found in Dictionary");
+
+            dictionary[key] = value;
+        }
+
         public static void ClearAndTrimExcess<T>(this HashSet<T> hashSet, int countToTrimExcess)
         {
             int count = hashSet.Count;

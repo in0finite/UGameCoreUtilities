@@ -43,6 +43,12 @@ namespace UGameCore.Utilities
                     this.currentPrefix = this.currentPrefix[..^kIndentPrefixString.Length];
             }
 
+            public void AppendLine(StringBuilder sb, string str)
+            {
+                sb.Append(this.currentPrefix);
+                sb.AppendLine(str);
+            }
+
             public void AppendCollection<T>(StringBuilder sb, IEnumerable<T> collection, string name, bool addObjectTypeCounts)
             {
                 sb.Append(this.currentPrefix);
