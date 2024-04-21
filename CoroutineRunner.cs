@@ -62,10 +62,20 @@ namespace UGameCore.Utilities
             Func<IEnumerator> coroutineFunc,
             System.Action onFinishSuccess = null,
             System.Action<System.Exception> onFinishError = null,
-            string profilerSectionName = null)
+            System.Action<CoroutineInfo> onFinish = null,
+            string profilerSectionName = null,
+            bool startImmediatelly = false)
         {
             var coroutineInfo = new CoroutineInfo(coroutineFunc, onFinishSuccess, onFinishError, profilerSectionName);
-            m_newCoroutines.Add(coroutineInfo);
+            if (onFinish != null)
+                coroutineInfo.onFinish += (ex) => onFinish(coroutineInfo);
+            
+            if (startImmediatelly)
+                this.UpdateCoroutine(coroutineInfo, -1);
+
+            if (coroutineInfo.IsRunning) // if still running after first update
+                m_newCoroutines.Add(coroutineInfo);
+
             return coroutineInfo;
         }
 
@@ -92,6 +102,8 @@ namespace UGameCore.Utilities
         public void Update()
         {
             UnityEngine.Profiling.Profiler.BeginSample("CoroutineRunner Update");
+
+            m_newCoroutines.RemoveAll(c => null == c || !c.IsRunning);
 
             m_coroutines.AddRange(m_newCoroutines);
             m_newCoroutines.Clear();
@@ -148,7 +160,8 @@ namespace UGameCore.Utilities
                 coroutine.FinishedSuccessfully = isSuccess;
                 coroutine.FailureException = failureException;
 
-                m_coroutines[coroutineIndex] = null;
+                if (coroutineIndex >= 0)
+                    m_coroutines[coroutineIndex] = null;
 
                 coroutine.NotifyOnFinish(failureException);
 
