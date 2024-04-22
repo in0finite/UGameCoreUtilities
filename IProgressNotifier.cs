@@ -36,35 +36,43 @@ namespace UGameCore.Utilities
         /// Clear the current progress, along with any visual information about it. For example,
         /// if dialog is being shown about current progress, it will be closed.
         /// </summary>
-        void ClearProgress(DisposableProgress progress = null);
+        void ClearProgress(DisposableProgress? progress = default);
 
         /// <summary>
         /// ETA calculated based on previous progress updates.
         /// </summary>
         string ETAText { get; }
 
-        public class DisposableProgress : System.IDisposable
+        public struct DisposableProgress : System.IDisposable
         {
-            bool m_disposed = false;
-            public IProgressNotifier ProgressNotifier { get; set; }
-            public long Id { get; set; } = -1;
+            bool m_disposed;
+            public IProgressNotifier ProgressNotifier { get; private set; }
+            public long Id { get; }
 
-            void System.IDisposable.Dispose()
+            public DisposableProgress(IProgressNotifier ProgressNotifier, long id)
+            {
+                m_disposed = false;
+                this.Id = id;
+                this.ProgressNotifier = ProgressNotifier;
+            }
+
+            public void Dispose()
             {
                 if (m_disposed)
                     return;
                 m_disposed = true;
                 this.ProgressNotifier?.ClearProgress(this);
+                this.ProgressNotifier = null;
             }
         }
 
         /// <summary>
         /// Set progress that will be cleared when returned object is disposed.
         /// </summary>
-        System.IDisposable SetDisposableProgress(string title, string info = null, float? progress = null)
+        DisposableProgress SetDisposableProgress(string title, string info = null, float? progress = null)
         {
             this.SetProgress(title, info, progress);
-            return new DisposableProgress { ProgressNotifier = this };
+            return new DisposableProgress(this, -1);
         }
     }
 }

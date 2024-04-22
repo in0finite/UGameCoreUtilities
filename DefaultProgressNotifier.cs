@@ -50,10 +50,10 @@ namespace UGameCore.Utilities
             this.Profiler?.BeginSection(title);
         }
 
-        public virtual void ClearProgress(DisposableProgress disposableProgress)
+        public virtual void ClearProgress(DisposableProgress? disposableProgress)
         {
             if (disposableProgress != null)
-                this.Profiler?.EndSectionWithChildren(disposableProgress.Id);
+                this.Profiler?.EndSectionWithChildren(disposableProgress.Value.Id);
             
             if (!this.HasProgress)
                 return;
@@ -72,10 +72,10 @@ namespace UGameCore.Utilities
 
         public virtual string ETAText => m_ETAMeasurer.ETA;
 
-        System.IDisposable IProgressNotifier.SetDisposableProgress(string title, string info, float? progress)
+        DisposableProgress IProgressNotifier.SetDisposableProgress(string title, string info, float? progress)
         {
             this.SetProgress(title, info, progress);
-            return new DisposableProgress { ProgressNotifier = this, Id = this.Profiler?.CurrentSectionId ?? -1 };
+            return new DisposableProgress(this, this.Profiler?.CurrentSectionId ?? -1);
         }
     }
 }
