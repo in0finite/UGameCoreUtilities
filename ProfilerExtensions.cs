@@ -112,14 +112,14 @@ namespace UGameCore.Utilities
 
         public static void Log(this IProfiler profiler, string prefix = null)
         {
-            var stringBuilder = new StringBuilder($"{prefix} total time: {profiler.GetTotalTime():F3} s:\n");
+            var stringBuilder = new StringBuilder($"{prefix} total time: {profiler.GetTotalTime() / 1000f:F3} s:\n");
             profiler.Dump(stringBuilder);
             Debug.Log(stringBuilder.ToString());
         }
 
         public static void LogSection(this IProfiler profiler, IProfiler.Section section, string prefix = null)
         {
-            var stringBuilder = new StringBuilder($"{prefix} total time: {(section.TotalDurationMs / 1000):F3} s:\n");
+            var stringBuilder = new StringBuilder($"{prefix} total time: {section.TotalDurationMs / 1000f:F3} s:\n");
             profiler.DumpSection(section, stringBuilder, 0, section.TotalDurationMs);
             Debug.Log(stringBuilder.ToString());
         }
