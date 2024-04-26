@@ -45,6 +45,12 @@ namespace UGameCore.Utilities
                 return null;
             }
 
+            if (!ValidateCurrentObjectSafe(current, catchExceptions))
+            {
+                m_stack.Pop();
+                return null;
+            }
+
             m_current = current;
 
             return true;
@@ -197,6 +203,24 @@ namespace UGameCore.Utilities
             }
 
             return current;
+        }
+
+        bool ValidateCurrentObjectSafe(object currentObj, bool catchExceptions)
+        {
+            if (currentObj == null)
+                return true;
+
+            if (currentObj is IEnumerator)
+                return true;
+
+            var ex = new InvalidOperationException($"Invalid object type returned from IEnumerator: {currentObj.GetType()}");
+
+            if (!catchExceptions)
+                throw ex;
+
+            ProcessException(ex);
+
+            return false;
         }
 
         void ResetSafe(IEnumerator enumerator, bool catchExceptions)
