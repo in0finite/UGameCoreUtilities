@@ -64,6 +64,12 @@ namespace UGameCore.Utilities
             }
         }
 
+        public void Rebuild()
+        {
+            m_dict = null;
+            this.EnsureDictBuilt();
+        }
+
         public bool ContainsKey(TKey key)
         {
             this.EnsureDictBuilt();

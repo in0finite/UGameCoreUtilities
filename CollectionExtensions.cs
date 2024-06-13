@@ -168,6 +168,8 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static void EnsureCountAtLeast<T>(this List<T> list, int count) => list.EnsureCount(count);
+
         public static void EnsureCountExactly<T>(this List<T> list, int count)
         {
             if (count < 0)

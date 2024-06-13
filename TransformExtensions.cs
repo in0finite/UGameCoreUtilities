@@ -64,6 +64,23 @@ namespace UGameCore.Utilities
             return array;
         }
 
+        public static List<Transform> GetAllChildrenRecursively(this Transform tr)
+            => tr.GetComponentsInChildrenExceptThis<Transform>();
+
+        public static List<T> GetComponentsInChildrenExceptThis<T>(this Transform tr)
+        {
+            int childCount = tr.childCount;
+            var resultList = new List<T>(childCount);
+            var tempList = new List<T>();
+            for (int i = 0; i < childCount; i++)
+            {
+                Transform child = tr.GetChild(i);
+                child.GetComponentsInChildren(tempList);
+                resultList.AddRange(tempList);
+            }
+            return resultList;
+        }
+
         /// <summary>
         /// Find first-level (direct) children of specified <see cref="Transform"/> that have specified name.
         /// </summary>

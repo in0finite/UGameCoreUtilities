@@ -285,6 +285,12 @@ namespace UGameCore.Utilities
             return rot.TransformDirection(Vector3.up);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Quaternion Inverse(this Quaternion rot)
+        {
+            return Quaternion.Inverse(rot);
+        }
+
         public static Vector3 ClampDirection(Vector3 dir, Vector3 referenceVec, float maxAngle)
         {
             float angle = Vector3.Angle(dir, referenceVec);
@@ -498,6 +504,7 @@ namespace UGameCore.Utilities
             return new Rect(center - size / 2.0f, size);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Bounds WithCenter(this Bounds bounds, Vector3 center)
         {
             bounds.center = center;
