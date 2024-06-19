@@ -21,6 +21,18 @@ namespace UGameCore.Utilities
             return child.GetAllParents().Any(p => p == tr);
         }
 
+        public static void ExchangeSiblings(Transform trA, Transform trB)
+        {
+            if (trA.parent != trB.parent)
+                throw new System.InvalidOperationException($"Transforms must have the same parent");
+
+            int indexA = trA.GetSiblingIndex();
+            int indexB = trB.GetSiblingIndex();
+
+            trA.SetSiblingIndex(indexB);
+            trB.SetSiblingIndex(indexA);
+        }
+
         /// <summary>
         /// Get depth level (ie. number of parents) in the hierarchy.
         /// </summary>
