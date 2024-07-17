@@ -79,7 +79,7 @@ namespace UGameCore.Utilities
 
 		public static IEnumerable<T> GetFirstLevelChildrenSingleComponent<T>(this GameObject go)
 		{
-			return go.transform.GetFirstLevelChildren().Select(c => c.GetComponent<T>()).Where(_ => _ != null);
+			return go.transform.GetFirstLevelChildren().Select(c => c.GetComponent<T>()).Where(_ => _ is Component component && component != null);
 		}
 
 		public static string GetGameObjectPath(this GameObject obj)
