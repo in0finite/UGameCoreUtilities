@@ -510,5 +510,12 @@ namespace UGameCore.Utilities
             bounds.center = center;
             return bounds;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Bounds WithExtents(this Bounds bounds, Vector3 extents)
+        {
+            bounds.extents = extents;
+            return bounds;
+        }
     }
 }

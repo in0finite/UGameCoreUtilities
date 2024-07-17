@@ -112,6 +112,8 @@ namespace UGameCore.Utilities
             return enumerable.FindIndex(elem => comparer.Equals(value, elem));
         }
 
+        public static int IndexOf<T>(this T[] arr, T value) => Array.IndexOf(arr, value);
+
         public static bool TryGetCountFast<T>(this IEnumerable<T> enumerable, out int count)
         {
             if (enumerable is ICollection<T> collectionGeneric)

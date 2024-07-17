@@ -7,5 +7,11 @@ namespace UGameCore.Utilities
     {
         public T Object;
         public bool Exists;
+
+        public ExistableUnityObject(T obj)
+        {
+            this.Object = obj;
+            this.Exists = obj != null;
+        }
     }
 }
