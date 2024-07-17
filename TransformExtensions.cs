@@ -218,6 +218,26 @@ namespace UGameCore.Utilities
             target.SetLocalPositionAndRotation(pos, rotation);
         }
 
+        public static void GetPositionAndRotation(this Transform tr, out PositionAndRotation positionAndRotation)
+        {
+            tr.GetPositionAndRotation(out positionAndRotation.Position, out positionAndRotation.Rotation);
+        }
+
+        public static void SetPositionAndRotation(this Transform tr, PositionAndRotation positionAndRotation)
+        {
+            tr.SetPositionAndRotation(positionAndRotation.Position, positionAndRotation.Rotation);
+        }
+
+        public static void GetLocalPositionAndRotation(this Transform tr, out PositionAndRotation positionAndRotation)
+        {
+            tr.GetLocalPositionAndRotation(out positionAndRotation.Position, out positionAndRotation.Rotation);
+        }
+
+        public static void SetLocalPositionAndRotation(this Transform tr, PositionAndRotation positionAndRotation)
+        {
+            tr.SetLocalPositionAndRotation(positionAndRotation.Position, positionAndRotation.Rotation);
+        }
+
         public static void SetGlobalScale(this Transform tr, Vector3 globalScale)
         {
             Vector3 parentGlobalScale = tr.parent != null ? tr.parent.lossyScale : Vector3.one;

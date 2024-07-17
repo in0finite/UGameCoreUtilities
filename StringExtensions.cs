@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace UGameCore.Utilities
 {
@@ -27,10 +29,17 @@ namespace UGameCore.Utilities
             return str;
         }
 
-        public static bool Contains(
-            this string str, string containedString, StringComparison stringComparison)
+        public static bool ContainsAny(
+            this string str, IReadOnlyList<string> containedStrings, StringComparison stringComparison)
         {
-            return str.IndexOf(containedString, stringComparison) >= 0;
+            int n = containedStrings.Count;
+            for (int i = 0; i < n; i++)
+            {
+                if (str.Contains(containedStrings[i], stringComparison))
+                    return true;
+            }
+
+            return false;
         }
 
         public static string SubstringCountClamped(this string str, int count)
