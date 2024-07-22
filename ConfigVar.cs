@@ -51,9 +51,13 @@ namespace UGameCore.Utilities
         {
         }
 
+        public virtual string GetAdditionalDescription() => string.Empty;
+
         public abstract ConfigVarValue LoadValueFromString(string str);
 
-        public abstract string SaveValueToString(ConfigVarValue obj);
+        public abstract string SaveValueToString(ConfigVarValue value);
+
+        public virtual string DescribeValue(ConfigVarValue value) => this.SaveValueToString(value);
 
         public void SetValue(ConfigVarValue value)
         {
@@ -354,13 +358,39 @@ namespace UGameCore.Utilities
             if (Enum.TryParse(str, true, out T enumValue))
                 return CreateValueFromGenericValue(enumValue);
 
-            long numericValue = long.Parse(str, CultureInfo.InvariantCulture);
-            return new ConfigVarValue { Int64Value = numericValue };
+            if (long.TryParse(str, NumberStyles.HexNumber, CultureInfo.InvariantCulture, out long hexValue))
+                return new ConfigVarValue { Int64Value = hexValue };
+
+            if (long.TryParse(str, NumberStyles.Integer, CultureInfo.InvariantCulture, out long integerValue))
+                return new ConfigVarValue { Int64Value = integerValue };
+
+            throw new ArgumentException($"Invalid Enum value: {str}");
         }
 
         public override string SaveValueToString(ConfigVarValue configVarValue)
         {
             return configVarValue.Int64Value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        public override string DescribeValue(ConfigVarValue value)
+        {
+            T enumValue = ExtractGenericValue(value);
+            return $"{enumValue} : 0x{enumValue:X}";
+        }
+
+        public override string GetAdditionalDescription()
+        {
+            Array values = Enum.GetValues(typeof(T));
+
+            string str = "\r\nAllowed values:\r\n";
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                T enumValue = (T)values.GetValue(i);
+                str += $"\t{enumValue} : 0x{enumValue:X}\r\n";
+            }
+
+            return str;
         }
 
         public override void Validate(ConfigVarValue value)
