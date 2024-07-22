@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace UGameCore.Utilities
 {
@@ -57,7 +59,7 @@ namespace UGameCore.Utilities
         {
             this.Validate(value);
             
-            if (this.IsAvailableCallback() && this.SetValueCallback != null)
+            if (this.SetValueCallback != null && this.IsAvailableCallback())
             {
                 this.SetValueCallback(value);
                 this.LastKnownValue = this.GetValueCallback?.Invoke() ?? value;
@@ -70,7 +72,7 @@ namespace UGameCore.Utilities
 
         public ConfigVarValue GetValue()
         {
-            if (this.IsAvailableCallback() && this.GetValueCallback != null)
+            if (this.GetValueCallback != null && this.IsAvailableCallback())
             {
                 ConfigVarValue value = this.GetValueCallback();
                 this.LastKnownValue = value;
@@ -92,6 +94,7 @@ namespace UGameCore.Utilities
         public object ReferenceValue;
 
         public int IntValue { readonly get => Union16Value.Part1.IntValuePart1; set => Union16Value.Part1.IntValuePart1 = value; }
+        public long Int64Value { readonly get => Union16Value.Part1.Int64Value; set => Union16Value.Part1.Int64Value = value; }
         public ulong Uint64Value { readonly get => Union16Value.Part1.Uint64Value; set => Union16Value.Part1.Uint64Value = value; }
         public float FloatValue { readonly get => Union16Value.Part1.FloatValuePart1; set => Union16Value.Part1.FloatValuePart1 = value; }
         public string StringValue { readonly get => (string)ReferenceValue; set => ReferenceValue = value; }
@@ -116,6 +119,8 @@ namespace UGameCore.Utilities
         }
 
         public T ValueGeneric { get => ExtractGenericValue(GetValue()); set => SetValue(CreateValueFromGenericValue(value)); }
+
+        public T DefaultValueGeneric { get => ExtractGenericValue(DefaultValue); init => DefaultValue = CreateValueFromGenericValue(value); }
 
         public abstract T ExtractGenericValue(ConfigVarValue value);
         public abstract ConfigVarValue CreateValueFromGenericValue(T genericValue);
@@ -302,32 +307,70 @@ namespace UGameCore.Utilities
     }
 
     public class EnumConfigVar<T> : ConfigVar<T>
-        where T : struct, Enum, IConvertible
+        where T : unmanaged, Enum
     {
-        public override ConfigVarValue CreateValueFromGenericValue(T genericValue) 
-            => new ConfigVarValue { StringValue = genericValue.ToString() };
+        // Enum has to be stored in numeric value because:
+        // - Flag Enums with combined values can not be stored as strings
+        // - storing as string would be slow, because every time the Getter is called, we would parse Enum from string,
+        // and when setter is called, we would allocate memory for new string
 
-        public override T ExtractGenericValue(ConfigVarValue value) 
-            => Enum.Parse<T>(value.StringValue, true);
+        static readonly int s_sizeOfEnum = Unsafe.SizeOf<T>();
+        static readonly int s_stackallocCount = 8 / s_sizeOfEnum;
 
-        //static readonly Array s_enumValues = Enum.GetValues(typeof(T));
-        //static readonly string[] s_enumNames = Enum.GetNames(typeof(T));
 
+        static EnumConfigVar()
+        {
+            if (s_sizeOfEnum > 8)
+                throw new InvalidOperationException($"Size of Enum should not be higher than 8 bytes");
+        }
+
+        public T ValueEnum { get => ValueGeneric; set => ValueGeneric = value; }
+
+        public T DefaultValueEnum { get => DefaultValueGeneric; init => DefaultValueGeneric = value; }
+
+        public override ConfigVarValue CreateValueFromGenericValue(T genericValue)
+        {
+            // note: Enum.ToInt64() allocates memory, so we will use Span casting
+
+            Span<T> enumSpan = stackalloc T[s_stackallocCount]; // make sure it can hold at least 1 Int64 value
+            enumSpan.Clear();
+            enumSpan[0] = genericValue;
+            var longSpan = MemoryMarshal.Cast<T, long>(enumSpan);
+            //long l = BitConverter.ToInt64(MemoryMarshal.AsBytes(enumSpan));
+            return new ConfigVarValue { Int64Value = longSpan[0] };
+        }
+
+        public override T ExtractGenericValue(ConfigVarValue value)
+        {
+            // long is 8 bytes, so it's safe to do Unsafe.As(), because Enum can never be larger than 8 bytes
+            long l = value.Int64Value;
+            return Unsafe.As<long, T>(ref l);
+        }
 
         public override ConfigVarValue LoadValueFromString(string str)
         {
-            T enumValue = Enum.Parse<T>(str, true);
-            //return new ConfigVarValue { Uint64Value = enumValue.ToUInt64(CultureInfo.InvariantCulture) };
-            return new ConfigVarValue { StringValue = str };
+            // allow both string and numeric values
+
+            if (Enum.TryParse(str, true, out T enumValue))
+                return CreateValueFromGenericValue(enumValue);
+
+            long numericValue = long.Parse(str, CultureInfo.InvariantCulture);
+            return new ConfigVarValue { Int64Value = numericValue };
         }
 
         public override string SaveValueToString(ConfigVarValue configVarValue)
         {
-            //configVarValue.Uint64Value.ToType(Enum.GetUnderlyingType(typeof(T)), CultureInfo.InvariantCulture);
+            return configVarValue.Int64Value.ToString(CultureInfo.InvariantCulture);
+        }
 
-            Enum.Parse<T>(configVarValue.StringValue, true);
-            //return configVarValue.Uint64Value.ToString(CultureInfo.InvariantCulture);
-            return configVarValue.StringValue;
+        public override void Validate(ConfigVarValue value)
+        {
+            T enumValue = ExtractGenericValue(value);
+
+            if (!Enum.IsDefined(typeof(T), enumValue))
+                throw new ArgumentException($"Value {enumValue} is not valid for Enum {typeof(T).Name}");
+
+            base.Validate(value);
         }
     }
 
