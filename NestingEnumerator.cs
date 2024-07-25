@@ -11,6 +11,7 @@ namespace UGameCore.Utilities
         object m_current;
         readonly Stack<IEnumerator> m_stack = new Stack<IEnumerator>();
         readonly bool m_noExceptions;
+        public bool NoExceptions => m_noExceptions;
         bool m_initialized = false;
         public Exception FailureException { get; private set; }
 

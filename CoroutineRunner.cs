@@ -9,8 +9,7 @@ namespace UGameCore.Utilities
     {
         private static long s_lastId = 0; // not thread-safe
         public long Id { get; } = ++s_lastId;
-
-        internal IEnumerator coroutine;
+        internal NestingEnumerator coroutine;
         internal System.Action onFinishSuccess;
         internal System.Action<System.Exception> onFinishError;
         public event System.Action<System.Exception> onFinish = delegate { };
@@ -81,6 +80,24 @@ namespace UGameCore.Utilities
 
         public CoroutineInfo StartCoroutine(IEnumerator coroutine, System.Action onFinishSuccess = null, System.Action<System.Exception> onFinishError = null)
             => this.StartCoroutine(() => coroutine, onFinishSuccess, onFinishError);
+
+        public void ReplaceCoroutineFunction(CoroutineInfo coroutineInfo, Func<IEnumerator> coroutineFunc)
+        {
+            // useful when you want to restart specified Coroutine, but maintain order of execution
+
+            if (coroutineFunc == null)
+                throw new ArgumentNullException();
+
+            if (!coroutineInfo.IsRunning) // because all the callbacks are nullified
+                throw new InvalidOperationException("Coroutine function can not be replaced if coroutine is not running");
+
+            // we must not call ResetWithOtherEnumerator(), because this execution path could be coming from this very Enumerator,
+            // so by clearing it's internal Stack, we could cause undefined behavior.
+
+            //coroutineInfo.coroutine.ResetWithOtherEnumerator(coroutineFunc);
+
+            coroutineInfo.coroutine = new NestingEnumerator(coroutineFunc, coroutineInfo.coroutine.NoExceptions);
+        }
 
         public void StopCoroutine(CoroutineInfo coroutineInfo)
         {
