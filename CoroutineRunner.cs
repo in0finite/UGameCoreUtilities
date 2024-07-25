@@ -7,8 +7,6 @@ namespace UGameCore.Utilities
 {
     public sealed class CoroutineInfo
     {
-        private static long s_lastId = 0; // not thread-safe
-        public long Id { get; } = ++s_lastId;
         internal NestingEnumerator coroutine;
         internal System.Action onFinishSuccess;
         internal System.Action<System.Exception> onFinishError;
