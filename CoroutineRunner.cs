@@ -8,6 +8,7 @@ namespace UGameCore.Utilities
     public sealed class CoroutineInfo
     {
         internal NestingEnumerator coroutine;
+        internal Func<IEnumerator> CoroutineFunc; // only used for RestartOnFailure
         internal System.Action onFinishSuccess;
         internal System.Action<System.Exception> onFinishError;
         public event System.Action<System.Exception> onFinish = delegate { };
@@ -25,23 +26,19 @@ namespace UGameCore.Utilities
         /// </summary>
         public Exception FailureException { get; internal set; }
 
-        public string ProfilerSectionName { get; private set; }
+        public string ProfilerSectionName { get; internal set; }
+
+        public bool RestartOnFailure { get; internal init; } = false;
 
 
-        internal CoroutineInfo(
-            Func<IEnumerator> coroutineFunc, Action onFinishSuccess, Action<Exception> onFinishError, string profilerSectionName)
-        {
-            this.coroutine = new NestingEnumerator(coroutineFunc, false);
-            this.onFinishSuccess = onFinishSuccess;
-            this.onFinishError = onFinishError;
-            this.ProfilerSectionName = profilerSectionName;
-        }
+        internal CoroutineInfo() { } // restrict Constructor to internal use
 
         internal void NotifyOnFinish(System.Exception ex) => this.onFinish.InvokeEventExceptionSafe(ex);
 
         internal void ReleaseReferences()
         {
             this.coroutine = null;
+            this.CoroutineFunc = null;
             this.onFinishSuccess = null;
             this.onFinishError = null;
             this.onFinish = null;
@@ -61,9 +58,22 @@ namespace UGameCore.Utilities
             System.Action<System.Exception> onFinishError = null,
             System.Action<CoroutineInfo> onFinish = null,
             string profilerSectionName = null,
-            bool startImmediatelly = false)
+            bool startImmediatelly = false,
+            bool restartOnFailure = false)
         {
-            var coroutineInfo = new CoroutineInfo(coroutineFunc, onFinishSuccess, onFinishError, profilerSectionName);
+            if (coroutineFunc == null)
+                throw new ArgumentNullException(nameof(coroutineFunc));
+
+            var coroutineInfo = new CoroutineInfo()
+            {
+                coroutine = new NestingEnumerator(coroutineFunc, false),
+                CoroutineFunc = restartOnFailure ? coroutineFunc : null,
+                onFinishSuccess = onFinishSuccess,
+                onFinishError = onFinishError,
+                ProfilerSectionName = profilerSectionName,
+                RestartOnFailure = restartOnFailure,
+            };
+
             if (onFinish != null)
                 coroutineInfo.onFinish += (ex) => onFinish(coroutineInfo);
             
@@ -86,7 +96,7 @@ namespace UGameCore.Utilities
             if (coroutineFunc == null)
                 throw new ArgumentNullException();
 
-            if (!coroutineInfo.IsRunning) // because all the callbacks are nullified
+            if (!coroutineInfo.IsRunning)
                 throw new InvalidOperationException("Coroutine function can not be replaced if coroutine is not running");
 
             // we must not call ResetWithOtherEnumerator(), because this execution path could be coming from this very Enumerator,
@@ -94,12 +104,13 @@ namespace UGameCore.Utilities
 
             //coroutineInfo.coroutine.ResetWithOtherEnumerator(coroutineFunc);
 
+            coroutineInfo.CoroutineFunc = coroutineInfo.RestartOnFailure ? coroutineFunc : null;
             coroutineInfo.coroutine = new NestingEnumerator(coroutineFunc, coroutineInfo.coroutine.NoExceptions);
         }
 
         public void StopCoroutine(CoroutineInfo coroutineInfo)
         {
-            if (null == coroutineInfo)
+            if (null == coroutineInfo) // kept for legacy reasons
                 return;
 
             coroutineInfo.IsRunning = false;
@@ -140,6 +151,8 @@ namespace UGameCore.Utilities
             System.Exception failureException = null;
             bool hasProfilerSection = !string.IsNullOrWhiteSpace(coroutine.ProfilerSectionName);
 
+            // -------------- advance Coroutine --------------
+
             if (hasProfilerSection)
                 UnityEngine.Profiling.Profiler.BeginSample(coroutine.ProfilerSectionName);
 
@@ -169,6 +182,20 @@ namespace UGameCore.Utilities
             if (hasProfilerSection)
                 UnityEngine.Profiling.Profiler.EndSample();
 
+            // ----------------------------
+
+            if (!coroutine.IsRunning) // stopped by calling StopCoroutine()
+                return;
+
+            if (isFinished && !isSuccess && coroutine.RestartOnFailure)
+            {
+                // restart on failure
+                // invoke callbacks, and restart the coroutine
+                this.InvokeCallbacks(coroutine, isSuccess, failureException);
+                coroutine.coroutine = new NestingEnumerator(coroutine.CoroutineFunc, false);
+                return;
+            }
+
             if (isFinished)
             {
                 coroutine.IsRunning = false;
@@ -178,22 +205,27 @@ namespace UGameCore.Utilities
                 if (coroutineIndex >= 0)
                     m_coroutines[coroutineIndex] = null;
 
-                coroutine.NotifyOnFinish(failureException);
-
-                if (isSuccess)
-                {
-                    if (coroutine.onFinishSuccess != null)
-                        F.RunExceptionSafe(coroutine.onFinishSuccess);
-                }
-                else
-                {
-                    if (coroutine.onFinishError != null)
-                        F.RunExceptionSafe(() => coroutine.onFinishError(failureException));
-                }
+                this.InvokeCallbacks(coroutine, isSuccess, failureException);
 
                 // coroutine object can still be referenced externally, so make sure to release
                 // references that are no longer needed
                 coroutine.ReleaseReferences();
+            }
+        }
+
+        void InvokeCallbacks(CoroutineInfo coroutine, bool isSuccess, Exception failureException)
+        {
+            coroutine.NotifyOnFinish(failureException);
+
+            if (isSuccess)
+            {
+                if (coroutine.onFinishSuccess != null)
+                    F.RunExceptionSafe(coroutine.onFinishSuccess);
+            }
+            else
+            {
+                if (coroutine.onFinishError != null)
+                    F.RunExceptionSafe(() => coroutine.onFinishError(failureException));
             }
         }
     }
