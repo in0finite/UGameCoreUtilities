@@ -18,7 +18,7 @@ namespace UGameCore.Utilities
 
         public NestingEnumerator(Func<IEnumerator> enumeratorFunc, bool noExceptions)
         {
-            m_enumeratorFunc = enumeratorFunc;
+            m_enumeratorFunc = enumeratorFunc ?? throw new ArgumentNullException(nameof(enumeratorFunc));
             m_noExceptions = noExceptions;
         }
 
@@ -122,15 +122,18 @@ namespace UGameCore.Utilities
         /// instance of <see cref="NestingEnumerator"/> is that you avoid 3 memory allocations (instance, stack,
         /// stack's internal array).
         /// </summary>
-        public void ResetWithOtherEnumerator(Func<IEnumerator> func)
+        public void ResetWithOtherEnumerator(Func<IEnumerator> enumeratorFunc)
         {
+            if (enumeratorFunc == null)
+                throw new ArgumentNullException(nameof(enumeratorFunc));
+
             m_startingEnumerator = null;
             m_current = null;
             m_initialized = false;
             this.FailureException = null;
             m_stack.Clear();
 
-            m_enumeratorFunc = func;
+            m_enumeratorFunc = enumeratorFunc;
         }
 
         void ProcessException(Exception exception)
