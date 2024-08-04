@@ -252,6 +252,12 @@ namespace UGameCore.Utilities
             return firstElement;
         }
 
+        public static void RemoveRangeFromEnd<T>(this List<T> list, int index)
+        {
+            int numToRemove = list.Count - index;
+            list.RemoveRange(index, numToRemove);
+        }
+
         public static int RemoveAll<T>(this List<T> list, System.Func<T, int, bool> predicate)
         {
             int i = 0;
@@ -301,6 +307,13 @@ namespace UGameCore.Utilities
             foreach (var item in enumerable)
                 queue.Enqueue(item);
             return queue;
+        }
+
+        public static T[] ToArray<T>(this List<T> list, int index, int length)
+        {
+            T[] array = new T[length];
+            list.CopyTo(index, array, 0, length);
+            return array;
         }
 
         public static T[] ToArrayOfLength<T>(this IEnumerable<T> enumerable, int length)

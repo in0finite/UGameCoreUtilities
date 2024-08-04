@@ -306,6 +306,13 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T Min<T>(this T a, T b)
+            where T : System.IComparable<T>
+        {
+            return a.CompareTo(b) > 0 ? b : a;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Max<T>(this T a, T b)
             where T : System.IComparable<T>
         {
@@ -331,9 +338,21 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Clamp(this double x, double a, double b)
+        {
+            return System.Math.Clamp(x, a, b);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float Clamp01(this float x)
         {
             return Mathf.Clamp(x, 0f, 1f);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Clamp01(this double x)
+        {
+            return System.Math.Clamp(x, 0.0, 1.0);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
