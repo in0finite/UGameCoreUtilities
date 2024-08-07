@@ -3,9 +3,9 @@ using UnityEngine.EventSystems;
 
 namespace UGameCore.Utilities
 {
-    public class BringToFrontWhenClicked : MonoBehaviour, IPointerClickHandler
+    public class BringToFrontWhenClicked : MonoBehaviour, IPointerDownHandler
     {
-        void IPointerClickHandler.OnPointerClick(PointerEventData eventData)
+        void IPointerDownHandler.OnPointerDown(PointerEventData eventData)
         {
             if (eventData.button == PointerEventData.InputButton.Left)
                 this.transform.SetAsLastSibling();
