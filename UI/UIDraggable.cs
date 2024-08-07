@@ -14,6 +14,9 @@ namespace UGameCore.Utilities
 
         public void OnDrag(PointerEventData eventData)
         {
+            if (eventData.button != PointerEventData.InputButton.Left)
+                return;
+
             Transform t = this.transformToDrag != null ? this.transformToDrag : this.transform;
 
             var rt = (RectTransform)t;
