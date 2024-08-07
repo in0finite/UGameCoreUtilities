@@ -78,5 +78,21 @@ namespace UGameCore.Utilities
                 }
             }
         }
+
+        [ContextMenu("Add all numbers")]
+        void AddAllNumbers()
+        {
+            var list = new List<KeyCode>(this.keyCodesToCheck);
+
+            for (KeyCode i = KeyCode.Alpha0; i <= KeyCode.Alpha9; i++)
+                list.Add(i);
+
+            for (KeyCode i = KeyCode.Keypad0; i <= KeyCode.Keypad9; i++)
+                list.Add(i);
+
+            this.keyCodesToCheck = list.Distinct().ToArray();
+
+            EditorUtilityEx.MarkObjectAsDirty(this);
+        }
     }
 }
