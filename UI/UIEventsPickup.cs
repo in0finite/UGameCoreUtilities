@@ -11,6 +11,7 @@ namespace UGameCore.Utilities
 
 		public	event	Action<PointerEventData>	onPointerClick = delegate {};
 		public	event	Action<PointerEventData>	onPointerDoubleClick = delegate {};
+        public event Action<PointerEventData> onLeftPointerDoubleClick;
         public event Action<PointerEventData> onLeftPointerClick = delegate { };
         public	event	Action<PointerEventData>	onPointerEnter = delegate {};
 		public	event	Action<PointerEventData>	onPointerExit = delegate {};
@@ -36,6 +37,7 @@ namespace UGameCore.Utilities
 
 		public void OnPointerClick (PointerEventData eventData)
 		{
+			bool isLeftPointer = eventData.button == PointerEventData.InputButton.Left;
 			double timeNow = Time.realtimeSinceStartupAsDouble; // works in edit-mode also
 
             double oldTimeWhenClicked = this.TimeWhenClicked;
@@ -47,6 +49,8 @@ namespace UGameCore.Utilities
 				{
                     this.IsWaitingForDoubleClick = false;
                     onPointerDoubleClick(eventData);
+					if (isLeftPointer)
+						this.onLeftPointerDoubleClick?.Invoke(eventData);
                 }
             }
 			else
@@ -56,7 +60,7 @@ namespace UGameCore.Utilities
 
             onPointerClick (eventData);
 
-			if (eventData.button == PointerEventData.InputButton.Left)
+			if (isLeftPointer)
 				onLeftPointerClick(eventData);
         }
 
