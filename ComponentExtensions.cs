@@ -34,6 +34,11 @@ namespace UGameCore.Utilities
             return component.gameObject.GetComponentInChildrenOrThrow<T>();
         }
 
+        public static T GetComponentInParentOrThrow<T>(this Component component)
+        {
+            return component.gameObject.GetComponentInParentOrThrow<T>();
+        }
+
         public static Transform GetTransformOrNull(this Component component)
         {
             return (component != null) ? component.transform : null;

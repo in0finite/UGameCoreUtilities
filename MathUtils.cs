@@ -445,6 +445,12 @@ namespace UGameCore.Utilities
             return float.IsFinite(f) ? f : 0f;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsFinite(this float f)
+        {
+            return float.IsFinite(f);
+        }
+
         /// <summary>
         /// Returns 0 if this number is not finite (Infinity or Nan), otherwise returns original value.
         /// </summary>

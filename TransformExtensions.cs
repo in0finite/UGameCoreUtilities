@@ -149,6 +149,13 @@ namespace UGameCore.Utilities
                 F.DestroyEvenInEditMode(transform.GetChild(i).gameObject);
         }
 
+        public static void SetChildrenActive(this Transform transform, bool isActive)
+        {
+            int childCount = transform.childCount;
+            for (int i = 0; i < childCount; i++)
+                transform.GetChild(i).gameObject.SetActive(isActive);
+        }
+
         public static void SetY(this Transform t, float yPos)
         {
             Vector3 pos = t.position;
