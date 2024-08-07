@@ -37,6 +37,9 @@ namespace UGameCore.Utilities
 
         void Update()
         {
+            if (!Input.anyKeyDown)
+                return;
+
             if (!this.editMode && !Application.isPlaying)
                 return;
 
