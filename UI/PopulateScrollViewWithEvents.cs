@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 namespace UGameCore.Utilities
 {
@@ -55,13 +56,25 @@ namespace UGameCore.Utilities
             });
         }
 
-        GameObject	CreateGameObjectForEvent(string eventText)
+        GameObject CreateGameObjectForEvent(string eventText)
 		{
-			var go = Instantiate( m_eventPrefab );
-			var text = go.GetComponentInChildrenOrThrow<UnityEngine.UI.Text> ();
-			text.text = eventText ;
+			GameObject go = Instantiate(m_eventPrefab);
 
-			return go;
+            var textMeshPro = go.GetComponentInChildren<TextMeshProUGUI>();
+            if (textMeshPro != null)
+            {
+                textMeshPro.text = eventText;
+                return go;
+            }
+
+            var textComp = go.GetComponentInChildren<UnityEngine.UI.Text>();
+			if (textComp != null)
+            {
+                textComp.text = eventText;
+				return go;
+            }
+
+			throw new System.InvalidOperationException($"Failed to find {nameof(TextMeshProUGUI)} or {nameof(UnityEngine.UI.Text)} component on prefab");
 		}
 
 		public	void	RemoveTopEventFromUI() {
