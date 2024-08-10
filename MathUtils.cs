@@ -134,10 +134,15 @@ namespace UGameCore.Utilities
             return new Vector3Int(Mathf.RoundToInt(v.x), Mathf.RoundToInt(v.y), Mathf.RoundToInt(v.z));
         }
 
-        /// <summary>
-        /// Returns vector with negated component at given index.
-        /// </summary>
+        /// <summary> Returns vector with negated component at given index.</summary>
         public static Vector3 NegatedAt(this Vector3 v, int index)
+        {
+            v[index] = -v[index];
+            return v;
+        }
+
+        /// <summary> Returns vector with negated component at given index.</summary>
+        public static Vector2 NegatedAt(this Vector2 v, int index)
         {
             v[index] = -v[index];
             return v;
@@ -187,6 +192,11 @@ namespace UGameCore.Utilities
         public static Vector3 WithX(this Vector3 vec3, float xValue)
         {
             return new Vector3(xValue, vec3.y, vec3.z);
+        }
+
+        public static Vector2 WithX(this Vector2 v, float xValue)
+        {
+            return new Vector2(xValue, v.y);
         }
 
         public static Vector3 WithY(this Vector3 vec3, float yValue)
