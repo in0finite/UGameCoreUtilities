@@ -30,5 +30,19 @@ namespace UGameCore.Utilities
         {
             camera.MoveInFrontOfObjects(new GameObject[] { go });
         }
+
+        public static Vector3 ConvertPointToDifferentFOV(this Camera cam, Vector3 pos, float newFOV)
+        {
+            Matrix4x4 worldToCameraMatrix = cam.worldToCameraMatrix;
+            float aspect = cam.aspect;
+            float nearClipPlane = cam.nearClipPlane;
+            float farClipPlane = cam.farClipPlane;
+            float currentFOV = cam.fieldOfView;
+
+            Matrix4x4 newFOVMatrix = Matrix4x4.Perspective(newFOV, aspect, nearClipPlane, farClipPlane) * worldToCameraMatrix;
+            Matrix4x4 currentFOVMatrix = Matrix4x4.Perspective(currentFOV, aspect, nearClipPlane, farClipPlane) * worldToCameraMatrix;
+            Matrix4x4 m = Matrix4x4.Inverse(currentFOVMatrix) * newFOVMatrix;
+            return m.MultiplyPoint(pos);
+        }
     }
 }
