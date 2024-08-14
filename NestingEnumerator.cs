@@ -11,10 +11,13 @@ namespace UGameCore.Utilities
         object m_current;
         readonly Stack<IEnumerator> m_stack = new Stack<IEnumerator>();
         readonly bool m_noExceptions;
-        public bool NoExceptions => m_noExceptions;
+        public bool NoExceptions { get => m_noExceptions; init => m_noExceptions = value; }
+        public bool LogExceptions { get; init; } = true;
         bool m_initialized = false;
         public Exception FailureException { get; private set; }
 
+
+        public NestingEnumerator() { }
 
         public NestingEnumerator(Func<IEnumerator> enumeratorFunc, bool noExceptions)
         {
@@ -139,6 +142,9 @@ namespace UGameCore.Utilities
         void ProcessException(Exception exception)
         {
             this.FailureException = exception;
+
+            if (!this.LogExceptions)
+                return;
 
             // no exception should leave this function
             try
