@@ -316,6 +316,49 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector3 ToUnityVector3(this System.Numerics.Vector3 v)
+        {
+            return new Vector3(v.X, v.Y, v.Z);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static System.Numerics.Vector3 ToNumericsVector3(this Vector3 v)
+        {
+            return new System.Numerics.Vector3(v.x, v.y, v.z);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector4 ToUnityVector4(this System.Numerics.Vector4 v)
+        {
+            return new Vector4(v.X, v.Y, v.Z, v.W);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Quaternion ToUnityQuaternion(this System.Numerics.Quaternion q)
+        {
+            return new Quaternion(q.X, q.Y, q.Z, q.W);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static System.Numerics.Quaternion ToNumericsQuaternion(this Quaternion q)
+        {
+            return new System.Numerics.Quaternion(q.x, q.y, q.z, q.w);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Matrix4x4 ToUnityMatrix(this System.Numerics.Matrix4x4 matrix)
+        {
+            System.Numerics.Matrix4x4.Decompose(matrix, out var scale, out var rot, out var pos);
+            return Matrix4x4.TRS(pos.ToUnityVector3(), rot.ToUnityQuaternion(), scale.ToUnityVector3());
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static System.Numerics.Vector3 GetScale(this System.Numerics.Matrix4x4 matrix)
+        {
+            return new System.Numerics.Vector3(matrix.M11, matrix.M22, matrix.M33);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Min<T>(this T a, T b)
             where T : System.IComparable<T>
         {
@@ -412,14 +455,22 @@ namespace UGameCore.Utilities
             return v.CompareTo(other) > 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int RoundToInt(this float f)
         {
             return Mathf.RoundToInt(f);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int RoundToInt(this double d)
         {
             return (int)System.Math.Round(d);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int FloorToInt(this double d)
+        {
+            return (int)System.Math.Floor(d);
         }
 
         public static float SqrtOrZero(this float f)
