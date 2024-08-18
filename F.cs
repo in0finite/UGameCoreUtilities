@@ -465,6 +465,13 @@ namespace UGameCore.Utilities
         public static bool IsOnDesktopPlatform => 
             !Application.isMobilePlatform && !Application.isConsolePlatform && SystemInfo.deviceType == DeviceType.Desktop;
 
+        public static readonly bool IsWebGLBuildTarget =
+#if UNITY_WEBGL
+            true;
+#else
+            false;
+#endif
+
         public static bool PlatformSupportsCreatingProcesses => 
             !Application.isMobilePlatform && !Application.isConsolePlatform && Application.platform != RuntimePlatform.WebGLPlayer;
 
