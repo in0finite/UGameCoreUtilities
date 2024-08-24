@@ -190,7 +190,22 @@ namespace UGameCore.Utilities
             return false;
 		}
 
-		public	static	void	Invoke( this System.Object obj, string methodName, params object[] args ) {
+        public static bool RunExceptionSafe(System.Action function, out System.Exception exception)
+        {
+            try
+            {
+                function();
+                exception = null;
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                exception = ex;
+                return false;
+            }
+        }
+
+        public	static	void	Invoke( this System.Object obj, string methodName, params object[] args ) {
 
 			var method = obj.GetType().GetMethod( methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public );
 			if(method != null) {
