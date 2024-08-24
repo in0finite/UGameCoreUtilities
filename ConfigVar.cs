@@ -295,18 +295,21 @@ namespace UGameCore.Utilities
         public int displayWidth = 200;
         public int maxNumCharacters = 0;
 
-        public override ConfigVarValue CreateValueFromGenericValue(string genericValue) => new ConfigVarValue { StringValue = genericValue };
+        public string ValueString { get => ValueGeneric; set => ValueGeneric = value; }
+        public string DefaultValueString { get => DefaultValueGeneric; init => DefaultValueGeneric = value; }
 
-        public override string ExtractGenericValue(ConfigVarValue value) => value.StringValue;
+        public override ConfigVarValue CreateValueFromGenericValue(string genericValue) => new ConfigVarValue { StringValue = genericValue ?? string.Empty };
+
+        public override string ExtractGenericValue(ConfigVarValue value) => value.StringValue ?? string.Empty;
 
         public override ConfigVarValue LoadValueFromString(string str)
         {
-            return new ConfigVarValue { StringValue = str };
+            return new ConfigVarValue { StringValue = str ?? string.Empty };
         }
 
         public override string SaveValueToString(ConfigVarValue configVarValue)
         {
-            return configVarValue.StringValue;
+            return configVarValue.StringValue ?? string.Empty;
         }
     }
 
