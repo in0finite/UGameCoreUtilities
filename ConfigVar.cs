@@ -57,6 +57,9 @@ namespace UGameCore.Utilities
 
         public abstract string SaveValueToString(ConfigVarValue value);
 
+        public void SaveToConfigProvider(IConfigProvider configProvider)
+            => configProvider.SetProperty(this.FinalSerializationName, this.SaveValueToString(this.GetValue()));
+
         public virtual string DescribeValue(ConfigVarValue value) => this.SaveValueToString(value);
 
         public void SetValue(ConfigVarValue value)
