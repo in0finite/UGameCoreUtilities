@@ -50,4 +50,21 @@ namespace UGameCore.Utilities
             return this.Part1.Equals(other.Part1) && this.Part2.Equals(other.Part2);
         }
     }
+
+    /// <summary>
+    /// C-equivalent of union, 32 bytes.
+    /// </summary>
+    [StructLayout(LayoutKind.Explicit, Pack = 1)]
+    public struct Union32 : IEquatable<Union32>
+    {
+        [FieldOffset(0)]
+        public Union16 Part1;
+        [FieldOffset(16)]
+        public Union16 Part2;
+
+        public readonly bool Equals(Union32 other)
+        {
+            return this.Part1.Equals(other.Part1) && this.Part2.Equals(other.Part2);
+        }
+    }
 }
