@@ -140,6 +140,19 @@ namespace UGameCore.Utilities
         public T? MaxValue;
         public T[] AdditionalAllowedValues = Array.Empty<T>();
 
+
+        public override string GetAdditionalDescription()
+        {
+            string str = "";
+            if (this.MinValue.HasValue)
+                str += $"Minimum value: {this.DescribeValue(this.CreateValueFromGenericValue(this.MinValue.Value))}\r\n";
+            if (this.MaxValue.HasValue)
+                str += $"Maximum value: {this.DescribeValue(this.CreateValueFromGenericValue(this.MaxValue.Value))}\r\n";
+            if (this.AdditionalAllowedValues.Length.BetweenExclusive(0, 10))
+                str += $"Additional allowed values: {string.Join(", ", this.AdditionalAllowedValues.Select(_ => this.DescribeValue(this.CreateValueFromGenericValue(_))))}\r\n";
+            return str;
+        }
+
         public override void Validate(ConfigVarValue value)
         {
             T genericValue = this.ExtractGenericValue(value);
