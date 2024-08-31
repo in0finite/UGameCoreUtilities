@@ -57,6 +57,7 @@ namespace UGameCore.Utilities
             this.fpsLimitConfigVar = new IntConfigVar
             {
                 SerializationName = "fps_max",
+                Description = "Maximum FPS",
                 MinValue = -1,
                 MaxValue = 1000,
                 DefaultValueInt = defaultFps,
