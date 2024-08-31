@@ -249,7 +249,7 @@ namespace UGameCore.Utilities
 
         public override ConfigVarValue LoadValueFromString(string str)
         {
-            float value = float.Parse(str, CultureInfo.InvariantCulture);
+            float value = float.Parse(str, NumberStyles.Float, CultureInfo.InvariantCulture);
             return new ConfigVarValue { FloatValue = value };
         }
 
