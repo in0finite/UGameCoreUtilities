@@ -114,6 +114,89 @@ namespace UGameCore.Utilities
 
         public static int IndexOf<T>(this T[] arr, T value) => Array.IndexOf(arr, value);
 
+        public static int ClampIndexWithinBounds<T>(this IReadOnlyCollection<T> collection, int index)
+        {
+            int count = collection.Count;
+            if (count <= 0)
+                return -1;
+
+            if (index < 0)
+                return 0;
+
+            if (index >= count)
+                return count - 1;
+
+            return index;
+        }
+
+        public static int BinarySearchNextAndPrevious<T>(
+            this List<T> list,
+            T value,
+            IComparer<T> comparer,
+            out int indexPrevious,
+            out int indexNext,
+            bool nextIsCurrentIfMatching = true)
+        {
+            if (list.Count == 0) // need to check, to avoid some edge cases below
+            {
+                indexNext = -1;
+                indexPrevious = -1;
+                return -1;
+            }
+
+            int index = list.BinarySearch(value, comparer);
+
+            if (index >= 0) // found matching value
+            {
+                if (nextIsCurrentIfMatching)
+                {
+                    indexNext = index;
+                    indexPrevious = index - 1;
+                }
+                else
+                {
+                    indexNext = index + 1;
+                    if (indexNext >= list.Count)
+                        indexNext = -1;
+
+                    indexPrevious = index;
+                }
+                
+                return index;
+            }
+
+            int indexOfHigher = ~index;
+            int listCountMinus1 = list.Count - 1;
+
+            indexNext = indexOfHigher;
+            if (!indexNext.BetweenInclusive(0, listCountMinus1))
+                indexNext = -1;
+
+            indexPrevious = indexOfHigher - 1;
+            if (!indexPrevious.BetweenInclusive(0, listCountMinus1))
+                indexPrevious = -1;
+
+            return index;
+        }
+
+        public static int BinarySearchNextAndPrevious<T>(
+            this List<T> list,
+            T value,
+            IComparer<T> comparer,
+            out T? previousElement,
+            out T? nextElement,
+            bool nextIsCurrentIfMatching = true)
+            where T : struct
+        {
+            int index = list.BinarySearchNextAndPrevious(
+                value, comparer, out int previousElementIndex, out int nextElementIndex, nextIsCurrentIfMatching);
+
+            previousElement = previousElementIndex < 0 ? null : list[previousElementIndex];
+            nextElement = nextElementIndex < 0 ? null : list[nextElementIndex];
+            
+            return index;
+        }
+
         public static bool TryGetCountFast<T>(this IEnumerable<T> enumerable, out int count)
         {
             if (enumerable is ICollection<T> collectionGeneric)
@@ -198,6 +281,12 @@ namespace UGameCore.Utilities
             }
 
             return array;
+        }
+
+        public static void EnsureCapacity<T>(this List<T> list, int capacity)
+        {
+            if (list.Capacity < capacity)
+                list.Capacity = capacity;
         }
 
         /// <summary>
