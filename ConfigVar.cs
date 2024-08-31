@@ -220,7 +220,9 @@ namespace UGameCore.Utilities
             init => SetValueCallback = (val) => value(val.FloatValue);
         }
 
-        public float DefaultValueFloat { get => DefaultValue.FloatValue; init => DefaultValue = new ConfigVarValue { FloatValue = value }; }
+        public float ValueFloat { get => ValueGeneric; set => ValueGeneric = value; }
+
+        public float DefaultValueFloat { get => DefaultValueGeneric; init => DefaultValueGeneric = value; }
 
 
         public FloatConfigVar() { }
@@ -352,7 +354,8 @@ namespace UGameCore.Utilities
 
         public override T ExtractGenericValue(ConfigVarValue value)
         {
-            // long is 8 bytes, so it's safe to do Unsafe.As(), because Enum can never be larger than 8 bytes
+            // long is 8 bytes, so it's safe to do Unsafe.As(), because Enum can never be larger
+            // than 8 bytes (we check for this in static constructor)
             long l = value.Int64Value;
             return Unsafe.As<long, T>(ref l);
         }
@@ -388,7 +391,7 @@ namespace UGameCore.Utilities
         {
             Array values = Enum.GetValues(typeof(T));
 
-            string str = "\r\nAllowed values:\r\n";
+            string str = "Allowed values:\r\n";
 
             for (int i = 0; i < values.Length; i++)
             {
