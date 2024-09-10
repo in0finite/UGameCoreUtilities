@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace UGameCore.Utilities
 {
+    [System.Serializable]
     public struct PositionAndRotation
     {
         public Vector3 Position;
@@ -21,6 +22,13 @@ namespace UGameCore.Utilities
         public readonly Vector3 TransformPoint(Vector3 pos)
         {
             return this.Position + this.Rotation.TransformDirection(pos);
+        }
+
+        public readonly PositionAndRotation Multiply(PositionAndRotation other)
+        {
+            return new PositionAndRotation(
+                this.TransformPoint(other.Position),
+                this.Rotation * other.Rotation);
         }
     }
 }

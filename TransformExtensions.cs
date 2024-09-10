@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace UGameCore.Utilities
@@ -175,6 +176,16 @@ namespace UGameCore.Utilities
             return Vector3.Distance(t.position, pos);
         }
 
+        public static float DistanceSquared(this Transform t, Vector3 pos)
+        {
+            return (t.position - pos).sqrMagnitude;
+        }
+
+        public static float LocalDistanceSquared(this Transform t, Vector3 pos)
+        {
+            return (t.localPosition - pos).sqrMagnitude;
+        }
+
         /// <summary>
 		/// Transforms the rotation from local space to world space.
 		/// </summary>
@@ -230,16 +241,34 @@ namespace UGameCore.Utilities
             tr.GetPositionAndRotation(out positionAndRotation.Position, out positionAndRotation.Rotation);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static PositionAndRotation GetPositionAndRotation(this Transform tr)
+        {
+            PositionAndRotation matrix;
+            tr.GetPositionAndRotation(out matrix.Position, out matrix.Rotation);
+            return matrix;
+        }
+
         public static void SetPositionAndRotation(this Transform tr, PositionAndRotation positionAndRotation)
         {
             tr.SetPositionAndRotation(positionAndRotation.Position, positionAndRotation.Rotation);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void GetLocalPositionAndRotation(this Transform tr, out PositionAndRotation positionAndRotation)
         {
             tr.GetLocalPositionAndRotation(out positionAndRotation.Position, out positionAndRotation.Rotation);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static PositionAndRotation GetLocalPositionAndRotation(this Transform tr)
+        {
+            PositionAndRotation matrix;
+            tr.GetLocalPositionAndRotation(out matrix.Position, out matrix.Rotation);
+            return matrix;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetLocalPositionAndRotation(this Transform tr, PositionAndRotation positionAndRotation)
         {
             tr.SetLocalPositionAndRotation(positionAndRotation.Position, positionAndRotation.Rotation);

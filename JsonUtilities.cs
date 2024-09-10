@@ -46,15 +46,21 @@ namespace UGameCore.Utilities
             };
         }
 
-        public static string ToJson(this object obj, JsonSerializerSettings settings)
+        public static string ToJson(this object obj, JsonSerializerSettings settings, Formatting formatting = Formatting.Indented)
         {
-            return JsonConvert.SerializeObject(obj, Formatting.Indented, settings);
+            return JsonConvert.SerializeObject(obj, formatting, settings);
         }
 
         public static string ToJson(this object obj)
         {
             var settings = CreateSettings();
             return obj.ToJson(settings);
+        }
+
+        public static string ToJsonInline(this object obj)
+        {
+            var settings = CreateSettings();
+            return obj.ToJson(settings, Formatting.None);
         }
 
         public static string ToJsonWithMaxDepth(this object obj, int maxDepth)
