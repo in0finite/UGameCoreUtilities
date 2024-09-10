@@ -42,6 +42,12 @@ namespace UGameCore.Utilities
             return condition ? enumerable.Where(predicate) : enumerable;
         }
 
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> enumerable)
+            where T : class
+        {
+            return enumerable.Where(_ => _ != null);
+        }
+
         public static T SingleOr<T>(this IEnumerable<T> enumerable, T defaultValue)
         {
             return enumerable.TryGetSingle(out T singleElem) ? singleElem : defaultValue;

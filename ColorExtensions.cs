@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace UGameCore.Utilities
@@ -10,6 +11,11 @@ namespace UGameCore.Utilities
         {
             color.a = alpha;
             return color;
+        }
+
+        public static Color32 FromInt(int n)
+        {
+            return MemoryMarshal.CreateReadOnlySpan(ref n, 1).CastWithSameLength<int, Color32>()[0];
         }
     }
 }
