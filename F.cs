@@ -157,7 +157,17 @@ namespace UGameCore.Utilities
         }
 
 
-		public static bool RunExceptionSafe (System.Action function, string errorMessagePrefix)
+        static void HandleRunException(System.Exception ex, Object contextObject)
+        {
+            // no exception should leave this function
+            try
+            {
+                Debug.LogException(ex, contextObject);
+            }
+            catch { }
+        }
+
+        public static bool RunExceptionSafe (System.Action function, string errorMessagePrefix)
 		{
 			try {
 				function();
@@ -178,17 +188,34 @@ namespace UGameCore.Utilities
 				function();
                 return true;
 			}
-            catch(System.Exception ex)
+            catch (System.Exception ex)
             {
-				try
-                {
-					Debug.LogException (ex, contextObject);
-				}
-                catch {}
-			}
-
-            return false;
+				HandleRunException(ex, contextObject);
+                return false;
+            }
 		}
+
+        public static bool RunExceptionSafeArg<T1>(T1 arg1, System.Action<T1> function, Object contextObject = null)
+        {
+            try
+            {
+                function(arg1);
+                return true;
+            }
+            catch (System.Exception ex)
+            {
+                HandleRunException(ex, contextObject);
+                return false;
+            }
+        }
+
+        public static bool RunExceptionSafeArg2<T1, T2>(T1 arg1, T2 arg2, System.Action<T1, T2> function, Object contextObject = null)
+        {
+            return RunExceptionSafeArg<(T1, T2, System.Action<T1, T2>)>(
+                (arg1, arg2, function),
+                static (a) => a.Item3(a.Item1, a.Item2),
+                contextObject);
+        }
 
         public static bool RunExceptionSafe(System.Action function, out System.Exception exception)
         {
@@ -219,7 +246,7 @@ namespace UGameCore.Utilities
 			try {
 				obj.Invoke( methodName, args );
 			} catch (System.Exception ex) {
-				Debug.LogException (ex);
+                HandleRunException(ex, null);
 			}
 
 		}
@@ -238,7 +265,7 @@ namespace UGameCore.Utilities
                         try {
                             del.Method.Invoke (del.Target, parameters);
                         } catch(System.Exception ex) {
-                            UnityEngine.Debug.LogException (ex);
+                            HandleRunException(ex, null);
                         }
                     }
                 }
