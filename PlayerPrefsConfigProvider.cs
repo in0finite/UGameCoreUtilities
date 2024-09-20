@@ -1,5 +1,5 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace UGameCore.Utilities
@@ -9,15 +9,19 @@ namespace UGameCore.Utilities
     /// </summary>
     public class PlayerPrefsConfigProvider : MonoBehaviour, IConfigProvider
     {
-        IEnumerable<string> IConfigProvider.GetKeys()
+        readonly HashSet<string> m_knownKeys = new(StringComparer.OrdinalIgnoreCase);
+
+
+        IEnumerable<string> IConfigProvider.GetKnownKeys()
         {
-            return Enumerable.Empty<string>();
+            return m_knownKeys;
         }
 
         string IConfigProvider.GetProperty(string key)
         {
             if (!PlayerPrefs.HasKey(key))
                 return null;
+            m_knownKeys.Add(key);
             return PlayerPrefs.GetString(key, null);
         }
 
@@ -26,6 +30,7 @@ namespace UGameCore.Utilities
             if (!PlayerPrefs.HasKey(key))
                 return false;
             PlayerPrefs.DeleteKey(key);
+            m_knownKeys.Remove(key);
             return true;
         }
 
@@ -37,10 +42,12 @@ namespace UGameCore.Utilities
         void IConfigProvider.Clear()
         {
             PlayerPrefs.DeleteAll();
+            m_knownKeys.Clear();
         }
 
         void IConfigProvider.SetProperty(string key, string value)
         {
+            m_knownKeys.Add(key);
             PlayerPrefs.SetString(key, value);
         }
     }

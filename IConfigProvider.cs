@@ -20,9 +20,9 @@ namespace UGameCore.Utilities
         bool RemoveProperty(string key);
 
         /// <summary>
-        /// Gets keys of all properties stored in configuration.
+        /// Gets known keys of all properties stored in configuration.
         /// </summary>
-        IEnumerable<string> GetKeys();
+        IEnumerable<string> GetKnownKeys();
 
         /// <summary>
         /// Saves configuration to permanent storage.
