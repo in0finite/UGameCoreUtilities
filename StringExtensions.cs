@@ -47,6 +47,18 @@ namespace UGameCore.Utilities
             return false;
         }
 
+        public static bool ContainsAnyChar(
+            this string str, string containedChars, StringComparison stringComparison)
+        {
+            for (int i = 0; i < containedChars.Length; i++)
+            {
+                if (str.Contains(containedChars[i], stringComparison))
+                    return true;
+            }
+
+            return false;
+        }
+
         public static string SubstringCountClamped(this string str, int count)
         {
             if (count < 0)

@@ -29,6 +29,7 @@ namespace UGameCore.Utilities
         }
 
         public string SerializationName { get; init; } = string.Empty;
+        public string[] Aliases { get; init; } = Array.Empty<string>();
         public string Description { get; init; } = string.Empty;
         public PersistType Persist { get; init; } = PersistType.OnAppStart;
         public bool ApplyDefaultValueWhenNotPresentInConfig { get; init; } = false;

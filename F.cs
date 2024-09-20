@@ -217,6 +217,14 @@ namespace UGameCore.Utilities
                 contextObject);
         }
 
+        public static bool RunExceptionSafeArg3<T1, T2, T3>(T1 arg1, T2 arg2, T3 arg3, System.Action<T1, T2, T3> function, Object contextObject = null)
+        {
+            return RunExceptionSafeArg<(T1, T2, T3, System.Action<T1, T2, T3>)>(
+                (arg1, arg2, arg3, function),
+                static (a) => a.Item4(a.Item1, a.Item2, a.Item3),
+                contextObject);
+        }
+
         public static bool RunExceptionSafe(System.Action function, out System.Exception exception)
         {
             try
