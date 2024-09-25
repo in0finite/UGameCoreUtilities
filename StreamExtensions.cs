@@ -48,5 +48,76 @@ namespace UGameCore.Utilities
             if (streamPosition + countToRead > streamLength)
                 countToRead = (int)(streamLength - streamPosition);
         }
+
+        public static void ReadBytesExactCount(this Stream stream, byte[] buffer, int count)
+        {
+            if (count > buffer.Length)
+                throw new ArgumentException($"Trying to read {count} bytes into a buffer of size {buffer.Length}");
+
+            ReadBytesExactCountArg(
+                static (arg1, totalNumRead, countToRead) => arg1.stream.Read(arg1.buffer, totalNumRead, countToRead),
+                (stream, buffer),
+                count);
+        }
+
+        public static byte[] ReadBytesExactCount(this Stream stream, int count)
+        {
+            byte[] buffer = new byte[count];
+            ReadBytesExactCount(stream, buffer, count);
+            return buffer;
+        }
+
+        public static void ReadBytesExactCountArg<T>(Func<T, int, int, int> readFunc, T arg, int count)
+        {
+            if (count < 0)
+                throw new ArgumentException("Count less than 0");
+
+            if (count == 0)
+                return;
+
+            int totalNumRead = 0;
+
+            while (true)
+            {
+                int numRead = readFunc(arg, totalNumRead, count - totalNumRead);
+                if (numRead <= 0)
+                    break;
+
+                totalNumRead += numRead;
+
+                if (totalNumRead >= count)
+                    break;
+            }
+
+            if (totalNumRead != count)
+                throw new IOException($"Failed to read exact number of bytes ({count}), read {totalNumRead} bytes");
+        }
+
+        public static void ReadExactCountGeneric<T>(Func<T[], int, int, int> readFunc, T[] buffer, int count)
+        {
+            ReadBytesExactCountArg(readFunc, buffer, count);
+        }
+
+        public static byte[] ReadAllUntilEnd(this Stream stream)
+        {
+            return stream.ReadBytesExactCount((int)(stream.Length - stream.Position));
+        }
+
+        public static bool TryGetMemoryStreamBuffer(this Stream stream, out ArraySegment<byte> arraySegment)
+        {
+            if (stream is MemoryStream memoryStream && memoryStream.TryGetBuffer(out arraySegment))
+            {
+                return true;
+            }
+
+            arraySegment = default;
+            return false;
+        }
+
+        public static void EnsureCapacity(this MemoryStream memoryStream, int capacity)
+        {
+            if (memoryStream.Capacity < capacity)
+                memoryStream.Capacity = capacity;
+        }
     }
 }

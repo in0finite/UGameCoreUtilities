@@ -1,9 +1,10 @@
+using System;
 using UnityEngine;
 
 namespace UGameCore.Utilities
 {
-    [System.Serializable]
-    public struct PositionAndRotation
+    [Serializable]
+    public struct PositionAndRotation : IEquatable<PositionAndRotation>
     {
         public Vector3 Position;
         public Quaternion Rotation;
@@ -29,6 +30,11 @@ namespace UGameCore.Utilities
             return new PositionAndRotation(
                 this.TransformPoint(other.Position),
                 this.Rotation * other.Rotation);
+        }
+
+        public readonly bool Equals(PositionAndRotation other)
+        {
+            return this.Position.Equals(other.Position) && this.Rotation.Equals(other.Rotation);
         }
     }
 }
