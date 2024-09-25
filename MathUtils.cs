@@ -34,6 +34,11 @@ namespace UGameCore.Utilities
             return Mathf.Min(Mathf.Min(v.x, v.y), v.z);
         }
 
+        public static float MinComponent(this Vector2 v)
+        {
+            return Mathf.Min(v.x, v.y);
+        }
+
         public static Vector3 Min(this Vector3 a, Vector3 b)
         {
             return new Vector3(Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y), Mathf.Min(a.z, b.z));
@@ -49,9 +54,16 @@ namespace UGameCore.Utilities
             return new Vector2(Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static float MaxComponent(this Vector3 v)
         {
             return Mathf.Max(Mathf.Max(v.x, v.y), v.z);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float MaxComponent(this Vector2 v)
+        {
+            return Mathf.Max(v.x, v.y);
         }
 
         public static Vector3 MaxComponents(Vector3 a, Vector3 b)
@@ -84,6 +96,11 @@ namespace UGameCore.Utilities
             return new Vector3(Mathf.Clamp(v.x, a, b), Mathf.Clamp(v.y, a, b), Mathf.Clamp(v.z, a, b));
         }
 
+        public static Vector2 Clamp(this Vector2 v, float a, float b)
+        {
+            return new Vector2(Mathf.Clamp(v.x, a, b), Mathf.Clamp(v.y, a, b));
+        }
+
         public static Vector3 NormalizedOrZero(this Vector3 vec)
         {
             if (vec == Vector3.zero)
@@ -112,6 +129,11 @@ namespace UGameCore.Utilities
         public static Vector3 Mul(this Vector3 v, Vector3 other)
         {
             return new Vector3(v.x * other.x, v.y * other.y, v.z * other.z);
+        }
+
+        public static Vector3 Divide(this Vector3 v, Vector3 other)
+        {
+            return new Vector3(v.x / other.x, v.y / other.y, v.z / other.z);
         }
 
         public static Vector3 Pow(this Vector3 v, float p)
@@ -264,6 +286,12 @@ namespace UGameCore.Utilities
                 else
                     return false;
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 ZeroIfNotFinite(this Vector2 v)
+        {
+            return new Vector2(v.x.ZeroIfNotFinite(), v.y.ZeroIfNotFinite());
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -601,6 +629,29 @@ namespace UGameCore.Utilities
         public static Bounds WithExtents(this Bounds bounds, Vector3 extents)
         {
             bounds.extents = extents;
+            return bounds;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Bounds Encapsulated(this Bounds bounds, Vector3 pos)
+        {
+            bounds.Encapsulate(pos);
+            return bounds;
+        }
+
+        public static Bounds? CalculateBounds(System.ReadOnlySpan<Vector3> positions)
+        {
+            Bounds? bounds = default;
+
+            for (int i = 0; i < positions.Length; i++)
+            {
+                Vector3 position = positions[i];
+                if (bounds.HasValue)
+                    bounds = bounds.Value.Encapsulated(position);
+                else
+                    bounds = new Bounds(position, Vector3.zero);
+            }
+
             return bounds;
         }
     }
