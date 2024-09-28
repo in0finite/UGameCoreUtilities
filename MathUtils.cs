@@ -119,6 +119,7 @@ namespace UGameCore.Utilities
             return new Vector2(Mathf.Abs(vec.x), Mathf.Abs(vec.y));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Scaled(this Vector3 v, Vector3 other)
         {
             Vector3 result = v;
@@ -126,11 +127,19 @@ namespace UGameCore.Utilities
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Mul(this Vector3 v, Vector3 other)
         {
             return new Vector3(v.x * other.x, v.y * other.y, v.z * other.z);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 Divide(this Vector2 v, Vector2 other)
+        {
+            return new Vector2(v.x / other.x, v.y / other.y);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 Divide(this Vector3 v, Vector3 other)
         {
             return new Vector3(v.x / other.x, v.y / other.y, v.z / other.z);
@@ -185,16 +194,31 @@ namespace UGameCore.Utilities
             return new Vector3(1.0f / vec3.x, 1.0f / vec3.y, 1.0f / vec3.z);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 ToVec2WithXAndZ(this Vector3 vec3)
         {
             return new Vector2(vec3.x, vec3.z);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 ToVec2XZ(this Vector3 vec3)
+        {
+            return new Vector2(vec3.x, vec3.z);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 ToVec2XY(this Vector3 vec3)
+        {
+            return new Vector2(vec3.x, vec3.y);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector4 ToVec4WithW(this Vector3 vec3, float w)
         {
             return new Vector4(vec3.x, vec3.y, vec3.z, w);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 ToVec3XZ(this Vector2 vec)
         {
             return new Vector3(vec.x, 0.0f, vec.y);
@@ -206,6 +230,7 @@ namespace UGameCore.Utilities
             return vec3;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector3 WithXAndZ(this Vector3 vec3)
         {
             return new Vector3(vec3.x, 0f, vec3.z);
@@ -556,6 +581,12 @@ namespace UGameCore.Utilities
         public static double ZeroIfNan(this double d)
         {
             return double.IsNaN(d) ? 0.0 : d;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static float OneIfZero(this float f)
+        {
+            return f == 0f ? 1f : f;
         }
 
         public static float CalculateLerpRatioBasedOnDeltaTime(float lerpRatio, float deltaTime)
