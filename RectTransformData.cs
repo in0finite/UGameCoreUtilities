@@ -14,17 +14,9 @@ namespace UGameCore.Utilities
         public Quaternion Rotation;
         public Vector3 Scale;
 
-        public RectTransformData WithDefault()
-        {
-            this.AnchoredPosition = Vector3.zero;
-            this.AnchorMin = Vector2.one * 0.5f;
-            this.AnchorMax = Vector2.one * 0.5f;
-            this.Size = Vector2.zero;
-            this.Pivot = Vector2.one * 0.5f;
-            this.Rotation = Quaternion.identity;
-            this.Scale = Vector3.one;
-            return this;
-        }
+        static readonly RectTransformData s_Default = new RectTransformData().WithDefault();
+        public static RectTransformData Default => s_Default;
+
 
         public RectTransformData(RectTransform rectTransform)
         {
@@ -35,6 +27,41 @@ namespace UGameCore.Utilities
             this.Pivot = rectTransform.pivot;
             this.Rotation = rectTransform.localRotation;
             this.Scale = rectTransform.localScale;
+        }
+
+        public void SetDefault()
+        {
+            this.AnchoredPosition = Vector3.zero;
+            this.AnchorMin = Vector2.one * 0.5f;
+            this.AnchorMax = Vector2.one * 0.5f;
+            this.Size = Vector2.zero;
+            this.Pivot = Vector2.one * 0.5f;
+            this.Rotation = Quaternion.identity;
+            this.Scale = Vector3.one;
+        }
+
+        public RectTransformData WithDefault()
+        {
+            this.SetDefault();
+            return this;
+        }
+
+        public RectTransformData WithSize(Vector2 size)
+        {
+            this.Size = size;
+            return this;
+        }
+
+        public RectTransformData WithSize(float size)
+        {
+            this.Size = new Vector2(size, size);
+            return this;
+        }
+
+        public RectTransformData WithPivot(Vector2 pivot)
+        {
+            this.Pivot = pivot;
+            return this;
         }
 
         public readonly void Apply(RectTransform rectTransform)

@@ -37,6 +37,8 @@ namespace UGameCore.Utilities
 
         public void EventHappened(GameObject eventGo, string eventText = null)
 		{
+            UnityEngine.Profiling.Profiler.BeginSample("Populator event happened");
+
             if (this.logEventsToConsole)
                 Debug.Log(eventText ?? eventGo.name, this);
 
@@ -54,6 +56,8 @@ namespace UGameCore.Utilities
                 if (eventGo != null)
                     eventGo.DestroyEvenInEditMode();
             });
+
+            UnityEngine.Profiling.Profiler.EndSample();
         }
 
         GameObject CreateGameObjectForEvent(string eventText)
