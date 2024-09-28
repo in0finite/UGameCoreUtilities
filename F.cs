@@ -312,8 +312,27 @@ namespace UGameCore.Utilities
 	        return 0;
         }
 
+        public static T RemoveFromEndUntilAliveObject<T>(this List<T> list)
+            where T : UnityEngine.Object
+        {
+            while (list.Count > 0)
+            {
+                T obj = list.RemoveLast();
+                if (obj != null)
+                    return obj;
+            }
 
-		public static Vector2 GetSize (this Texture2D tex)
+            return null;
+        }
+
+        public static int RemoveDeadObjects<T>(this HashSet<T> hashSet)
+            where T : UnityEngine.Object
+        {
+            return hashSet.RemoveWhere(obj => null == obj);
+        }
+
+
+        public static Vector2 GetSize (this Texture2D tex)
 		{
 			return new Vector2 (tex.width, tex.height);
 		}

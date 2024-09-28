@@ -79,6 +79,11 @@ namespace UGameCore.Utilities
             return true;
         }
 
+        public static bool ContainsNonAlloc<T>(this T[] array, T value)
+        {
+            return Array.IndexOf(array, value) >= 0;
+        }
+
         public static bool TryFind<T>(this IEnumerable<T> enumerable, System.Predicate<T> predicate, out T result)
         {
             foreach (T elem in enumerable)
@@ -333,14 +338,15 @@ namespace UGameCore.Utilities
             list.Capacity = newCapacity;
         }
 
-        public static T RemoveLast<T>(this IList<T> list)
+        public static T RemoveLast<T>(this List<T> list)
         {
-            T lastElement = list[list.Count - 1];
-            list.RemoveAt(list.Count - 1);
+            int lastIndex = list.Count - 1;
+            T lastElement = list[lastIndex];
+            list.RemoveAt(lastIndex);
             return lastElement;
         }
 
-        public static T RemoveFirst<T>(this IList<T> list)
+        public static T RemoveFirst<T>(this List<T> list)
         {
             T firstElement = list[0];
             list.RemoveAt(0);
@@ -439,6 +445,12 @@ namespace UGameCore.Utilities
             T[] array = new T[count];
             collection.CopyTo(array, 0);
             return array;
+        }
+
+        public static bool IsNullOrEmpty<TCollection>(this TCollection collection)
+            where TCollection : System.Collections.ICollection
+        {
+            return collection == null || collection.Count == 0;
         }
 
         public static IEnumerable<T> AppendIf<T>(this IEnumerable<T> enumerable, bool condition, T element)
@@ -647,12 +659,6 @@ namespace UGameCore.Utilities
             hashSet.Clear();
             if (count > countToTrimExcess)
                 hashSet.TrimExcess();
-        }
-
-        public static int RemoveDeadObjects<T>(this HashSet<T> hashSet)
-            where T : UnityEngine.Object
-        {
-            return hashSet.RemoveWhere(obj => null == obj);
         }
 
         public static LinkedListNode<T> InsertSorted<T>(
