@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -12,12 +13,20 @@ namespace UGameCore.Utilities
     {
         public class Context
         {
-            public readonly Dictionary<string, StringBuilder> StringBuildersPerCategory = new(StringComparer.OrdinalIgnoreCase);
+            public Dictionary<string, StringBuilder> StringBuildersPerCategory { get; private set; } = new(StringComparer.OrdinalIgnoreCase);
             public string categoryToProcess;
             public bool allowExpensiveProcessing = true;
             public int initialCapacity = 1024;
-            public string currentPrefix = string.Empty;
+            public string currentPrefix { get; private set; } = string.Empty;
             public const string kIndentPrefixString = "\t";
+
+
+            public Context Clone()
+            {
+                Context context = (Context)this.MemberwiseClone();
+                context.StringBuildersPerCategory = new(this.StringBuildersPerCategory, this.StringBuildersPerCategory.Comparer);
+                return context;
+            }
 
             public StringBuilder GetStringBuilderForCategory(string category)
             {
@@ -47,6 +56,20 @@ namespace UGameCore.Utilities
             {
                 sb.Append(this.currentPrefix);
                 sb.AppendLine(str);
+            }
+
+            public void AppendStringBuilder(StringBuilder sb, StringBuilder stringBuilderToAppend)
+            {
+                sb.Append(this.currentPrefix);
+                sb.Append(stringBuilderToAppend);
+            }
+
+            public void AppendOtherContext(StringBuilder sb, Context other)
+            {
+                foreach (var pair in other.StringBuildersPerCategory)
+                {
+                    sb.Append(pair.Value);
+                }
             }
 
             public void AppendCollection<T>(StringBuilder sb, IEnumerable<T> collection, string name, bool addObjectTypeCounts)
@@ -94,8 +117,91 @@ namespace UGameCore.Utilities
             }
         }
 
-        void GetCategories(List<string> categories);
+        void GetCategories(List<string> categories) => GetCategoriesDefault(this, categories);
 
-        void DumpStats(Context context);
+        static string GetDefaultCategory(IStatsCollectable statsCollectable) => statsCollectable.GetType().Name;
+
+        public static void GetCategoriesDefault(IStatsCollectable statsCollectable, List<string> categories)
+        {
+            categories.Add(GetDefaultCategory(statsCollectable));
+        }
+
+        void DumpStats(Context context) => DumpStatsDefault(this, context);
+
+        public static void DumpStatsDefault(IStatsCollectable statsCollectable, Context context)
+        {
+            StringBuilder sb = context.GetStringBuilderForCategory(GetDefaultCategory(statsCollectable));
+            if (sb == null)
+                return;
+
+            Type type = statsCollectable.GetType();
+
+            System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+            System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+
+            foreach (System.Reflection.FieldInfo field in fields)
+                DumpMember(statsCollectable, sb, context, field);
+            
+            foreach (System.Reflection.PropertyInfo property in properties)
+                DumpMember(statsCollectable, sb, context, property);
+        }
+
+        static void DumpMember(IStatsCollectable statsCollectable, StringBuilder sb, Context context, System.Reflection.MemberInfo memberInfo)
+        {
+            var fieldInfo = memberInfo as System.Reflection.FieldInfo;
+            var propertyInfo = memberInfo as System.Reflection.PropertyInfo;
+
+            if (propertyInfo != null && !propertyInfo.CanRead)
+                return;
+
+            Type memberType = fieldInfo?.FieldType ?? propertyInfo.PropertyType;
+            
+            if (!ShouldDumpMemberWithType(memberType))
+                return;
+
+            string memberName = memberInfo.Name;
+
+            object value = null;
+            bool bGetValue = F.RunExceptionSafe(() => value = fieldInfo != null ? fieldInfo.GetValue(statsCollectable) : propertyInfo.GetValue(statsCollectable));
+
+            if (!bGetValue)
+            {
+                context.AppendLine(sb, $"{memberName}: <exception>");
+                return;
+            }
+
+            if (null == value)
+            {
+                context.AppendLine(sb, $"{memberName}: null");
+                return;
+            }
+
+            if (value is IConvertible convertible)
+            {
+                context.AppendLine(sb, $"{memberName}: {convertible.ToString(CultureInfo.InvariantCulture)}");
+                return;
+            }
+
+            if (value is IStatsCollectable nestedStatsCollectable)
+            {
+                context.AppendLine(sb, $"{memberName}:");
+                context.IncreaseIndent();
+
+                Context nestedContext = context.Clone();
+                nestedContext.StringBuildersPerCategory.Clear(); // make sure existing StringBuilders are not modified
+                nestedContext.categoryToProcess = null; // allow processing all categories
+                nestedStatsCollectable.DumpStats(nestedContext);
+                context.AppendOtherContext(sb, nestedContext);
+
+                context.DecreaseIndent();
+                return;
+            }
+        }
+
+        static bool ShouldDumpMemberWithType(Type type)
+        {
+            return typeof(IStatsCollectable).IsAssignableFrom(type)
+                || typeof(IConvertible).IsAssignableFrom(type);
+        }
     }
 }
