@@ -204,6 +204,18 @@ namespace UGameCore.Utilities
             return false;
         }
 
+        public bool MovePrevious(ref int index, out KeyValue pair)
+        {
+            for (; index >= 0; index--)
+            {
+                if (GetAtIndex(index, out pair))
+                    return true;
+            }
+
+            pair = default;
+            return false;
+        }
+
         public KeyValue GetFirst()
         {
             int i = 0;
@@ -212,10 +224,26 @@ namespace UGameCore.Utilities
             throw new InvalidOperationException("Empty collection");
         }
 
-        //public KeyValuePair<TKey, TValue> RemoveFirst()
-        //{
+        public KeyValue GetLast()
+        {
+            int i = ListCount - 1;
+            if (MovePrevious(ref i, out KeyValue pair))
+                return pair;
+            throw new InvalidOperationException("Empty collection");
+        }
 
-        //}
+        public KeyValue RemoveLast()
+        {
+            int i = ListCount - 1;
+            if (MovePrevious(ref i, out KeyValue pair))
+            {
+                Remove(pair.Key);
+                List.RemoveRangeFromEnd(i); // also remove from List
+                return pair;
+            }
+
+            throw new InvalidOperationException("Empty collection");
+        }
 
         public void EnsureCapacity(int capacity)
         {

@@ -97,6 +97,11 @@ namespace UGameCore.Utilities
 
         //}
 
+        public TKey RemoveLast()
+        {
+            return DictAndList.RemoveLast().Key;
+        }
+
         /// <summary>
         /// Remove all entries from the List, which are not contained in the HashSet.
         /// </summary>

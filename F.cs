@@ -325,6 +325,19 @@ namespace UGameCore.Utilities
             return null;
         }
 
+        public static T RemoveFromEndUntilAliveObject<T>(this HashSetAndList<T> hashSetAndList)
+            where T : UnityEngine.Object
+        {
+            while (hashSetAndList.Count > 0)
+            {
+                T obj = hashSetAndList.RemoveLast();
+                if (obj != null)
+                    return obj;
+            }
+
+            return null;
+        }
+
         public static int RemoveDeadObjects<T>(this HashSet<T> hashSet)
             where T : UnityEngine.Object
         {

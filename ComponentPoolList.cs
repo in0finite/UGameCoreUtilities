@@ -6,7 +6,7 @@ namespace UGameCore.Utilities
     public class ComponentPoolList<T> : IStatsCollectable
         where T : Component
     {
-        readonly List<T> PooledObjects = new();
+        readonly HashSetAndList<T> PooledObjects = new();
         public GameObject PrefabGameObject;
         public Transform ParentTransform;
 
@@ -46,9 +46,10 @@ namespace UGameCore.Utilities
             if (null == obj)
                 throw new System.ArgumentNullException();
 
-            obj.gameObject.SetActive(false);
             PooledObjects.Add(obj);
             NumPoolReturns++;
+
+            obj.gameObject.SetActive(false);
         }
 
         public void ReturnMultipleToPool(IReadOnlyList<T> list)
