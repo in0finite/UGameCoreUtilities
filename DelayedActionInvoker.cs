@@ -19,13 +19,16 @@ namespace UGameCore.Utilities
             // An ideal collection here would be PriorityQueue, but since we don't have it, the next best one
             // is LinkedList.
 
-            // Sorted Set/Dictionary allocates at least log(n) memory for every operation (insert, remove, iterate).
+            // SortedSet/SortedDictionary allocates at least O(log(n)) memory for every operation (insert, remove, iterate).
 
             // SortedList would be very slow, because it has to move entire array for insert/remove.
 
-            // Keep in mind that we potentially have to remove multiple elements every frame.
+            // List would be slow at inserting (binary search O(log(n)) + move entire array O(n)), everything else would be fine.
+
+            // Note: we potentially have to remove multiple elements every frame.
 
             // With LinkedList, there is no memory allocation, except when adding elements.
+            // Insert sorted O(n), Remove O(1), Iterate O(n).
 
             public readonly LinkedList<(double time, Action action)> actions = new();
 
@@ -153,7 +156,7 @@ namespace UGameCore.Utilities
             if (time < perListData.minTime)
                 perListData.minTime = time;
 
-            perListData.actions.InsertSorted((time, action), (a, b) => a.time.CompareTo(b.time));
+            perListData.actions.InsertSorted((time, action), static (a, b) => a.time.CompareTo(b.time));
         }
 
         void CheckTimeArgument(double time)
