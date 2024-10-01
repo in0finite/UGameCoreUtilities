@@ -476,6 +476,18 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool BetweenInclusive(this float v, float min, float max)
+        {
+            return v >= min && v <= max;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool BetweenInclusive(this double v, double min, double max)
+        {
+            return v >= min && v <= max;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool BetweenExclusive<T>(this T v, T min, T max)
             where T : System.IComparable<T>
         {
@@ -483,13 +495,13 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool BetweenInclusive(this float v, float min, float max)
+        public static bool BetweenExclusive(this float v, float min, float max)
         {
-            return v >= min && v <= max;
+            return v > min && v < max;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool BetweenExclusive(this float v, float min, float max)
+        public static bool BetweenExclusive(this double v, double min, double max)
         {
             return v > min && v < max;
         }

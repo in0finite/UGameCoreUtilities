@@ -157,7 +157,7 @@ namespace UGameCore.Utilities
         }
 
 
-        static void HandleRunException(System.Exception ex, Object contextObject)
+        public static void HandleRunSafeException(System.Exception ex, Object contextObject)
         {
             // no exception should leave this function
             try
@@ -190,7 +190,7 @@ namespace UGameCore.Utilities
 			}
             catch (System.Exception ex)
             {
-				HandleRunException(ex, contextObject);
+				HandleRunSafeException(ex, contextObject);
                 return false;
             }
 		}
@@ -204,7 +204,7 @@ namespace UGameCore.Utilities
             }
             catch (System.Exception ex)
             {
-                HandleRunException(ex, contextObject);
+                HandleRunSafeException(ex, contextObject);
                 return false;
             }
         }
@@ -254,7 +254,7 @@ namespace UGameCore.Utilities
 			try {
 				obj.Invoke( methodName, args );
 			} catch (System.Exception ex) {
-                HandleRunException(ex, null);
+                HandleRunSafeException(ex, null);
 			}
 
 		}
@@ -273,7 +273,7 @@ namespace UGameCore.Utilities
                         try {
                             del.Method.Invoke (del.Target, parameters);
                         } catch(System.Exception ex) {
-                            HandleRunException(ex, null);
+                            HandleRunSafeException(ex, null);
                         }
                     }
                 }
@@ -295,13 +295,13 @@ namespace UGameCore.Utilities
         public static IEnumerable<T> WhereAlive<T> (this IEnumerable<T> enumerable)
 	        where T : UnityEngine.Object
         {
-	        return enumerable.Where(obj => obj != null);
+	        return enumerable.Where(static obj => obj != null);
         }
 
         public static int RemoveDeadObjects<T> (this List<T> list)
 	        where T : UnityEngine.Object
         {
-            return list.RemoveAll(item => null == item);
+            return list.RemoveAll(static item => null == item);
         }
 
         public static int RemoveDeadObjectsIfNotEmpty<T>(this List<T> list)
@@ -328,7 +328,7 @@ namespace UGameCore.Utilities
         public static int RemoveDeadObjects<T>(this HashSet<T> hashSet)
             where T : UnityEngine.Object
         {
-            return hashSet.RemoveWhere(obj => null == obj);
+            return hashSet.RemoveWhere(static obj => null == obj);
         }
 
 

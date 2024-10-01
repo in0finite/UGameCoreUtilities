@@ -18,6 +18,8 @@ namespace UGameCore.Utilities
         {
             get
             {
+                if (m_isCached)
+                    return m_isAliveCached;
                 this.EnsureCached();
                 return m_isAliveCached;
             }

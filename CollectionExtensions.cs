@@ -370,6 +370,12 @@ namespace UGameCore.Utilities
             });
         }
 
+        public static int RemoveAllNullReferences<T>(this List<T> list)
+            where T : class
+        {
+            return list.RemoveAll(static item => object.ReferenceEquals(item, null));
+        }
+
         public static void Clear(this System.Array array)
         {
             System.Array.Clear(array, 0, array.Length);
@@ -451,6 +457,11 @@ namespace UGameCore.Utilities
             where TCollection : System.Collections.ICollection
         {
             return collection == null || collection.Count == 0;
+        }
+
+        public static bool IsNullOrEmpty<T>(this T[] array)
+        {
+            return array == null || array.Length == 0;
         }
 
         public static IEnumerable<T> AppendIf<T>(this IEnumerable<T> enumerable, bool condition, T element)

@@ -67,30 +67,49 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static void GetFirstLevelChildren(this Transform tr, List<Transform> children)
+        {
+            int childCount = tr.childCount;
+            for (int i = 0; i < childCount; i++)
+                children.Add(tr.GetChild(i));
+        }
+
+        public static void GetFirstLevelChildren(this Transform tr, List<GameObject> children)
+        {
+            int childCount = tr.childCount;
+            for (int i = 0; i < childCount; i++)
+                children.Add(tr.GetChild(i).gameObject);
+        }
+
         public static Transform[] GetFirstLevelChildrenPreallocated(this Transform tr)
         {
-            var array = new Transform[tr.childCount];
-            for (int i = 0; i < tr.childCount; i++)
-            {
+            int childCount = tr.childCount;
+            var array = new Transform[childCount];
+            for (int i = 0; i < childCount; i++)
                 array[i] = tr.GetChild(i);
-            }
             return array;
         }
 
         public static List<Transform> GetAllChildrenRecursively(this Transform tr)
             => tr.GetComponentsInChildrenExceptThis<Transform>();
 
-        public static List<T> GetComponentsInChildrenExceptThis<T>(this Transform tr)
+        public static void GetComponentsInChildrenExceptThis<T>(
+            this Transform tr, bool includeInactive, List<T> resultList, List<T> tempList)
         {
             int childCount = tr.childCount;
-            var resultList = new List<T>(childCount);
-            var tempList = new List<T>();
             for (int i = 0; i < childCount; i++)
             {
                 Transform child = tr.GetChild(i);
-                child.GetComponentsInChildren(tempList);
+                child.GetComponentsInChildren(includeInactive, tempList);
                 resultList.AddRange(tempList);
             }
+            tempList.Clear();
+        }
+
+        public static List<T> GetComponentsInChildrenExceptThis<T>(this Transform tr)
+        {
+            var resultList = new List<T>(tr.childCount);
+            tr.GetComponentsInChildrenExceptThis(false, resultList, new List<T>());
             return resultList;
         }
 
