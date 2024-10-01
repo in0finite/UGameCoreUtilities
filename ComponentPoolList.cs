@@ -10,6 +10,9 @@ namespace UGameCore.Utilities
         public GameObject PrefabGameObject;
         public Transform ParentTransform;
 
+        public bool ActivateWhenRenting = true;
+        public bool SetParentWhenGettingFromPool = true;
+
         public int NumPooledObjects => PooledObjects.Count;
         public ulong NumCreations { get; private set; } = 0;
         public ulong NumPoolRents { get; private set; } = 0;
@@ -22,7 +25,8 @@ namespace UGameCore.Utilities
             T obj = PooledObjects.RemoveFromEndUntilAliveObject();
             if (obj != null)
             {
-                obj.transform.SetParent(ParentTransform, true);
+                if (SetParentWhenGettingFromPool)
+                    obj.transform.SetParent(ParentTransform, true);
                 NumPoolRents++;
             }
             else
@@ -31,7 +35,8 @@ namespace UGameCore.Utilities
                 NumCreations++;
             }
             
-            obj.gameObject.SetActive(true);
+            if (ActivateWhenRenting)
+                obj.gameObject.SetActive(true);
 
             return obj;
         }

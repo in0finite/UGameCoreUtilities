@@ -67,15 +67,11 @@ namespace UGameCore.Utilities
             if (null == eventGo)
                 throw new System.ArgumentNullException();
 
-            if (!eventGo.activeSelf) // TODO: remove this check
-                throw new System.ArgumentException("Event GameObject must be active, otherwise it will be removed from internal list");
-
             if (m_addedObjects.Contains(eventGo))
                 throw new System.ArgumentException($"Specified GameObject already added: {eventGo.name}");
 
             UnityEngine.Profiling.Profiler.BeginSample("Populator event happened");
 
-            // TODO: use diff
             this.RemoveUnwantedObjectsFromList();
 
             if (this.logEventsToConsole)
@@ -129,8 +125,6 @@ namespace UGameCore.Utilities
             if (!m_addedObjects.Contains(go))
                 return;
 
-            Debug.Log($"Removing event: {go.name}", go);
-
             m_addedObjects.Remove(go);
 
             this.OnRemoveObject?.Invoke(go);
@@ -154,7 +148,6 @@ namespace UGameCore.Utilities
         void RemoveTopEventFromUIInternal()
         {
             GameObject go = m_addedObjects.GetFirst();
-            Debug.Log($"RemoveTopEventFromUIInternal(), removing event: {go.name}", go);
             this.RemoveEventFromUI(go);
         }
 
