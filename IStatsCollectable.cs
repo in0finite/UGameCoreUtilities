@@ -136,8 +136,10 @@ namespace UGameCore.Utilities
 
             Type type = statsCollectable.GetType();
 
-            System.Reflection.FieldInfo[] fields = type.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
-            System.Reflection.PropertyInfo[] properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
+            System.Reflection.FieldInfo[] fields = type.GetFields(
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+            System.Reflection.PropertyInfo[] properties = type.GetProperties(
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public);
 
             foreach (System.Reflection.FieldInfo field in fields)
                 DumpMember(statsCollectable, sb, context, field);
