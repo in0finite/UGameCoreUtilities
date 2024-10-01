@@ -47,7 +47,6 @@ namespace UGameCore.Utilities
         readonly Dictionary<TKey, DictEntry> Dict;
         readonly List<ListEntry> List;
 
-        readonly Predicate<ListEntry> ConsolidateListPredicate;
         readonly Predicate<ListEntry> RemoveAllPredicate;
         Predicate<KeyValue> UserRemoveAllPredicate;
 
@@ -63,7 +62,6 @@ namespace UGameCore.Utilities
         {
             Dict = new(capacity, comparer);
             List = new(capacity);
-            ConsolidateListPredicate = ShouldRemoveListElement;
             RemoveAllPredicate = RemoveAllPredicateFunction;
         }
 
@@ -118,19 +116,40 @@ namespace UGameCore.Utilities
         {
             Dict.Clear();
             List.Clear();
+            UserRemoveAllPredicate = null;
         }
 
         /// <summary>
-        /// Note: this function is not re-entrable.
+        /// Bulk-remove all entries which pass specified <see cref="Predicate{KeyValue}"/>.
+        /// This function is not re-entrable.
+        /// After bulk-removal, number of entries in <see cref="List{T}"/> and <see cref="Dictionary{TKey, TValue}"/> will be equal.
         /// </summary>
         public void RemoveAll(Predicate<KeyValue> predicate)
         {
             if (null == predicate)
                 throw new ArgumentNullException(nameof(predicate));
 
+            // optimization if Dictionary is empty
+            if (Dict.Count == 0)
+            {
+                List.Clear();
+                return;
+            }
+
             UserRemoveAllPredicate = predicate;
             List.RemoveAll(RemoveAllPredicate);
             UserRemoveAllPredicate = null;
+
+            CheckCountsAfterBulkRemoving();
+        }
+
+        void CheckCountsAfterBulkRemoving()
+        {
+            if (List.Count != Dict.Count)
+            {
+                throw new ShouldNotHappenException($"List count ({List.Count}) should be equal to Dictionary count ({Dict.Count}) after bulk removing of elements. " +
+                    $"There could be a bug in {nameof(IEqualityComparer<TKey>)} or {nameof(GetHashCode)} function");
+            }
         }
 
         bool RemoveAllPredicateFunction(ListEntry listEntry)
@@ -158,24 +177,11 @@ namespace UGameCore.Utilities
         }
 
         /// <summary>
-        /// Remove all entries from the List, which are not contained in the Dictionary.
+        /// Bulk-remove all entries from the <see cref="List{T}"/> which are not contained in the <see cref="Dictionary{TKey, TValue}"/>.
         /// </summary>
         public void ConsolidateList()
         {
-            // optimization if Dictionary is empty
-            if (Dict.Count == 0)
-            {
-                List.Clear();
-                return;
-            }
-
-            List.RemoveAll(ConsolidateListPredicate);
-
-            if (List.Count != Dict.Count)
-            {
-                throw new ShouldNotHappenException($"List count ({List.Count}) should be equal to Dictionary count ({Dict.Count}) after consolidating. " +
-                    $"There could be a bug in {nameof(IEqualityComparer<TKey>)} or {nameof(GetHashCode)} function");
-            }
+            RemoveAll(static pair => false);
         }
 
         public bool GetAtIndex(int index, out KeyValue pair)
@@ -279,7 +285,7 @@ namespace UGameCore.Utilities
             return ((ICollection<KeyValuePair<TKey, TValue>>)Dict).Contains(item);
         }
 
-        // not ordered ?
+        // not ordered
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
             ((ICollection<KeyValuePair<TKey, TValue>>)Dict).CopyTo(array, arrayIndex);
@@ -290,11 +296,13 @@ namespace UGameCore.Utilities
             return ((ICollection<KeyValuePair<TKey, TValue>>)Dict).Remove(item);
         }
 
+        // not ordered
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
             return ((IEnumerable<KeyValuePair<TKey, TValue>>)Dict).GetEnumerator();
         }
 
+        // not ordered
         IEnumerator IEnumerable.GetEnumerator()
         {
             return ((IEnumerable)Dict).GetEnumerator();

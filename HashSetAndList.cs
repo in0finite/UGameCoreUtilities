@@ -92,18 +92,13 @@ namespace UGameCore.Utilities
             return DictAndList.GetFirst().Key;
         }
 
-        //public TKey RemoveFirst()
-        //{
-
-        //}
-
         public TKey RemoveLast()
         {
             return DictAndList.RemoveLast().Key;
         }
 
         /// <summary>
-        /// Remove all entries from the List, which are not contained in the HashSet.
+        /// Bulk-remove all entries from the <see cref="List{T}"/> which are not contained in the <see cref="HashSet{T}"/>.
         /// </summary>
         public void ConsolidateList()
         {
@@ -111,7 +106,7 @@ namespace UGameCore.Utilities
         }
 
         /// <summary>
-        /// Consolidates, if difference between Dictionary.Count and List.Count is higher than specified value.
+        /// Consolidates, if difference between <see cref="HashSet{T}.Count"/> and <see cref="List{T}.Count"/> is higher than specified value.
         /// </summary>
         public void ConsolidateListIfDifference(int diff)
         {
@@ -120,7 +115,9 @@ namespace UGameCore.Utilities
         }
 
         /// <summary>
-        /// Note: this function is not re-entrable.
+        /// Bulk-remove all entries which pass specified <see cref="Predicate{KeyValue}"/>.
+        /// This function is not re-entrable.
+        /// After bulk-removal, number of entries in <see cref="List{T}"/> and <see cref="HashSet{T}"/> will be equal.
         /// </summary>
         public void RemoveAll(Predicate<TKey> predicate)
         {
