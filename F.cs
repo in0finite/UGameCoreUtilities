@@ -265,17 +265,17 @@ namespace UGameCore.Utilities
 		/// </summary>
 		public static void InvokeEventExceptionSafe( this MulticastDelegate eventDelegate, params object[] parameters )
         {
-            RunExceptionSafe( () => {
-                var delegates = eventDelegate.GetInvocationList ();
+            RunExceptionSafeArg2(eventDelegate, parameters, static (arg1, arg2) =>
+            {
+                Delegate[] delegates = arg1.GetInvocationList();
 
-                foreach (var del in delegates) {
-                    if (del.Method != null) {
-                        try {
-                            del.Method.Invoke (del.Target, parameters);
-                        } catch(System.Exception ex) {
-                            HandleRunSafeException(ex, null);
-                        }
-                    }
+                foreach (Delegate del in delegates)
+                {
+                    MethodInfo method = del.Method;
+                    if (method == null)
+                        continue;
+
+                    RunExceptionSafeArg3(method, del.Target, arg2, static (a, b, c) => a.Invoke(b, c));
                 }
             });
         }
