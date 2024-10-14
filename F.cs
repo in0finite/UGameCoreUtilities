@@ -507,6 +507,10 @@ namespace UGameCore.Utilities
             #endif
         }
 
+        public static GameObject CreateTemporaryContainerGameObject(string name)
+        {
+            return new GameObject(name) { hideFlags = HideFlags.DontSave };
+        }
 
         private static bool? _isInHeadlessModeCached;
 	    public static bool IsInHeadlessMode
