@@ -90,7 +90,13 @@ namespace UGameCore.Utilities
 			return go.transform.GetFirstLevelChildren().Select(c => c.GetComponent<T>()).Where(_ => _ is Component component && component != null);
 		}
 
-		public static string GetGameObjectPath(this GameObject obj)
+        public static GameObject WithParent(this GameObject go, Transform parent)
+        {
+            go.transform.parent = parent;
+			return go;
+        }
+
+        public static string GetGameObjectPath(this GameObject obj)
 		{
 			string path = obj.name;
 			while (obj.transform.parent != null)
@@ -101,7 +107,13 @@ namespace UGameCore.Utilities
 			return path;
 		}
 
-		public static void SetLayerRecursive(this GameObject go, int Layer)
+        public static GameObject WithActive(this GameObject go, bool active)
+        {
+            go.SetActive(active);
+            return go;
+        }
+
+        public static void SetLayerRecursive(this GameObject go, int Layer)
 		{
 			go.layer = Layer;
 
