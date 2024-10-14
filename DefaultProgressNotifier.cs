@@ -25,6 +25,9 @@ namespace UGameCore.Utilities
 
         public virtual void SetProgress(string title, string description, float? progress)
         {
+            if (progress.HasValue && progress.Value.IsNan())
+                throw new System.ArgumentException("Progress value is NaN");
+
             if (progress.HasValue)
                 this.Progress = progress.Value;
 

@@ -18,8 +18,12 @@ namespace UGameCore.Utilities
             get => m_fillAmount;
             set
             {
+                if (float.IsNaN(value))
+                    throw new System.ArgumentException("Value is NaN");
+
                 if (m_fillAmount == value)
                     return;
+
                 m_fillAmount = value;
                 this.Refresh();
             }
@@ -27,6 +31,7 @@ namespace UGameCore.Utilities
 
         void Refresh()
         {
+            m_fillAmount = m_fillAmount.ZeroIfNotFinite();
             m_fillAmount = Mathf.Clamp(m_fillAmount, this.minProgress, this.maxProgress);
 
             if (null == m_rectTransform)
