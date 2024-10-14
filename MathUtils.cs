@@ -533,9 +533,27 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int FloorToInt(this float f)
+        {
+            return (int)System.MathF.Floor(f);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int FloorToInt(this double d)
         {
             return (int)System.Math.Floor(d);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CeilingToInt(this float f)
+        {
+            return (int)System.MathF.Ceiling(f);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int CeilingToInt(this double d)
+        {
+            return (int)System.Math.Ceiling(d);
         }
 
         public static float SqrtOrZero(this float f)

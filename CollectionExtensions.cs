@@ -252,6 +252,8 @@ namespace UGameCore.Utilities
             return false;
         }
 
+        public static bool AddIfNotExists<T>(this List<T> list, T item) => list.AddIfNotPresent(item);
+
         public static void EnsureCount<T>(this List<T> list, int count)
         {
             if (list.Count < count)
@@ -284,6 +286,9 @@ namespace UGameCore.Utilities
 
         public static T[] EnsureCount<T>(this T[] array, int count)
         {
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
             if (array.Length < count)
             {
                 T[] newArray = new T[count];
@@ -292,6 +297,14 @@ namespace UGameCore.Utilities
             }
 
             return array;
+        }
+
+        public static T[] EnsureCountNextPowerOf2<T>(this T[] array, int count)
+        {
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+            count = UnityEngine.Mathf.NextPowerOfTwo(count);
+            return array.EnsureCount(count);
         }
 
         public static void EnsureCapacity<T>(this List<T> list, int capacity)
@@ -357,6 +370,12 @@ namespace UGameCore.Utilities
         {
             int numToRemove = list.Count - index;
             list.RemoveRange(index, numToRemove);
+        }
+
+        public static void RemoveCountFromEnd<T>(this List<T> list, int count)
+        {
+            int index = list.Count - count;
+            list.RemoveRange(index, count);
         }
 
         public static int RemoveAll<T>(this List<T> list, System.Func<T, int, bool> predicate)
@@ -467,6 +486,19 @@ namespace UGameCore.Utilities
         public static IEnumerable<T> AppendIf<T>(this IEnumerable<T> enumerable, bool condition, T element)
         {
             return condition ? enumerable.Append(element) : enumerable;
+        }
+
+        public static T[] AppendToArray<T>(this T[] array, ICollection<T> collection)
+        {
+            int countToAppend = collection.Count;
+            if (countToAppend == 0)
+                return array;
+
+            T[] newArray = array.EnsureCount(array.Length + countToAppend);
+
+            collection.CopyTo(newArray, array.Length);
+
+            return newArray;
         }
 
         public static void AddMultiple<T>(this ICollection<T> collection, T value, int count)
