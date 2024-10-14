@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace UGameCore.Utilities
 {
-    public class DictionaryAndList<TKey, TValue> : IEnumerable //, ICollection<KeyValuePair<TKey, TValue>>
+    public class DictionaryAndList<TKey, TValue> : IEnumerable, IEnumerable<KeyValuePair<TKey, TValue>> //, ICollection<KeyValuePair<TKey, TValue>>
     {
         struct DictEntry
         {
@@ -21,13 +21,11 @@ namespace UGameCore.Utilities
         public struct ListEntry
         {
             public TKey Key;
-            public TValue Value;
             public ulong Counter;
 
-            public ListEntry(TKey key, TValue value, ulong counter)
+            public ListEntry(TKey key, ulong counter)
             {
                 Key = key;
-                Value = value;
                 Counter = counter;
             }
         }
@@ -84,9 +82,28 @@ namespace UGameCore.Utilities
 
             LastElementCounter++;
 
-            List.Add(new ListEntry(key, value, id));
+            List.Add(new ListEntry(key, id));
 
             return true;
+        }
+
+        void AddOrModify(TKey key, TValue value)
+        {
+            // this function performs 2 lookups for both cases
+
+            if (!Dict.TryGetValue(key, out DictEntry dictEntry))
+            {
+                Add(key, value);
+                return;
+            }
+
+            // Key already exists.
+            // We only need to update Dictionary, List should already contain this key.
+            // Don't update Id of item, because it's not a new item, only it's value is updated, so the order
+            // of items doesn't change.
+
+            dictEntry.Value = value;
+            Dict[key] = dictEntry;
         }
 
         public void Add(TKey key, TValue value)
@@ -110,6 +127,20 @@ namespace UGameCore.Utilities
             bool bGet = Dict.TryGetValue(key, out var data);
             value = bGet ? data.Value : default;
             return bGet;
+        }
+
+        public TValue this[TKey key]
+        {
+            get
+            {
+                return TryGetValue(key, out TValue value)
+                    ? value
+                    : throw new ArgumentException($"Item with specified key not found: {key}");
+            }
+            set
+            {
+                AddOrModify(key, value);
+            }
         }
 
         public void Clear()
@@ -154,10 +185,10 @@ namespace UGameCore.Utilities
 
         bool RemoveAllPredicateFunction(ListEntry listEntry)
         {
-            if (ShouldRemoveListElement(listEntry))
+            if (ShouldRemoveListElement(listEntry, out TValue value))
                 return true;
 
-            bool bRemove = UserRemoveAllPredicate(new KeyValue(listEntry.Key, listEntry.Value));
+            bool bRemove = UserRemoveAllPredicate(new KeyValue(listEntry.Key, value));
 
             if (bRemove)
                 Dict.Remove(listEntry.Key);
@@ -165,14 +196,21 @@ namespace UGameCore.Utilities
             return bRemove;
         }
 
-        bool ShouldRemoveListElement(ListEntry listEntry)
+        bool ShouldRemoveListElement(ListEntry listEntry, out TValue value)
         {
-            if (!Dict.TryGetValue(listEntry.Key, out DictEntry dictValue))
+            if (!Dict.TryGetValue(listEntry.Key, out DictEntry dictEntry))
+            {
+                value = default;
                 return true;
+            }
 
-            if (dictValue.Counter != listEntry.Counter)
+            if (dictEntry.Counter != listEntry.Counter)
+            {
+                value = default;
                 return true;
+            }
 
+            value = dictEntry.Value;
             return false;
         }
 
@@ -188,13 +226,13 @@ namespace UGameCore.Utilities
         {
             ListEntry listEntry = List[index];
 
-            if (ShouldRemoveListElement(listEntry))
+            if (ShouldRemoveListElement(listEntry, out TValue value))
             {
                 pair = default;
                 return false;
             }
 
-            pair = new KeyValue(listEntry.Key, listEntry.Value);
+            pair = new KeyValue(listEntry.Key, value);
             return true;
         }
 
@@ -275,6 +313,8 @@ namespace UGameCore.Utilities
             return Dict.Keys;
         }
 
+        #region interface methods
+
         public void Add(KeyValuePair<TKey, TValue> item)
         {
             Add(item.Key, item.Value);
@@ -296,16 +336,21 @@ namespace UGameCore.Utilities
             return ((ICollection<KeyValuePair<TKey, TValue>>)Dict).Remove(item);
         }
 
-        // not ordered
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            return ((IEnumerable<KeyValuePair<TKey, TValue>>)Dict).GetEnumerator();
+            // we have to go through the List, so that we return ordered items
+            for (int i = 0; i < List.Count; i++)
+            {
+                if (GetAtIndex(i, out KeyValue pair))
+                    yield return new KeyValuePair<TKey, TValue>(pair.Key, pair.Value);
+            }
         }
 
-        // not ordered
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return ((IEnumerable)Dict).GetEnumerator();
+            return GetEnumerator();
         }
+
+        #endregion
     }
 }
