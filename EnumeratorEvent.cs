@@ -10,6 +10,7 @@ namespace UGameCore.Utilities
 
 
         public void Subscribe(Func<T, IEnumerator> enumeratorFunc) => m_subscribers.Add(enumeratorFunc);
+        public void SubscribeIfNotExists(Func<T, IEnumerator> enumeratorFunc) => m_subscribers.AddIfNotExists(enumeratorFunc);
 
         public void Unsubscribe(Func<T, IEnumerator> enumeratorFunc) => m_subscribers.Remove(enumeratorFunc);
 
