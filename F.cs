@@ -280,7 +280,13 @@ namespace UGameCore.Utilities
             });
         }
 
-		public static void SendMessageToObjectsOfType<T> (string msg, params object[] args)
+        public static void DisposeNoException<T>(this T disposable)
+            where T : IDisposable
+        {
+            F.RunExceptionSafeArg(disposable, static arg => arg.Dispose());
+        }
+
+        public static void SendMessageToObjectsOfType<T> (string msg, params object[] args)
             where T : UnityEngine.Component
 		{
 			var objects = UnityEngine.Object.FindObjectsByType<T>(FindObjectsSortMode.InstanceID);
