@@ -24,13 +24,13 @@ namespace UGameCore.Utilities
             BuildFile[] buildFiles = report.GetFiles();
             Debug.Log($"Build files [{buildFiles.Length}]:\n{string.Join("\n", buildFiles.Select(f => f.path))}");
 
-            //BuildFile frameworkJsFile = buildFiles.SingleOrDefault(f => f.path.EndsWith(".framework.js", System.StringComparison.OrdinalIgnoreCase));
-            //if (frameworkJsFile.path == default)
-            //    throw new System.InvalidOperationException($"Failed to find '.framework.js' file among build files");
+            BuildFile frameworkJsFile = buildFiles.SingleOrDefault(f => f.path.EndsWith(".framework.js", System.StringComparison.OrdinalIgnoreCase));
+            if (frameworkJsFile.path == default)
+                throw new System.InvalidOperationException($"Failed to find '.framework.js' file among build files");
 
-            //PostprocessBuild(frameworkJsFile.path);
+            PostprocessBuild(frameworkJsFile.path);
 
-            //Debug.Log($"Successfully replaced code in framework.js");
+            Debug.Log($"Successfully replaced code in framework.js");
         }
 
         public void PostprocessBuild(string frameworkJsFilePath)
