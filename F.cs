@@ -96,6 +96,8 @@ namespace UGameCore.Utilities
 
             TimeSpan timeSpan = TimeSpan.FromSeconds(elapsedTimeSeconds);
 
+            // create format string
+
             Span<char> formatSpan = stackalloc char[20];
             Span<char> tempSpan = formatSpan;
 
@@ -112,8 +114,22 @@ namespace UGameCore.Utilities
 
             formatSpan = formatSpan[..(formatSpan.Length - tempSpan.Length)];
 
-            if (!timeSpan.TryFormat(resultSpan, out charsWritten, formatSpan, CultureInfo.InvariantCulture))
-                throw new ArgumentException("Failed to format time span");
+            // format TimeSpan
+
+            charsWritten = 0;
+
+            // add minus sign for negative time
+            if (elapsedTimeSeconds < 0)
+            {
+                resultSpan[0] = '-';
+                resultSpan = resultSpan[1..];
+                charsWritten++;
+            }
+
+            if (!timeSpan.TryFormat(resultSpan, out int charsWrittenFormat, formatSpan, CultureInfo.InvariantCulture))
+                throw new ArgumentException("Failed to format TimeSpan");
+
+            charsWritten += charsWrittenFormat;
         }
 
 
