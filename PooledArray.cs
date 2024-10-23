@@ -34,7 +34,7 @@ namespace UGameCore.Utilities
             m_minArraySize = 0;
         }
 
-        public readonly Span<T> ArrayAsSpan => new Span<T>(m_array, 0, m_minArraySize);
+        public readonly Span<T> Span => m_array.AsSpan(0, m_minArraySize);
 
         public readonly T[] Array => m_array;
     }
