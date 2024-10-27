@@ -41,6 +41,8 @@ namespace UGameCore.Utilities
             return obj;
         }
 
+        public T Rent() => GetOrCreate();
+
         public void ReturnToPool(T obj)
         {
             if (null == obj)
