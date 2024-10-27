@@ -4,20 +4,18 @@ using UnityEngine.EventSystems;
 
 namespace UGameCore.Utilities
 {
-
 	public class UIEventsPickup : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler,
 		IPointerUpHandler, IDragHandler
 	{
-
-		public	event	Action<PointerEventData>	onPointerClick = delegate {};
-		public	event	Action<PointerEventData>	onPointerDoubleClick = delegate {};
-        public event Action<PointerEventData> onLeftPointerDoubleClick;
-        public event Action<PointerEventData> onLeftPointerClick = delegate { };
-        public	event	Action<PointerEventData>	onPointerEnter = delegate {};
-		public	event	Action<PointerEventData>	onPointerExit = delegate {};
-		public	event	Action<PointerEventData>	onPointerDown = delegate {};
-		public	event	Action<PointerEventData>	onPointerUp = delegate {};
-		public	event	Action<PointerEventData>	onDrag = delegate {};
+		public Action<PointerEventData>	onPointerClick = delegate {};
+		public Action<PointerEventData>	onPointerDoubleClick = delegate {};
+        public Action<PointerEventData> onLeftPointerDoubleClick;
+        public Action<PointerEventData> onLeftPointerClick = delegate { };
+        public Action<PointerEventData> onPointerEnter = delegate { };
+		public Action<PointerEventData> onPointerExit = delegate { };
+		public Action<PointerEventData> onPointerDown = delegate { };
+		public Action<PointerEventData> onPointerUp = delegate { };
+		public Action<PointerEventData> onDrag = delegate { };
 
 		public bool IsPointerInside { get; private set; } = false;
 		public bool IsPointerDown { get; private set; } = false;
@@ -35,6 +33,19 @@ namespace UGameCore.Utilities
 			this.IsWaitingForDoubleClick = false;
         }
 
+		public void ClearAllEvents()
+		{
+			onPointerClick = null;
+			onPointerDoubleClick = null;
+			onLeftPointerDoubleClick = null;
+			onLeftPointerClick = null;
+			onPointerEnter = null;
+			onPointerExit = null;
+			onPointerDown = null;
+			onPointerUp = null;
+			onDrag = null;
+        }
+
 		public void OnPointerClick (PointerEventData eventData)
 		{
 			bool isLeftPointer = eventData.button == PointerEventData.InputButton.Left;
@@ -48,7 +59,7 @@ namespace UGameCore.Utilities
 				if (timeNow - oldTimeWhenClicked < this.doubleClickDuration)
 				{
                     this.IsWaitingForDoubleClick = false;
-                    onPointerDoubleClick(eventData);
+                    onPointerDoubleClick?.Invoke(eventData);
 					if (isLeftPointer)
 						this.onLeftPointerDoubleClick?.Invoke(eventData);
                 }
@@ -58,42 +69,39 @@ namespace UGameCore.Utilities
                 this.IsWaitingForDoubleClick = true;
             }
 
-            onPointerClick (eventData);
+            onPointerClick?.Invoke(eventData);
 
 			if (isLeftPointer)
-				onLeftPointerClick(eventData);
+				onLeftPointerClick?.Invoke(eventData);
         }
 
 		public void OnPointerEnter (PointerEventData eventData)
 		{
 			this.IsPointerInside = true;
-			onPointerEnter (eventData);
+			onPointerEnter?.Invoke(eventData);
 		}
 
 		public void OnPointerExit (PointerEventData eventData)
 		{
 			this.IsPointerInside = false;
-			onPointerExit (eventData);
+			onPointerExit?.Invoke(eventData);
 		}
 
 		public void OnPointerDown (PointerEventData eventData)
 		{
 			this.IsPointerDown = true;
-			onPointerDown (eventData);
+			onPointerDown?.Invoke(eventData);
 		}
 
 		public void OnPointerUp (PointerEventData eventData)
 		{
 			this.IsPointerDown = false;
-			onPointerUp (eventData);
+			onPointerUp?.Invoke(eventData);
 		}
 
 		public void OnDrag (PointerEventData eventData)
 		{
-			onDrag (eventData);
+			onDrag?.Invoke(eventData);
 		}
-
-
 	}
-
 }
