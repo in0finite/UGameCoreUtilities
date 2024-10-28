@@ -149,9 +149,14 @@ namespace UGameCore.Utilities
 			m_textFpsCount = 0;
 			m_timeSinceUpdatedFpsText = 0;
 
-            string text = string.Format("{0:0.0} fps", averageFps);
-			if (this.fpsText.text != text)
-				this.fpsText.text = text;
+			System.Span<char> chars = stackalloc char[16];
+            SpanCharStream spanCharStream = new(chars);
+
+            int averageFpsRounded = averageFps.RoundToInt();
+            spanCharStream.WriteInt(averageFpsRounded);
+			spanCharStream.WriteString(" fps");
+
+            this.fpsText.SetStringIfChanged(spanCharStream.AsSpan);
 		}
 	}
 }
