@@ -135,8 +135,31 @@ namespace UGameCore.Utilities
 
         public static string SurroundTextWithColor(string text, Color color)
         {
-            string strColor = ColorUtility.ToHtmlStringRGB(color);
-            return $"<color=#{strColor}>{text}</color>";
+            Span<char> chars = stackalloc char[text.Length + 32];
+            SpanCharStream spanCharStream = new(chars);
+            SurroundTextWithColor(text, ColorUtility.ToHtmlStringRGBA(color), ref spanCharStream);
+            return new string(spanCharStream.AsSpan);
+        }
+
+        public static void SurroundTextWithColor(
+            ReadOnlySpan<char> text, ReadOnlySpan<char> htmlColorString, System.Text.StringBuilder sb)
+        {
+            Span<char> chars = stackalloc char[text.Length + 32];
+            SpanCharStream spanCharStream = new(chars);
+            SurroundTextWithColor(text, htmlColorString, ref spanCharStream);
+            sb.Append(spanCharStream.AsSpan);
+        }
+
+        public static void SurroundTextWithColor(
+            ReadOnlySpan<char> text,
+            ReadOnlySpan<char> htmlColorString,
+            ref SpanCharStream dest)
+        {
+            dest.WriteString("<color=#");
+            dest.WriteString(htmlColorString);
+            dest.WriteString(">");
+            dest.WriteString(text);
+            dest.WriteString("</color>");
         }
     }
 }
