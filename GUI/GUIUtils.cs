@@ -24,6 +24,7 @@ namespace UGameCore.Utilities
 		public static GUIStyle LeftAlignedButtonStyle => s_leftAlignedButtonStyle ??= new GUIStyle(GUI.skin.button) { alignment = TextAnchor.MiddleLeft };
 
 		public static Rect ScreenRect { get { return new Rect (0, 0, Screen.width, Screen.height); } }
+		public static Vector2 ScreenSize => ScreenRect.size;
 
 
 

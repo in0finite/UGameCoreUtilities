@@ -583,6 +583,11 @@ namespace UGameCore.Utilities
         public static bool PlatformSupportsCreatingProcesses => 
             !Application.isMobilePlatform && !Application.isConsolePlatform && Application.platform != RuntimePlatform.WebGLPlayer;
 
+        public static string SystemClipboardText
+        {
+            get => GUIUtility.systemCopyBuffer;
+            set => GUIUtility.systemCopyBuffer = value;
+        }
 
         public static int GetTotalPCMSamplesSizeInBytes(this AudioClip clip)
         {

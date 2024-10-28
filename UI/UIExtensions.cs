@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using TMPro;
 using UnityEngine;
@@ -46,6 +47,18 @@ namespace UGameCore.Utilities
                 textComponent.SetText(value); // use SetText() because it doesn't check for changes - it's faster
         }
 
+        public static void SetStringIfChanged(this Text textComponent, string value)
+        {
+            textComponent.text = value; // it will check for changes itself
+        }
+
+        public static void SetStringIfChanged(this Text textComponent, ReadOnlySpan<char> value)
+        {
+            if (textComponent.text.AsSpan().SequenceEqual(value))
+                return;
+            textComponent.text = new string(value);
+        }
+
         public static void SetIntIfChanged(this TextMeshProUGUI textComponent, int value)
         {
             if (int.TryParse(textComponent.text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int currentValue))
@@ -56,6 +69,17 @@ namespace UGameCore.Utilities
 
             // use SetText() because it doesn't check for changes - it's faster
             textComponent.SetText(value.ToString(CultureInfo.InvariantCulture));
+        }
+
+        public static void SetIntIfChanged(this Text textComponent, int value)
+        {
+            if (int.TryParse(textComponent.text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int currentValue))
+            {
+                if (currentValue == value)
+                    return;
+            }
+
+            textComponent.text = value.ToString(CultureInfo.InvariantCulture);
         }
 
         public static TextMeshProUGUI GetTextComponentOrThrow(this Button button)
