@@ -580,6 +580,13 @@ namespace UGameCore.Utilities
             false;
 #endif
 
+        public static readonly bool IsOnWebPlatform =
+#if UNITY_WEBGL && !UNITY_EDITOR
+            true;
+#else
+            false;
+#endif
+
         public static bool PlatformSupportsCreatingProcesses => 
             !Application.isMobilePlatform && !Application.isConsolePlatform && Application.platform != RuntimePlatform.WebGLPlayer;
 
