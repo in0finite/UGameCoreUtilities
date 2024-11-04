@@ -592,8 +592,8 @@ namespace UGameCore.Utilities
 
         public static string SystemClipboardText
         {
-            get => GUIUtility.systemCopyBuffer;
-            set => GUIUtility.systemCopyBuffer = value;
+            get => ClipboardUtility.GetClipboardText();
+            set => ClipboardUtility.SetClipboardText(value);
         }
 
         public static int GetTotalPCMSamplesSizeInBytes(this AudioClip clip)
