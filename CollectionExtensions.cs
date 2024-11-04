@@ -704,6 +704,12 @@ namespace UGameCore.Utilities
                 hashSet.TrimExcess();
         }
 
+        public static void AddOrThrow<T>(this HashSet<T> hashSet, T element)
+        {
+            if (!hashSet.Add(element))
+                throw new ArgumentException($"Element already exists in HashSet: {element}");
+        }
+
         public static LinkedListNode<T> InsertSorted<T>(
             this LinkedList<T> linkedList, T valueToAdd, Comparison<T> comparison)
         {
