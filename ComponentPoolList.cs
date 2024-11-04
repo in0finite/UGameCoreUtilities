@@ -13,6 +13,9 @@ namespace UGameCore.Utilities
         public bool ActivateWhenRenting = true;
         public bool SetParentWhenGettingFromPool = true;
 
+        public bool KeepTrackOfRentedObjects = false;
+        HashSet<T> RentedObjects = null;
+
         public int NumPooledObjects => PooledObjects.Count;
         public ulong NumCreations { get; private set; } = 0;
         public ulong NumPoolRents { get; private set; } = 0;
@@ -38,6 +41,12 @@ namespace UGameCore.Utilities
             if (ActivateWhenRenting)
                 obj.gameObject.SetActive(true);
 
+            if (KeepTrackOfRentedObjects)
+            {
+                RentedObjects ??= new HashSet<T>();
+                RentedObjects.AddOrThrow(obj);
+            }
+
             return obj;
         }
 
@@ -49,6 +58,8 @@ namespace UGameCore.Utilities
                 throw new System.ArgumentNullException();
 
             PooledObjects.Add(obj);
+            RentedObjects?.Remove(obj);
+
             NumPoolReturns++;
 
             obj.gameObject.SetActive(false);
@@ -59,6 +70,33 @@ namespace UGameCore.Utilities
             int count = list.Count;
             for (int i = 0; i < count; i++)
                 ReturnToPool(list[i]);
+        }
+
+        /// <summary>
+        /// Works only if <see cref="KeepTrackOfRentedObjects"/> is true.
+        /// </summary>
+        public void ReturnAllRentedObjects()
+        {
+            if (RentedObjects == null)
+                return;
+
+            using PooledArray<T> pooledArray = new(RentedObjects.Count);
+
+            RentedObjects.CopyTo(pooledArray.Array);
+
+            System.Span<T> span = pooledArray.Span;
+
+            for (int i = 0; i < span.Length; i++)
+            {
+                T component = span[i];
+
+                if (component != null) // don't try to return dead objects
+                    ReturnToPool(component);
+                else
+                    RentedObjects.Remove(component); // dead object, don't keep track of him anymore
+            }
+
+            span.Clear(); // release references from rented array
         }
     }
 }
