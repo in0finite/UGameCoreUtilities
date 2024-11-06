@@ -44,6 +44,14 @@ namespace UGameCore.Utilities
             }
         }
 
+        public static string GetLogFilePath()
+        {
+            string str = Application.consoleLogPath;
+            if (string.IsNullOrWhiteSpace(str))
+                throw new System.PlatformNotSupportedException();
+            return str;
+        }
+
         public static Span<T> CopyFromOther<T>(this Span<T> destinationSpan, ReadOnlySpan<T> other)
         {
             if (destinationSpan.Length < other.Length)
@@ -546,6 +554,13 @@ namespace UGameCore.Utilities
 		    }
 	    }
 
+        public static readonly bool IsInEditor =
+#if UNITY_EDITOR
+            true;
+#else
+            false;
+#endif
+
         public static bool IsAppInEditMode
         {
             get
@@ -558,20 +573,29 @@ namespace UGameCore.Utilities
             }
         }
 
-        public static bool IsIL2CPPBuild
-        {
-            get
-            {
+        public static readonly bool IsIL2CPPBuild = 
 #if ENABLE_IL2CPP
-                return true;
+            true;
 #else
-                return false;
+            false;
 #endif
-            }
-        }
 
         public static bool IsOnDesktopPlatform => 
-            !Application.isMobilePlatform && !Application.isConsolePlatform && SystemInfo.deviceType == DeviceType.Desktop;
+            !Application.isMobilePlatform && !Application.isConsolePlatform && SystemInfo.deviceType == DeviceType.Desktop && !IsOnWebPlatform;
+
+        public static readonly bool IsOnWindowsPlatform =
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            true;
+#else
+            false;
+#endif
+
+        public static readonly bool IsOnLinuxPlatform =
+#if UNITY_STANDALONE_LINUX || UNITY_EDITOR_LINUX || UNITY_EMBEDDED_LINUX
+            true;
+#else
+            false;
+#endif
 
         public static readonly bool IsWebGLBuildTarget =
 #if UNITY_WEBGL
@@ -588,7 +612,7 @@ namespace UGameCore.Utilities
 #endif
 
         public static bool PlatformSupportsCreatingProcesses => 
-            !Application.isMobilePlatform && !Application.isConsolePlatform && Application.platform != RuntimePlatform.WebGLPlayer;
+            !Application.isMobilePlatform && !Application.isConsolePlatform && !IsOnWebPlatform;
 
         public static string SystemClipboardText
         {
