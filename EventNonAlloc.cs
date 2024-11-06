@@ -12,6 +12,9 @@ namespace UGameCore.Utilities
         readonly List<Action<T>> Subscribers = new();
         readonly List<Action<T>> TempSubscribers = new();
 
+        readonly ReEntranceGuard InvokingReEntranceGuard = new();
+        const string InvokingReEntranceGuardErrorMessage = "This function is not re-entrable because it re-uses an array for temporary subscribers";
+
 
         public void Subscribe(Action<T> action) => Subscribers.Add(action);
         public void SubscribeIfNotExists(Action<T> action) => Subscribers.AddIfNotExists(action);
@@ -39,29 +42,29 @@ namespace UGameCore.Utilities
         /// <summary>
         /// Invoke all subscribers. This function is not re-entrable.
         /// </summary>
-        public void Invoke(T eventParameter)
-        {
-            TempSubscribers.Clear();
-            TempSubscribers.AddRange(Subscribers);
-
-            foreach (Action<T> action in TempSubscribers)
-                action(eventParameter);
-
-            TempSubscribers.Clear();
-        }
+        public void Invoke(T eventParameter) => InvokeInternal(eventParameter, false);
 
         /// <summary>
         /// Invoke all subscribers, while catching and logging their exceptions, ensuring that every subscriber is
         /// invoked.
         /// This function is not re-entrable.
         /// </summary>
-        public void InvokeNoException(T eventParameter)
+        public void InvokeNoException(T eventParameter) => InvokeInternal(eventParameter, true);
+
+        void InvokeInternal(T eventParameter, bool bNoExceptions)
         {
+            using var _ = InvokingReEntranceGuard.AttemptEntrance(InvokingReEntranceGuardErrorMessage);
+
             TempSubscribers.Clear();
             TempSubscribers.AddRange(Subscribers);
 
             foreach (Action<T> action in TempSubscribers)
-                F.RunExceptionSafeArg2(action, eventParameter, static (arg1, arg2) => arg1(arg2));
+            {
+                if (bNoExceptions)
+                    F.RunExceptionSafeArg2(action, eventParameter, static (arg1, arg2) => arg1(arg2));
+                else
+                    action(eventParameter);
+            }
 
             TempSubscribers.Clear();
         }
