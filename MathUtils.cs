@@ -574,11 +574,22 @@ namespace UGameCore.Utilities
             return float.IsNaN(f) ? 0f : f;
         }
 
+        /// <summary>
+        /// Returns 0 if this number is NaN (Not-a-number), otherwise returns original value.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double ZeroIfNan(this double d)
+        {
+            return double.IsNaN(d) ? 0.0 : d;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNan(this float f)
         {
             return float.IsNaN(f);
         }
+
+        public static readonly Vector3 Vector3NaN = Vector3.one * float.NaN;
 
         /// <summary>
         /// Returns 0 if this number is not finite (Infinity or Nan), otherwise returns original value.
@@ -587,12 +598,6 @@ namespace UGameCore.Utilities
         public static float ZeroIfNotFinite(this float f)
         {
             return float.IsFinite(f) ? f : 0f;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsFinite(this float f)
-        {
-            return float.IsFinite(f);
         }
 
         /// <summary>
@@ -604,13 +609,16 @@ namespace UGameCore.Utilities
             return double.IsFinite(d) ? d : 0.0;
         }
 
-        /// <summary>
-        /// Returns 0 if this number is NaN (Not-a-number), otherwise returns original value.
-        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static double ZeroIfNan(this double d)
+        public static bool IsFinite(this float f)
         {
-            return double.IsNaN(d) ? 0.0 : d;
+            return float.IsFinite(f);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsFinite(this Vector3 v)
+        {
+            return float.IsFinite(v.x) && float.IsFinite(v.y) && float.IsFinite(v.z);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

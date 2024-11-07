@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -11,6 +12,12 @@ namespace UGameCore.Utilities
         {
             color.a = alpha;
             return color;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Color32 ToColor32(this Vector4 vec4)
+        {
+            return (Color)vec4;
         }
 
         public static Color32 FromInt(int n)
