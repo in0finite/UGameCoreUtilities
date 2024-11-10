@@ -47,6 +47,12 @@ namespace UGameCore.Utilities
                 textComponent.SetText(value); // use SetText() because it doesn't check for changes - it's faster
         }
 
+        public static void SetStringIfChanged(this TextMeshProUGUI textComponent, ReadOnlySpan<char> value)
+        {
+            if (!textComponent.text.AsSpan().SequenceEqual(value))
+                textComponent.SetText(new string(value)); // use SetText() because it doesn't check for changes - it's faster
+        }
+
         public static void SetStringIfChanged(this Text textComponent, string value)
         {
             textComponent.text = value; // it will check for changes itself
