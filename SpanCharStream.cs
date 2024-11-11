@@ -3,7 +3,7 @@ using System;
 namespace UGameCore.Utilities
 {
     /// <summary>
-    /// Provides equivalent functionality of <see cref="System.Text.StringBuilder"/> or <see cref="System.IO.MemoryStream"/>,
+    /// Provides equivalent functionality of <see cref="System.Text.StringBuilder"/>,
     /// but without memory allocations, storing all data in <see cref="Span{char}"/>.
     /// </summary>
     public ref struct SpanCharStream
