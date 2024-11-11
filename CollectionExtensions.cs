@@ -472,6 +472,51 @@ namespace UGameCore.Utilities
             return array;
         }
 
+        // copied from UnityEngine.NoAllocHelpers
+        class ListPrivateFieldAccess<T>
+        {
+            internal T[] _items;
+
+            internal int _size;
+
+            internal int _version;
+        }
+
+        static ListPrivateFieldAccess<T> GetPrivateFieldsUnsafe<T>(this List<T> list)
+        {
+            if (list == null)
+                throw new ArgumentNullException();
+            return System.Runtime.CompilerServices.Unsafe.As<ListPrivateFieldAccess<T>>(list);
+        }
+
+        static T[] GetInternalArrayUnsafe<T>(this List<T> list)
+        {
+            return list.GetPrivateFieldsUnsafe()._items;
+        }
+
+        public static Span<T> ListAsSpan<T>(this List<T> list)
+        {
+            return list.GetInternalArrayUnsafe().AsSpan(0, list.Count);
+        }
+
+        public static void AddSpan<T>(this List<T> list, ReadOnlySpan<T> span)
+        {
+            // first re-allocate internal array if needed
+            int newSize = list.Count + span.Length;
+            list.EnsureCapacity(newSize);
+
+            span.CopyTo(list.GetInternalArrayUnsafe().AsSpan(list.Count, span.Length));
+
+            list.SetSizeUnsafe(newSize);
+        }
+
+        static void SetSizeUnsafe<T>(this List<T> list, int newSize)
+        {
+            ListPrivateFieldAccess<T> fields = list.GetPrivateFieldsUnsafe();
+            fields._size = newSize;
+            fields._version++;
+        }
+
         public static bool IsNullOrEmpty<TCollection>(this TCollection collection)
             where TCollection : System.Collections.ICollection
         {
