@@ -589,6 +589,20 @@ namespace UGameCore.Utilities
             return float.IsNaN(f);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ThrowIfNan(this float f)
+        {
+            if (float.IsNaN(f))
+                throw new System.NotFiniteNumberException("Specified number is NaN", f);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ThrowIfNan(this double d)
+        {
+            if (double.IsNaN(d))
+                throw new System.NotFiniteNumberException("Specified number is NaN", d);
+        }
+
         public static readonly Vector3 Vector3NaN = Vector3.one * float.NaN;
 
         /// <summary>
