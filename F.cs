@@ -6,7 +6,6 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.Rendering;
 using Object = UnityEngine.Object;
 
 namespace UGameCore.Utilities
@@ -17,6 +16,7 @@ namespace UGameCore.Utilities
     public static class F
     {
         public const string kEditorMenuName = nameof(UGameCore);
+        public const string kFrameworkFolderPath = "UGameCoreUtilities/";
 
         private static readonly Vector3[] s_fourCornersArray = new Vector3[4];
 
