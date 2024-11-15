@@ -32,6 +32,15 @@ namespace UGameCore.Utilities
         }
 #endif
 
+        public static UnityEngine.Object GetURPAssetAsObject()
+        {
+#if UGAMECORE_URP
+            return GetURPAsset();
+#else
+            return null;
+#endif
+        }
+
         public static void SetForwardRenderer()
         {
 #if UGAMECORE_URP

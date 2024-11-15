@@ -14,7 +14,7 @@ namespace UGameCore.Utilities
 
     public class WebPreProcessorForwardRendererSwitcher : IPreprocessBuildWithReport
     {
-        public int callbackOrder => 40;
+        public int callbackOrder => -500;
 
         public void OnPreprocessBuild(BuildReport report)
         {
@@ -26,15 +26,22 @@ namespace UGameCore.Utilities
 
             var instance = WebPreProcessorForwardRendererSwitcherScriptableSingleton.instance;
 
+            const string logMsg = "switching to Forward renderer on Web platform";
+
             if (!instance.SwitchToForwardRendererOnWeb)
             {
-                Debug.Log($"Skipped switching to Forward renderer on Web platform");
+                Debug.Log($"Skipped {logMsg}");
                 return;
             }
 
-            Debug.Log($"Switching to Forward renderer on Web platform");
+            Debug.Log(logMsg);
 
             URPUtils.SetForwardRenderer();
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            Debug.Log($"Done {logMsg}");
         }
     }
 }
