@@ -4,7 +4,10 @@ namespace UGameCore.Utilities
 {
     /// <summary>
     /// Provides equivalent functionality of <see cref="System.Text.StringBuilder"/>,
-    /// but without memory allocations, storing all data in <see cref="Span{char}"/>.
+    /// but operating on a <see cref="Span{char}"/>.
+    /// It has fixed capacity, without ability to resize.
+    /// It also has some features that <see cref="System.Text.StringBuilder"/> doesn't, like replacing a string
+    /// using <see cref="StringComparison"/>.
     /// </summary>
     public ref struct SpanCharStream
     {
@@ -80,9 +83,12 @@ namespace UGameCore.Utilities
             if (replaceCount < stringToReplace.Length) // nothing to replace
                 return;
 
+            // We will store new string in a temporary PooledArray, then copy it back to our buffer when finished
+            // replacing.
+            // Don't initialize PooledArray immediatelly, but only when needed.
             bool bInitializedTempBuffer = false;
             using PooledArray<byte> pooledArray = PooledArray<byte>.Empty();
-            SpanCharStream tempSpanCharStream = SpanCharStream.Empty;
+            SpanCharStream tempSB = SpanCharStream.Empty;
 
             int i = replaceIndex;
             int replaceEnd = replaceIndex + replaceCount;
@@ -106,18 +112,18 @@ namespace UGameCore.Utilities
                 {
                     bInitializedTempBuffer = true;
                     pooledArray.Resize(Capacity * 2);
-                    tempSpanCharStream = new SpanCharStream(pooledArray.Span.CastEntirely<byte, char>());
+                    tempSB = new SpanCharStream(pooledArray.Span.CastEntirely<byte, char>());
                 }
 
                 // copy from existing buffer up to current index, into temp buffer
 
                 int numToCopyFromOriginalBuffer = indexOf - lastIndexOriginalBuffer;
-                tempSpanCharStream.WriteString(Span.Slice(lastIndexOriginalBuffer, numToCopyFromOriginalBuffer));
+                tempSB.WriteString(Span.Slice(lastIndexOriginalBuffer, numToCopyFromOriginalBuffer));
 
                 lastIndexOriginalBuffer += numToCopyFromOriginalBuffer + stringToReplace.Length;
 
                 // append replaced string
-                tempSpanCharStream.WriteString(newString);
+                tempSB.WriteString(newString);
 
                 i = indexOf + stringToReplace.Length;
             }
@@ -127,12 +133,12 @@ namespace UGameCore.Utilities
 
             // append rest of original buffer
 
-            tempSpanCharStream.WriteString(Span.Slice(lastIndexOriginalBuffer, Length - lastIndexOriginalBuffer));
+            tempSB.WriteString(Span.Slice(lastIndexOriginalBuffer, Length - lastIndexOriginalBuffer));
 
             // copy from temp buffer into original buffer
 
-            tempSpanCharStream.AsSpan.CopyTo(Span.Slice(0, tempSpanCharStream.Length));
-            Length = tempSpanCharStream.Length;
+            tempSB.AsSpan.CopyTo(Span.Slice(0, tempSB.Length));
+            Length = tempSB.Length;
         }
 
         readonly void CheckArguments(int index, int count)

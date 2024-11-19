@@ -19,19 +19,24 @@ namespace UGameCore.Utilities
 
 
         /// <summary>
-        /// Create empty <see cref="ArrayPool{T}"/>, which can be resized later if needed.
+        /// Create empty <see cref="PooledArray{T}"/>, without renting array from <see cref="ArrayPool{T}"/>, 
+        /// which can be resized later if needed.
         /// </summary>
         public static PooledArray<T> Empty() => new PooledArray<T>(0);
 
         /// <summary>
-        /// Create empty <see cref="ArrayPool{T}"/>, which can be resized later if needed.
+        /// Create empty <see cref="PooledArray{T}"/>, without renting array from <see cref="ArrayPool{T}"/>, 
+        /// which can be resized later if needed.
         /// </summary>
         public static PooledArray<T> Empty(ArrayPool<T> arrayPool) => new PooledArray<T>(0, arrayPool);
+
 
         public PooledArray(int minArraySize, ArrayPool<T> arrayPool)
         {
             if (arrayPool == null)
                 throw new ArgumentNullException(nameof(arrayPool));
+            if (minArraySize < 0)
+                throw new ArgumentOutOfRangeException(nameof(minArraySize));
 
             m_arrayPool = arrayPool;
             m_minArraySize = minArraySize;
