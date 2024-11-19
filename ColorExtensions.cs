@@ -26,12 +26,12 @@ namespace UGameCore.Utilities
             return MemoryMarshal.CreateReadOnlySpan(ref n, 1).CastWithSameLength<int, Color32>()[0];
         }
 
-        public static void ToHtmlStringRGBA(ref SpanCharStream sb, Color color)
+        public static void ToHtmlStringRGBA(ref SpanCharBuilder sb, Color color)
         {
             ToHtmlStringRGBA(ref sb, (Color32)color);
         }
 
-        public static void ToHtmlStringRGBA(ref SpanCharStream sb, Color32 color)
+        public static void ToHtmlStringRGBA(ref SpanCharBuilder sb, Color32 color)
         {
             ReadOnlySpan<char> format = "X2";
 

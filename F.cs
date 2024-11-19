@@ -63,7 +63,7 @@ namespace UGameCore.Utilities
             return new string(chars[..charsWritten]);
         }
 
-        public static void FormatElapsedTime(ref SpanCharStream sb, double elapsedTimeSeconds, bool useMilliseconds = false)
+        public static void FormatElapsedTime(ref SpanCharBuilder sb, double elapsedTimeSeconds, bool useMilliseconds = false)
         {
             Span<char> chars = stackalloc char[32];
             FormatElapsedTime(chars, out int charsWritten, elapsedTimeSeconds, useMilliseconds);

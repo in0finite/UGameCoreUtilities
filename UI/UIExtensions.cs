@@ -139,7 +139,7 @@ namespace UGameCore.Utilities
             return "<noparse>" + RemoveNoParseForTMP(str) + "</noparse>";
         }
 
-        public static void EscapeStringForTMP(ref SpanCharStream sb, ReadOnlySpan<char> str)
+        public static void EscapeStringForTMP(ref SpanCharBuilder sb, ReadOnlySpan<char> str)
         {
             if (str.Length == 0)
                 return;
@@ -155,7 +155,7 @@ namespace UGameCore.Utilities
                 return text;
 
             Span<char> chars = stackalloc char[text.Length + 32];
-            SpanCharStream sb = new(chars);
+            SpanCharBuilder sb = new(chars);
             AppendColorTagOpening(ref sb, color);
             sb.WriteString(text);
             AppendColorTagEnding(ref sb);
@@ -163,7 +163,7 @@ namespace UGameCore.Utilities
         }
 
         public static void SurroundTextWithColor(
-            ref SpanCharStream sb,
+            ref SpanCharBuilder sb,
             ReadOnlySpan<char> text,
             Color color)
         {
@@ -172,14 +172,14 @@ namespace UGameCore.Utilities
             AppendColorTagEnding(ref sb);
         }
 
-        public static void AppendColorTagOpening(ref SpanCharStream sb, Color color)
+        public static void AppendColorTagOpening(ref SpanCharBuilder sb, Color color)
         {
             sb.WriteString("<color=#");
             ColorExtensions.ToHtmlStringRGBA(ref sb, color);
             sb.WriteString(">");
         }
 
-        public static void AppendColorTagEnding(ref SpanCharStream sb)
+        public static void AppendColorTagEnding(ref SpanCharBuilder sb)
         {
             sb.WriteString("</color>");
         }

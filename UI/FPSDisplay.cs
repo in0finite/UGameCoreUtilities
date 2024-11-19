@@ -150,13 +150,13 @@ namespace UGameCore.Utilities
 			m_timeSinceUpdatedFpsText = 0;
 
 			System.Span<char> chars = stackalloc char[16];
-            SpanCharStream spanCharStream = new(chars);
+            SpanCharBuilder sb = new(chars);
 
             int averageFpsRounded = averageFps.RoundToInt();
-            spanCharStream.WriteInt(averageFpsRounded);
-			spanCharStream.WriteString(" fps");
+            sb.WriteInt(averageFpsRounded);
+			sb.WriteString(" fps");
 
-            this.fpsText.SetStringIfChanged(spanCharStream.AsSpan);
+            this.fpsText.SetStringIfChanged(sb.AsSpan);
 		}
 	}
 }

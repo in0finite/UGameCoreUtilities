@@ -9,7 +9,7 @@ namespace UGameCore.Utilities
     /// It also has some features that <see cref="System.Text.StringBuilder"/> doesn't, like replacing a string
     /// using <see cref="StringComparison"/>.
     /// </summary>
-    public ref struct SpanCharStream
+    public ref struct SpanCharBuilder
     {
         readonly Span<char> Span;
         int m_position;
@@ -23,10 +23,10 @@ namespace UGameCore.Utilities
         public readonly Span<char> AsSpan => Span.Slice(0, m_position);
         public readonly string AsString => new string(AsSpan);
 
-        public static SpanCharStream Empty => new SpanCharStream(Span<char>.Empty);
+        public static SpanCharBuilder Empty => new SpanCharBuilder(Span<char>.Empty);
 
 
-        public SpanCharStream(Span<char> span)
+        public SpanCharBuilder(Span<char> span)
             : this()
         {
             Span = span;
@@ -88,7 +88,7 @@ namespace UGameCore.Utilities
             // Don't initialize PooledArray immediatelly, but only when needed.
             bool bInitializedTempBuffer = false;
             using PooledArray<byte> pooledArray = PooledArray<byte>.Empty();
-            SpanCharStream tempSB = SpanCharStream.Empty;
+            SpanCharBuilder tempSB = SpanCharBuilder.Empty;
 
             int i = replaceIndex;
             int replaceEnd = replaceIndex + replaceCount;
@@ -112,7 +112,7 @@ namespace UGameCore.Utilities
                 {
                     bInitializedTempBuffer = true;
                     pooledArray.Resize(Capacity * 2);
-                    tempSB = new SpanCharStream(pooledArray.Span.CastEntirely<byte, char>());
+                    tempSB = new SpanCharBuilder(pooledArray.Span.CastEntirely<byte, char>());
                 }
 
                 // copy from existing buffer up to current index, into temp buffer
