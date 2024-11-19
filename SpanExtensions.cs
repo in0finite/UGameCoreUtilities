@@ -55,6 +55,20 @@ namespace UGameCore.Utilities
             return result;
         }
 
+        public static Span<T> CopyFromOther<T>(this Span<T> destinationSpan, ReadOnlySpan<T> other)
+        {
+            if (destinationSpan.Length < other.Length)
+                throw new ArgumentOutOfRangeException($"Destination span is shorter ({destinationSpan.Length}) than source span ({other.Length})");
+            other.CopyTo(destinationSpan);
+            return destinationSpan.Slice(other.Length);
+        }
+
+        public static void CopyFromOther<T>(this Span<T> destinationSpan, ReadOnlySpan<T> other, out int otherLength)
+        {
+            destinationSpan.CopyFromOther(other);
+            otherLength = other.Length;
+        }
+
         public static void Split<T>(this Span<T> span, T splitter, Span<int> indexes, out int numIndexes)
             where T : IEquatable<T> // Span<IEquatable<T>> has additional extension methods
         {

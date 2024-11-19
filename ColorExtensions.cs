@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -23,6 +24,21 @@ namespace UGameCore.Utilities
         public static Color32 FromInt(int n)
         {
             return MemoryMarshal.CreateReadOnlySpan(ref n, 1).CastWithSameLength<int, Color32>()[0];
+        }
+
+        public static void ToHtmlStringRGBA(ref SpanCharStream sb, Color color)
+        {
+            ToHtmlStringRGBA(ref sb, (Color32)color);
+        }
+
+        public static void ToHtmlStringRGBA(ref SpanCharStream sb, Color32 color)
+        {
+            ReadOnlySpan<char> format = "X2";
+
+            sb.WriteByte(color.r, format);
+            sb.WriteByte(color.g, format);
+            sb.WriteByte(color.b, format);
+            sb.WriteByte(color.a, format);
         }
     }
 }

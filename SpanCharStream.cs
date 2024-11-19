@@ -10,8 +10,12 @@ namespace UGameCore.Utilities
     {
         readonly Span<char> Span;
         int m_position;
-        public readonly int Position => m_position;
-        public readonly int Length => m_position;
+        public int Length
+        {
+            readonly get => m_position;
+            private set => m_position = value;
+        }
+
         public readonly int Capacity => Span.Length;
         public readonly Span<char> AsSpan => Span.Slice(0, m_position);
         public readonly string AsString => new string(AsSpan);
@@ -46,5 +50,14 @@ namespace UGameCore.Utilities
 
             m_position += charsWritten;
         }
+
+        public void WriteByte(byte value, ReadOnlySpan<char> format = default)
+        {
+            if (!value.TryFormat(Span.Slice(m_position), out int charsWritten, format))
+                throw new ArgumentException($"Failed to format value: {value}");
+
+            m_position += charsWritten;
+        }
+
     }
 }
