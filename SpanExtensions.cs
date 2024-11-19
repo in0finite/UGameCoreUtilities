@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UGameCore.Utilities
@@ -6,8 +7,8 @@ namespace UGameCore.Utilities
     public static class SpanExtensions
     {
         public static Span<TTo> CastWithSameLength<TFrom, TTo>(this Span<TFrom> span)
-            where TFrom : struct
-            where TTo : struct
+            where TFrom : unmanaged
+            where TTo : unmanaged
         {
             Span<TTo> result = MemoryMarshal.Cast<TFrom, TTo>(span);
             if (span.Length != result.Length)
@@ -16,8 +17,8 @@ namespace UGameCore.Utilities
         }
 
         public static ReadOnlySpan<TTo> CastWithSameLength<TFrom, TTo>(this ReadOnlySpan<TFrom> span)
-            where TFrom : struct
-            where TTo : struct
+            where TFrom : unmanaged
+            where TTo : unmanaged
         {
             ReadOnlySpan<TTo> result = MemoryMarshal.Cast<TFrom, TTo>(span);
             if (span.Length != result.Length)
@@ -25,33 +26,32 @@ namespace UGameCore.Utilities
             return result;
         }
 
+        static void CheckCastEntirelyLengths<TFrom, TTo>(int sourceLength, int castedLength)
+            where TFrom : unmanaged
+            where TTo : unmanaged
+        {
+            int sizeOfFrom = Unsafe.SizeOf<TFrom>();
+            int sizeOfTo = Unsafe.SizeOf<TTo>();
+
+            if (sourceLength * sizeOfFrom != castedLength * sizeOfTo)
+                throw new InvalidOperationException($"Failed to cast Span<{typeof(TFrom).Name}> to Span<{typeof(TTo).Name}> entirely: {sourceLength} * {sizeOfFrom} != {castedLength} * {sizeOfTo}");
+        }
+
         public static ReadOnlySpan<TTo> CastEntirely<TFrom, TTo>(this ReadOnlySpan<TFrom> span)
-            where TFrom : struct
-            where TTo : struct
+            where TFrom : unmanaged
+            where TTo : unmanaged
         {
             ReadOnlySpan<TTo> result = MemoryMarshal.Cast<TFrom, TTo>(span);
-
-            int sizeOfFrom = Marshal.SizeOf<TFrom>();
-            int sizeOfTo = Marshal.SizeOf<TTo>();
-
-            if (span.Length * sizeOfFrom != result.Length * sizeOfTo)
-                throw new InvalidOperationException($"Failed to cast Span<{typeof(TFrom).Name}> to Span<{typeof(TTo).Name}> entirely");
-
+            CheckCastEntirelyLengths<TFrom, TTo>(span.Length, result.Length);
             return result;
         }
 
         public static Span<TTo> CastEntirely<TFrom, TTo>(this Span<TFrom> span)
-            where TFrom : struct
-            where TTo : struct
+            where TFrom : unmanaged
+            where TTo : unmanaged
         {
             Span<TTo> result = MemoryMarshal.Cast<TFrom, TTo>(span);
-
-            int sizeOfFrom = Marshal.SizeOf<TFrom>();
-            int sizeOfTo = Marshal.SizeOf<TTo>();
-
-            if (span.Length * sizeOfFrom != result.Length * sizeOfTo)
-                throw new InvalidOperationException($"Failed to cast Span<{typeof(TFrom).Name}> to Span<{typeof(TTo).Name}> entirely");
-
+            CheckCastEntirelyLengths<TFrom, TTo>(span.Length, result.Length);
             return result;
         }
 

@@ -145,7 +145,7 @@ namespace UGameCore.Utilities
                 return;
 
             sb.WriteString("<noparse>");
-            sb.WriteStringReplaced(str, "</noparse>", "</ noparse>", StringComparison.OrdinalIgnoreCase);
+            sb.WriteStringReplaced(str, "</noparse>", "</ noparse>", ignoreCase: true);
             sb.WriteString("</noparse>");
         }
 

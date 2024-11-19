@@ -65,14 +65,22 @@ namespace UGameCore.Utilities
         }
 
         public void WriteStringReplaced(
-            ReadOnlySpan<char> str, ReadOnlySpan<char> stringToReplace, ReadOnlySpan<char> newString, StringComparison stringComparison)
+            ReadOnlySpan<char> str, ReadOnlySpan<char> stringToReplace, ReadOnlySpan<char> newString, bool ignoreCase)
         {
             int positionBefore = Length;
             WriteString(str);
-            Replace(stringToReplace, newString, positionBefore, Length - positionBefore, stringComparison);
+            Replace(stringToReplace, newString, positionBefore, Length - positionBefore, ignoreCase);
         }
 
         public void Replace(
+            ReadOnlySpan<char> stringToReplace, ReadOnlySpan<char> newString, bool ignoreCase)
+            => Replace(stringToReplace, newString, 0, Length, ignoreCase);
+
+        public void Replace(
+            ReadOnlySpan<char> stringToReplace, ReadOnlySpan<char> newString, int replaceIndex, int replaceCount, bool ignoreCase)
+            => Replace(stringToReplace, newString, replaceIndex, replaceCount, ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+
+        void Replace(
             ReadOnlySpan<char> stringToReplace, ReadOnlySpan<char> newString, int replaceIndex, int replaceCount, StringComparison stringComparison)
         {
             CheckArguments(replaceIndex, replaceCount);
@@ -144,7 +152,7 @@ namespace UGameCore.Utilities
         readonly void CheckArguments(int index, int count)
         {
             if (index < 0 || count < 0)
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(index), "Negative");
 
             if (index + count > Length)
                 throw new ArgumentOutOfRangeException(nameof(index), $"{index} + {count} > {Length}");
