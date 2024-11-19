@@ -52,20 +52,6 @@ namespace UGameCore.Utilities
             return str;
         }
 
-        public static Span<T> CopyFromOther<T>(this Span<T> destinationSpan, ReadOnlySpan<T> other)
-        {
-            if (destinationSpan.Length < other.Length)
-                throw new ArgumentOutOfRangeException($"Destination span is shorter ({destinationSpan.Length}) than source span ({other.Length})");
-            other.CopyTo(destinationSpan);
-            return destinationSpan.Slice(other.Length);
-        }
-
-        public static void CopyFromOther<T>(this Span<T> destinationSpan, ReadOnlySpan<T> other, out int otherLength)
-        {
-            destinationSpan.CopyFromOther(other);
-            otherLength = other.Length;
-        }
-
         /// <summary>
         /// Formats the elapsed time (in seconds) in format [d].[hh]:mm:ss.[fff].
         /// For example, 40 seconds will return 00:40, 70 will return 01:10, 3700 will return 01:01:40.
@@ -75,6 +61,24 @@ namespace UGameCore.Utilities
             Span<char> chars = stackalloc char[32];
             FormatElapsedTime(chars, out int charsWritten, elapsedTimeSeconds, useMilliseconds);
             return new string(chars[..charsWritten]);
+        }
+
+        public static void FormatElapsedTime(ref SpanCharStream sb, double elapsedTimeSeconds, bool useMilliseconds = false)
+        {
+            Span<char> chars = stackalloc char[32];
+            FormatElapsedTime(chars, out int charsWritten, elapsedTimeSeconds, useMilliseconds);
+
+            // need to use this trick to avoid following compiler error:
+            // disallowed because it may expose variables referenced by parameter 'str' outside of their declaration scope
+
+            if (charsWritten > 32) // just to be safe, because we are creating new Span from `ref`
+                throw new ShouldNotHappenException();
+
+            ReadOnlySpan<char> differentSpan = System.Runtime.InteropServices.MemoryMarshal.CreateReadOnlySpan(
+                ref System.Runtime.InteropServices.MemoryMarshal.GetReference(chars),
+                charsWritten);
+
+            sb.WriteString(differentSpan);
         }
 
         /// <summary>
