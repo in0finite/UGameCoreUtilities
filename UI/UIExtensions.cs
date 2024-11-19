@@ -128,44 +128,60 @@ namespace UGameCore.Utilities
             // We only need to make sure that <noparse> can not be closed by attacker, everything else doesn't matter
             // because TextMeshPro ignores all other tags when inside <noparse> tag.
 
-            return str.Replace("</noparse>", "</ noparse>", System.StringComparison.OrdinalIgnoreCase);
+            return str.Replace("</noparse>", "</ noparse>", StringComparison.OrdinalIgnoreCase);
         }
 
         public static string EscapeStringForTMP(string str)
         {
-            if (string.IsNullOrWhiteSpace(str))
+            if (string.IsNullOrEmpty(str))
                 return str;
 
             return "<noparse>" + RemoveNoParseForTMP(str) + "</noparse>";
         }
 
+        public static void EscapeStringForTMP(ref SpanCharStream sb, ReadOnlySpan<char> str)
+        {
+            if (str.Length == 0)
+                return;
+
+            sb.WriteString("<noparse>");
+            sb.WriteStringReplaced(str, "</noparse>", "</ noparse>", StringComparison.OrdinalIgnoreCase);
+            sb.WriteString("</noparse>");
+        }
+
         public static string SurroundTextWithColor(string text, Color color)
         {
+            if (string.IsNullOrEmpty(text))
+                return text;
+
             Span<char> chars = stackalloc char[text.Length + 32];
-            SpanCharStream spanCharStream = new(chars);
-            SurroundTextWithColor(text, ColorUtility.ToHtmlStringRGBA(color), ref spanCharStream);
-            return new string(spanCharStream.AsSpan);
+            SpanCharStream sb = new(chars);
+            AppendColorTagOpening(ref sb, color);
+            sb.WriteString(text);
+            AppendColorTagEnding(ref sb);
+            return new string(sb.AsSpan);
         }
 
         public static void SurroundTextWithColor(
-            ReadOnlySpan<char> text, ReadOnlySpan<char> htmlColorString, System.Text.StringBuilder sb)
-        {
-            Span<char> chars = stackalloc char[text.Length + 32];
-            SpanCharStream spanCharStream = new(chars);
-            SurroundTextWithColor(text, htmlColorString, ref spanCharStream);
-            sb.Append(spanCharStream.AsSpan);
-        }
-
-        public static void SurroundTextWithColor(
+            ref SpanCharStream sb,
             ReadOnlySpan<char> text,
-            ReadOnlySpan<char> htmlColorString,
-            ref SpanCharStream dest)
+            Color color)
         {
-            dest.WriteString("<color=#");
-            dest.WriteString(htmlColorString);
-            dest.WriteString(">");
-            dest.WriteString(text);
-            dest.WriteString("</color>");
+            AppendColorTagOpening(ref sb, color);
+            sb.WriteString(text);
+            AppendColorTagEnding(ref sb);
+        }
+
+        public static void AppendColorTagOpening(ref SpanCharStream sb, Color color)
+        {
+            sb.WriteString("<color=#");
+            ColorExtensions.ToHtmlStringRGBA(ref sb, color);
+            sb.WriteString(">");
+        }
+
+        public static void AppendColorTagEnding(ref SpanCharStream sb)
+        {
+            sb.WriteString("</color>");
         }
     }
 }
