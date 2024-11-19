@@ -72,5 +72,8 @@ namespace UGameCore.Utilities
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int ReadInt32() => ReadUnmanaged<int>();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ulong ReadUInt64() => ReadUnmanaged<ulong>();
     }
 }
