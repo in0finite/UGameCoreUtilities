@@ -132,5 +132,10 @@ namespace UGameCore.Utilities
             m_gameObject = null;
             m_transform = null;
         }
+
+        public static implicit operator GameObject(CachedGameObject cachedGameObject)
+        {
+            return cachedGameObject.GameObject;
+        }
     }
 }

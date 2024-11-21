@@ -98,7 +98,10 @@ namespace UGameCore.Utilities
 			return go;
         }
 
-        public static string GetGameObjectPath(this GameObject obj)
+		[System.Obsolete]
+		public static string GetGameObjectPath(this GameObject go) => go.GetHierarchyPath();
+
+        public static string GetHierarchyPath(this GameObject obj)
 		{
 			string path = obj.name;
 			while (obj.transform.parent != null)

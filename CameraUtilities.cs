@@ -14,7 +14,7 @@ namespace UGameCore.Utilities
         public static void MoveObjectInFrontOf(this Camera camera, GameObject go)
         {
             Bounds bounds = go.GetRenderersAndCollidersBounds();
-            go.transform.position = camera.transform.position + camera.transform.forward * bounds.size.magnitude.Max(0.5f);
+            go.transform.position = camera.transform.position + camera.transform.forward * bounds.size.magnitude.Max(2.5f);
         }
 
         public static void MoveInFrontOfObjects(this Camera camera, IEnumerable<GameObject> gos)
@@ -23,7 +23,7 @@ namespace UGameCore.Utilities
             if (!bounds.HasValue)
                 return;
 
-            camera.transform.position = bounds.Value.center - camera.transform.forward * bounds.Value.size.magnitude.Max(0.5f);
+            camera.transform.position = bounds.Value.center - camera.transform.forward * bounds.Value.size.magnitude.Max(2.5f);
         }
 
         public static void MoveInFrontOfObject(this Camera camera, GameObject go)

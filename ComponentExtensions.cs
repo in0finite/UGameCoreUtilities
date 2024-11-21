@@ -39,9 +39,16 @@ namespace UGameCore.Utilities
             return component.gameObject.GetComponentInParentOrThrow<T>();
         }
 
-        public static Transform GetTransformOrNull(this Component component)
+        public static Transform GetTransformIfAlive(this Component component)
         {
             return (component != null) ? component.transform : null;
         }
+
+        public static GameObject GetGameObjectIfAlive(this Component component)
+        {
+            return (component != null) ? component.gameObject : null;
+        }
+
+        public static string GetHierarchyPath(this Component component) => component.gameObject.GetHierarchyPath();
     }
 }
