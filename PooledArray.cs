@@ -1,5 +1,6 @@
 using System;
 using System.Buffers;
+using System.Runtime.CompilerServices;
 
 namespace UGameCore.Utilities
 {
@@ -11,6 +12,8 @@ namespace UGameCore.Utilities
         T[] m_array;
         int m_minArraySize;
         ArrayPool<T> m_arrayPool;
+
+        static readonly bool IsUnmanagedType = !RuntimeHelpers.IsReferenceOrContainsReferences<T>();
 
         /// <summary>
         /// Minimum array length that was requested.
@@ -66,7 +69,14 @@ namespace UGameCore.Utilities
         readonly void ReturnArray(T[] arr)
         {
             if (arr != null && arr.Length > 0 && m_arrayPool != null)
+            {
+                // Clear references from array, so that GC can immediatelly collect them.
+                // Otherwise they will remain in ArrayPool until he disposes the array.
+                if (!IsUnmanagedType)
+                    System.Array.Clear(arr, 0, arr.Length);
+
                 m_arrayPool.Return(arr);
+            }
         }
 
         /// <summary>
