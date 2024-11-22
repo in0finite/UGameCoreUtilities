@@ -149,15 +149,18 @@ namespace UGameCore.Utilities
             sb.WriteString("</noparse>");
         }
 
-        public static string SurroundTextWithColor(string text, Color color)
+        public static string SurroundTextWithColor(string text, Color color, bool bEscaped = false)
         {
             if (string.IsNullOrEmpty(text))
                 return text;
 
-            Span<char> chars = stackalloc char[text.Length + 32];
+            Span<char> chars = stackalloc char[text.Length + 64];
             SpanCharBuilder sb = new(chars);
             AppendColorTagOpening(ref sb, color);
-            sb.WriteString(text);
+            if (bEscaped)
+                EscapeStringForTMP(ref sb, text);
+            else
+                sb.WriteString(text);
             AppendColorTagEnding(ref sb);
             return new string(sb.AsSpan);
         }
