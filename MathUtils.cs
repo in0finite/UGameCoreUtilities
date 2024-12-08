@@ -5,18 +5,31 @@ namespace UGameCore.Utilities
 {
     public static class MathUtils
     {
-        public static float DistanceFromPointToLineSegment(Vector3 p, Vector3 v, Vector3 w)
+        public static float SqrDistanceFromPointToLineSegment(Vector3 point, Vector3 lineStart, Vector3 lineEnd)
         {
-            // Return minimum distance between line segment vw and point p
-            float l2 = Vector3.SqrMagnitude(v - w);  // i.e. |w-v|^2 -  avoid a sqrt
-            if (l2 == 0.0f) return Vector3.Distance(p, v);   // v == w case
-                                                    // Consider the line extending the segment, parameterized as v + t (w - v).
-                                                    // We find projection of point p onto the line. 
-                                                    // It falls where t = [(p-v) . (w-v)] / |w-v|^2
-                                                    // We clamp t from [0,1] to handle points outside the segment vw.
-            float t = Mathf.Max(0, Mathf.Min(1, Vector3.Dot(p - v, w - v) / l2));
-            Vector3 projection = v + t * (w - v);  // Projection falls on the segment
-            return Vector3.Distance(p, projection);
+            // Return minimum sqr distance between line segment vw and point p
+
+            Vector3 lineDir = lineEnd - lineStart;
+            Vector3 lineStartToPoint = point - lineStart;
+
+            float l2 = Vector3.SqrMagnitude(lineDir);  // i.e. |w-v|^2 -  avoid a sqrt
+            if (l2 == 0.0f)
+                return Vector3.SqrMagnitude(lineStartToPoint);   // v == w case
+            
+            // Consider the line extending the segment, parameterized as v + t (w - v).
+            // We find projection of point p onto the line. 
+            // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+            
+            float t = Vector3.Dot(lineStartToPoint, lineDir) / l2;
+
+            if (t < 0f)
+                return Vector3.SqrMagnitude(lineStartToPoint);
+
+            if (t > 1f)
+                return Vector3.SqrMagnitude(point - lineEnd);
+
+            Vector3 projection = lineStart + t * lineDir;  // Projection falls on the segment
+            return Vector3.SqrMagnitude(point - projection);
         }
 
         public static Vector2 MinComponents(Vector2 a, Vector2 b)
