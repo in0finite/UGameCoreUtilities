@@ -84,6 +84,16 @@ namespace UGameCore.Utilities
             return Array.IndexOf(array, value) >= 0;
         }
 
+        public static bool Contains<T>(this List<T> list, T value, IEqualityComparer<T> comparer)
+        {
+            return Contains(list.ListAsSpan(), value, comparer);
+        }
+
+        public static bool Contains<T>(this ReadOnlySpan<T> span, T value, IEqualityComparer<T> comparer)
+        {
+            return FindIndex(span, value, comparer) >= 0;
+        }
+
         public static bool TryFind<T>(this IEnumerable<T> enumerable, System.Predicate<T> predicate, out T result)
         {
             foreach (T elem in enumerable)
@@ -97,6 +107,21 @@ namespace UGameCore.Utilities
 
             result = default;
             return false;
+        }
+
+        public static int FindIndex<T, TArg>(this ReadOnlySpan<T> span, Func<T, TArg, bool> predicate, TArg argument)
+        {
+            for (int i = 0; i < span.Length; i++)
+            {
+                if (predicate(span[i], argument))
+                    return i;
+            }
+            return -1;
+        }
+
+        public static int FindIndex<T>(this ReadOnlySpan<T> span, T value, IEqualityComparer<T> comparer)
+        {
+            return FindIndex(span, static (a, b) => b.comparer.Equals(b.value, a), (comparer, value));
         }
 
         public static int FindIndex<T>(this IEnumerable<T> enumerable, System.Predicate<T> predicate)
@@ -117,6 +142,7 @@ namespace UGameCore.Utilities
             return index != -1;
         }
 
+        [Obsolete("Method allocates memory")]
         public static int IndexOf<T>(this IEnumerable<T> enumerable, T value)
         {
             var comparer = EqualityComparer<T>.Default;
