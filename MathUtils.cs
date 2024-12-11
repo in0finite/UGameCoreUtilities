@@ -147,6 +147,12 @@ namespace UGameCore.Utilities
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 Mul(this Vector2 v, Vector2 other)
+        {
+            return new Vector2(v.x * other.x, v.y * other.y);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector2 Divide(this Vector2 v, Vector2 other)
         {
             return new Vector2(v.x / other.x, v.y / other.y);
@@ -205,6 +211,12 @@ namespace UGameCore.Utilities
         public static Vector3 Inverted(this Vector3 vec3)
         {
             return new Vector3(1.0f / vec3.x, 1.0f / vec3.y, 1.0f / vec3.z);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Vector2 Inverted(this Vector2 v)
+        {
+            return new Vector2(1.0f / v.x, 1.0f / v.y);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
