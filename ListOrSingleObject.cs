@@ -14,6 +14,19 @@ namespace UGameCore.Utilities
         bool HasSingleObject;
 
 
+        public ListOrSingleObject(IEnumerable<T> objects)
+            : this()
+        {
+            AddRange(objects);
+        }
+
+        public static ListOrSingleObject<T> FromSingle(T obj)
+        {
+            ListOrSingleObject<T> list = default;
+            list.Add(obj);
+            return list;
+        }
+
         public readonly int Count
         {
             get

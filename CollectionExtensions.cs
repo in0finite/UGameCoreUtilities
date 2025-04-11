@@ -498,6 +498,14 @@ namespace UGameCore.Utilities
             return array;
         }
 
+        public static T2[] ConvertToArray<T, T2>(this List<T> list, System.Func<T, T2> converter)
+        {
+            T2[] array = new T2[list.Count];
+            for (int i = 0; i < array.Length; i++)
+                array[i] = converter(list[i]);
+            return array;
+        }
+
         // copied from UnityEngine.NoAllocHelpers
         class ListPrivateFieldAccess<T>
         {
